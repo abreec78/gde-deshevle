@@ -1,0 +1,15 @@
+[
+  {
+    "id": "yandex-market",
+    "adapter": "yml",
+    "authorized": false,
+    "merchant": "Яндекс Маркет",
+    "url": "https://feed.example.org/replace-with-approved-category-feed.xml",
+    "feedHosts": ["feed.example.org"],
+    "productHosts": ["market.yandex.ru"],
+    "imageHosts": ["avatars.mds.yandex.net"],
+    "region": "Москва",
+    "deliveryVerified": false,
+    "categoryMap": {"REPLACE_WITH_SSD_CATEGORY_ID_FROM_FEED": "Компьютеры и комплектующие"}
+  }
+]
