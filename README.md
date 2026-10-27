@@ -45,3 +45,8 @@ node --test tests/app.test.cjs
 вёрстки, офлайн-режима или установки PWA.
 
 Матрица выполненной браузерной проверки и ограничения: [docs/PR2_VERIFICATION.md](docs/PR2_VERIFICATION.md).
+
+GitHub Actions запускает весь набор командой `node --test` на Node.js 24
+при открытии, обновлении коммитов и повторном открытии любого Pull Request.
+Workflow: `.github/workflows/tests.yml`. Установка npm-пакетов не требуется.
+Workflow только проверяет код: не публикует приложение и не объединяет PR.
