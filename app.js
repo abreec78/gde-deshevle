@@ -1,4 +1,5 @@
 'use strict';
+let catalogPage=0,lastPageKey='';
 const C=window.Catalog,$=id=>document.getElementById(id);
 const icon=name=>'<svg aria-hidden="true"><use href="#i-'+name+'"/></svg>';
 const money=n=>n===null?'Неизвестно':n.toLocaleString('ru-RU')+' ₽';
@@ -20,9 +21,9 @@ function renderCategories(){
 }
 function renderCard(p,detailMode){
   const offers=C.sortedOffers(p.id),image='<img class="product-image" src="'+escape(imagePath(p))+'" width="300" height="180" alt="'+escape(name(p))+(C.mode==='demo'?' — иллюстрация':'')+'" loading="lazy" decoding="async">';
-  const info='<div class="card-info"><h3><button data-open="'+p.id+'">'+escape(name(p))+'</button></h3>'+(detailMode?'<p class="card-subtitle">'+escape(p.specs.join(', '))+'</p>'+specs(p):'<div class="price">'+money(C.bestPrice(p))+'</div><p class="card-note">с известной доставкой'+(C.mode==='demo'?' · демо':' · '+escape(offers[0]?.region||''))+'</p>'+shopMark(offers[0],0))+'</div>';
+  const info='<div class="card-info"><h3><button data-open="'+p.id+'">'+escape(name(p))+'</button></h3>'+(detailMode?'<p class="card-subtitle">'+escape(p.specs.join(', '))+'</p>'+specs(p):'<div class="price">'+money(C.bestPrice(p)??(C.mode==='live'&&offers.length?Math.min(...offers.map(o=>o.price)):null))+'</div><p class="card-note">с известной доставкой'+(C.mode==='demo'?' · демо':' · '+escape(offers[0]?.region||''))+'</p>'+shopMark(offers[0],0))+'</div>';
   const open='<button class="compare-link" data-open="'+p.id+'">Сравнить цены ('+offers.length+') '+icon('arrow')+'</button>';
-  return '<article class="product-card" data-product="'+p.id+'">'+favoriteButton(p)+'<button class="product-image-button" data-open="'+p.id+'" aria-label="Сравнить '+escape(name(p))+'">'+image+'</button>'+info+(detailMode?'<div class="card-offers"><div class="price">'+money(C.bestPrice(p))+'</div><p class="card-note">итого с доставкой'+(C.mode==='demo'?' · демо':' · '+escape(offers[0]?.region||''))+'</p>'+offers.map((o,i)=>'<div class="mini-offer">'+shopMark(o,i)+'<b>'+money(C.total(o))+'</b></div>').join('')+open+'</div>':open)+'</article>';
+  return '<article class="product-card" data-product="'+p.id+'">'+favoriteButton(p)+'<button class="product-image-button" data-open="'+p.id+'" aria-label="Сравнить '+escape(name(p))+'">'+image+'</button>'+info+(detailMode?'<div class="card-offers"><div class="price">'+money(C.bestPrice(p)??(C.mode==='live'&&offers.length?Math.min(...offers.map(o=>o.price)):null))+'</div><p class="card-note">итого с доставкой'+(C.mode==='demo'?' · демо':' · '+escape(offers[0]?.region||''))+'</p>'+offers.map((o,i)=>'<div class="mini-offer">'+shopMark(o,i)+'<b>'+money(C.total(o))+'</b></div>').join('')+open+'</div>':open)+'</article>';
 }
 function chart(p){
   if(C.mode==='live'){
@@ -77,7 +78,8 @@ function render(){
   $('results-heading').textContent=state.onlyFav?'Избранное':ssdMode?'SSD '+(state.capacity||'накопители'):state.category|| (state.query?'Результаты поиска':(C.mode==='demo'?'Популярные товары':'Товары магазинов'));
   $('catalog-subtitle').textContent=C.mode==='live'?'Данные фидов · итог только с известной доставкой':active?'Иллюстративный каталог · сравнение с доставкой':'Сравнивайте итоговую стоимость, а не только ценник';
   $('count').textContent=C.countLabel(results.length);
-  $('grid').innerHTML=results.length?results.map(p=>renderCard(p,detailMode)).join(''):'<div class="empty-state"><h3>Ничего не найдено</h3><p>Попробуйте другой запрос или сбросьте фильтры.</p><button class="primary" id="empty-reset">Показать все товары</button></div>';
+  const pageKey=JSON.stringify([state.query,state.category,state.sort,state.onlyFav,state.ssdOnly,state.capacity,state.brands,state.interfaces,state.minPrice,state.maxPrice,C.mode]);if(pageKey!==lastPageKey){catalogPage=0;lastPageKey=pageKey;}catalogPage=Math.min(catalogPage,Math.max(0,Math.ceil(results.length/48)-1));
+  $('grid').innerHTML=results.length?results.slice(catalogPage*48,(catalogPage+1)*48).map(p=>renderCard(p,detailMode)).join('')+(results.length>48?'<nav style="grid-column:1/-1"><button class="primary" data-page="-1" '+(!catalogPage?'disabled':'')+'>‹</button> '+(catalogPage+1)+' / '+Math.ceil(results.length/48)+' <button class="primary" data-page="1" '+((catalogPage+1)*48>=results.length?'disabled':'')+'>›</button></nav>':''):'<div class="empty-state"><h3>Ничего не найдено</h3><p>Попробуйте другой запрос или сбросьте фильтры.</p><button class="primary" id="empty-reset">Показать все товары</button></div>';
   const selected=results.find(p=>p.id===state.selectedId)||results[0];
   $('detail').hidden=!detailMode||!selected;
   if(!results.length&&C.mode==='live'&&!C.sources.length)$('grid').innerHTML='<div class="empty-state"><h3>Реальный источник пока не подключён</h3><p>Подтверждённых цен нет. Демоверсию можно открыть отдельной кнопкой выше.</p></div>';
@@ -99,6 +101,7 @@ function readRoute(){const p=new URLSearchParams(location.hash.slice(1));state.d
 document.addEventListener('click',event=>{
   if(event.target.closest('a[href="#"]')){event.preventDefault();reset();return;}
   const button=event.target.closest('button');if(!button)return;
+  if(button.dataset.page){catalogPage+=Number(button.dataset.page);render();return;}
   if(button.dataset.category!==undefined){selectCategory(button.dataset.category);return;}
   if(button.dataset.favorite){const id=parseId(button.dataset.favorite);C.toggleFavorite(state.favorites,id);if(!C.saveFavorites(storage,state.favorites)){$('storage-status').textContent='Хранилище недоступно. Избранное сохранено только до закрытия страницы.';$('storage-status').hidden=false;clearTimeout(storageTimer);storageTimer=setTimeout(()=>$('storage-status').hidden=true,6500);}render();return;}
   if(button.dataset.open){state.selectedId=parseId(button.dataset.open);const p=C.products.find(p=>p.id===state.selectedId);if(!p)return;if(!document.body.classList.contains('detail-mode')){state.query=C.isSSD(p)?'SSD 1 ТБ':p.name;state.category='';state.ssdOnly=C.isSSD(p);state.capacity=p.capacity||null;$('q').value=state.query;}state.detailOpen=true;render();document.body.classList.add('show-detail');syncRoute();if(matchMedia('(max-width:980px)').matches)$('catalog').scrollIntoView({block:'start'});return;}

@@ -1,0 +1,8 @@
+{
+  "id": "kupiora-logo-v1",
+  "enabled": false,
+  "variants": [{"id":"A","weight":1},{"id":"B","weight":1},{"id":"C","weight":1}],
+  "assignment": "stable-random-local-id",
+  "activationRequiresOwnerApproval": true,
+  "analyticsEndpoint": null
+}

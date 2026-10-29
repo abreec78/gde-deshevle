@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "Где дешевле? — сравнение цен",
-  "short_name": "Где дешевле?",
-  "description": "Демонстрация сравнения цен с учётом доставки и избранным",
+  "name": "Купиора — умные покупки",
+  "short_name": "Купиора",
+  "description": "Kupiora. Умные покупки. Реальная выгода. Сравнение предложений и умная корзина.",
   "lang": "ru",
   "start_url": "./",
   "scope": "./",
@@ -10,11 +10,39 @@
   "background_color": "#f8fbff",
   "theme_color": "#0875ff",
   "icons": [
-    {"src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-    {"src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+    {
+      "src": "assets/brand/selected/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/brand/selected/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ],
   "shortcuts": [
-    {"name": "Избранное", "url": "./#favorites=1", "icons": [{"src":"assets/icon-192.png","sizes":"192x192"}]},
-    {"name": "SSD 1 ТБ", "url": "./#ssd=1&capacity=1+%D0%A2%D0%91", "icons": [{"src":"assets/icon-192.png","sizes":"192x192"}]}
+    {
+      "name": "Избранное",
+      "url": "./#favorites=1",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "SSD 1 ТБ",
+      "url": "./#ssd=1&capacity=1+%D0%A2%D0%91",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ]
 }

@@ -24,19 +24,19 @@
   function offersFor(id){if(mode==='live')return (liveOffers.get(id)||[]).filter(o=>fresh(o));const p=products.find(p=>p.id===id);return p?[{shop:p.shop,price:p.price,delivery:390},{shop:'Тестовый магазин Г',price:p.price+250,delivery:0},{shop:'Тестовый магазин Д',price:p.price+700,delivery:null}]:[];}
   function useDemo(){mode='demo';products.splice(0,products.length,...demoProducts);liveOffers=new Map();sourceInfo=[];}
   function useLive(snapshot){
-    const accepted=[],offers=new Map();
-    if(snapshot?.schemaVersion!==1||snapshot.mode!=='live'||!Array.isArray(snapshot.products)||!Array.isArray(snapshot.sources)||snapshot.products.length>5000)throw Error('Invalid catalogue');
+    const accepted=[],offers=new Map(),seenIds=new Set();
+    if(snapshot?.schemaVersion!==1||snapshot.mode!=='live'||!Array.isArray(snapshot.products)||!Array.isArray(snapshot.sources)||snapshot.products.length>120000)throw Error('Invalid catalogue');
     const sources=new Set(snapshot.sources.map(s=>s.id));
     const regions=new Set();
     for(const p of snapshot.products){
-      if(!/^live:[a-f0-9]{24}$/.test(p.id)||accepted.some(x=>x.id===p.id)||typeof p.name!=='string'||!p.name||p.name.length>500||!categories.includes(p.category)||!safeUrl(p.imageUrl)||!Array.isArray(p.specs)||p.specs.some(x=>typeof x!=='string')||!Array.isArray(p.offers))throw Error('Invalid product');
+      if(!/^live:[a-f0-9]{24}$/.test(p.id)||seenIds.has(p.id)||typeof p.name!=='string'||!p.name||p.name.length>500||!categories.includes(p.category)||!safeUrl(p.imageUrl)||!Array.isArray(p.specs)||p.specs.some(x=>typeof x!=='string')||!Array.isArray(p.offers))throw Error('Invalid product');
       const valid=p.offers.filter(o=>sources.has(o.source)&&typeof o.shop==='string'&&o.shop&&o.currency==='RUB'&&Number.isFinite(o.price)&&o.price>=0&&(o.delivery===null||Number.isFinite(o.delivery)&&o.delivery>=0)&&safeUrl(o.url)&&fresh(o));
       if(!valid.length)continue;
       for(const o of valid){if(typeof o.region!=='string'||!o.region)throw Error('Missing region');regions.add(o.region);}
       if(regions.size>1)throw Error('Mixed regions');
-      accepted.push({...p});offers.set(p.id,valid.map(o=>({...o})));
+      seenIds.add(p.id);accepted.push({...p});offers.set(p.id,valid.map(o=>({...o})));
     }
-    mode='live';products.splice(0,products.length,...accepted);liveOffers=offers;sourceInfo=snapshot.sources.map(s=>({...s}));
+    mode='live';products.length=0;for(const p of accepted)products.push(p);liveOffers=offers;sourceInfo=snapshot.sources.map(s=>({...s}));
   }
   function total(o){return o.delivery===null||!Number.isFinite(o.delivery)||!Number.isFinite(o.price)?null:o.price+o.delivery;}
   function sortedOffers(id){return offersFor(id).slice().sort((a,b)=>(total(a)??Infinity)-(total(b)??Infinity));}
@@ -46,7 +46,7 @@
   function filterProducts(state={}){
     const q=(state.query||'').trim().toLocaleLowerCase('ru-RU');
     let list=products.filter(p=>{
-      const searchable=[p.name,p.displayName,p.brand,p.capacity,p.interface,isSSD(p)?'SSD накопители накопитель':'',...(p.specs||[])].filter(Boolean).join(' ').toLocaleLowerCase('ru-RU');
+      const searchable=q?[p.name,p.displayName,p.brand,p.capacity,p.interface,isSSD(p)?'SSD накопители накопитель':'',...(p.specs||[])].filter(Boolean).join(' ').toLocaleLowerCase('ru-RU'):'';
       const category=aliases[state.category]||state.category;
       return (mode!=='live'||offersFor(p.id).length>0)&&(!q||q.split(/\s+/).every(term=>searchable.includes(term)))&&(!category||p.category===category)&&(!state.onlyFav||state.favorites?.has(p.id))&&(!state.ssdOnly||isSSD(p))&&(!state.capacity||p.capacity===state.capacity)&&(!state.brands?.length||state.brands.includes(p.brand))&&(!state.interfaces?.length||state.interfaces.includes(p.interface))&&(state.minPrice==null||bestPrice(p)!==null&&bestPrice(p)>=state.minPrice)&&(state.maxPrice==null||bestPrice(p)!==null&&bestPrice(p)<=state.maxPrice);
     });

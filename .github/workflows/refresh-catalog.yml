@@ -1,32 +1,25 @@
-name: Publish verification page only
+name: Publish Kupiora approved update
 on:
   workflow_dispatch:
 permissions:
-  actions: read
   contents: read
   pages: write
   id-token: write
 jobs:
-  verify-page:
+  publish:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          artifact-ids: 12922931831
-          run-id: 40931221459
-          github-token: ${{ github.token }}
-          path: previous
-          merge-multiple: true
-      - name: Preserve published site and add verification
+      - uses: actions/checkout@v4
+      - name: Prepare site
         run: |
-          mkdir site
-          tar -xf previous/artifact.tar -C site
-          printf '%s' '<!doctype html><html lang="ru"><meta charset="utf-8"><title>Yandex verification</title><body>kghfhs3afifawlfx</body></html>' > site/yandex-verification.html
+          mkdir _site
+          cp index.html app.js core.js catalog-loader.js smart-basket.js kupiora-ui.js styles.css kupiora.css sw.js manifest.webmanifest yandex-verification.html _site/
+          cp -r assets data _site/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: _site
       - uses: actions/deploy-pages@v4
         id: deployment
