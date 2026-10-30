@@ -50,6 +50,58 @@ class PrivateCompareTests(unittest.TestCase):
         self.assertEqual(calls[-1][1]["regionid"],"Москва")
         self.assertTrue(job["submitted"])
 
+    def test_wildberries_link_normalization_and_malicious_urls(self):
+        raw='https://www.wildberries.ru/catalog/247318779/detail.aspx?targetUrl=EX'
+        canonical='https://www.wildberries.ru/catalog/247318779/detail.aspx'
+        self.assertEqual(srv.wildberries_product_link(raw),canonical)
+        self.assertEqual(srv.wildberries_product_link('https://wildberries.ru/catalog/247318779'),canonical)
+        self.assertEqual(srv.source_product_id(raw,'wb'),'247318779')
+        self.assertEqual(srv.identify_product_link(raw)['market'],'wb')
+        self.assertIsNone(srv.identify_product_link('https://wildberries.ru.evil.test/catalog/247318779/detail.aspx'))
+        self.assertIsNone(srv.identify_product_link('http://www.wildberries.ru/catalog/247318779/detail.aspx'))
+        self.assertIsNone(srv.identify_product_link('https://www.wildberries.ru/catalog/0/search.aspx?search=phone'))
+
+    def test_wildberries_exact_source_uses_direct_wb_mode(self):
+        source='https://www.wildberries.ru/catalog/247318779/detail.aspx'
+        calls=[]
+        def fake(endpoint,payload):
+            calls.append(payload)
+            return [{"result":"success"}]
+        job={"markets":{},"offers":[],"errors":[],"submitted":False}
+        with patch.object(srv,"provider_post",side_effect=fake):
+            srv.submit(job,source,"Москва",source)
+        self.assertEqual([x['market'] for x in calls],['wb'])
+        self.assertEqual(calls[0]['products'][0]['linkset'],[source])
+
+    def test_wildberries_preview_uses_exact_article_and_stores_real_photo(self):
+        source='https://www.wildberries.ru/catalog/247318779/detail.aspx'
+        report={"data":[{"link":source,"sku":{"Name_found":"Resanta SAI-160K"},
+            "offers":[{"Name":"Resanta SAI-160K","Price":5890,
+                       "Offer_pics":["https://basket-cdn.wb.ru/item.jpg"]}]}]}
+        job={"markets":{"wb":{"label":"wbone","state":"waiting"}},"offers":[],"errors":[],
+             "submitted":True,"sourceUrl":source,"sourceMarket":"wb","sourceTitle":None,
+             "phase":"source","region":"Москва"}
+        response=[{"result":"success"},{"data":[[
+            {"userlabel":"wbone"},{"status":"completed"},
+            {"report_json":"https://files.parser.market/_filestorage/a/report.json"}]]}]
+        with patch.object(srv,"provider_post",return_value=response),patch.object(srv,"get_report",return_value=report),patch.object(srv.threading,"Thread") as thread:
+            srv.poll(job)
+        self.assertEqual(job['phase'],'preview')
+        self.assertEqual(job['sourceTitle'],'Resanta SAI-160K')
+        self.assertEqual(job['sourceImage'],'https://basket-cdn.wb.ru/item.jpg')
+        self.assertEqual(job['offers'][0]['match'],'source')
+        thread.assert_not_called()
+
+    def test_wildberries_cross_market_search_uses_ozon_and_yandex(self):
+        job={"markets":{"wb":{"label":"original","state":"done"}},"offers":[],"errors":[],"submitted":False}
+        calls=[]
+        def fake(endpoint,payload):
+            calls.append(payload)
+            return [{"result":"success"}]
+        with patch.object(srv,"provider_post",side_effect=fake):
+            srv.submit(job,'Resanta SAI-160K','Москва',None,['ozons','ym'])
+        self.assertEqual([x['market'] for x in calls],['ozons','ym'])
+
     def test_ozon_source_link_is_exact_and_safe(self):
         self.assertEqual(srv.product_id('https://www.ozon.ru/product/samsung-ssd-12345678/?utm_source=shop'), '12345678')
         self.assertIsNone(srv.ozon_product_link('https://ozon.ru.evil.test/product/samsung-12345678/'))
