@@ -103,7 +103,7 @@ test('product preview appears with Ozon link before comparison and no fabricated
  assert.equal(elements['product-preview'].hidden,false);
  assert.ok(html.includes('id="comparison-panel" hidden'));
  assert.equal(elements['preview-title'].textContent,'samsung ssd');
- assert.ok(elements['preview-photo'].children[0].textContent.includes('Фотография загрузится'));
+ assert.ok(elements['preview-photo'].children[0].textContent.includes('Фотография появится'));
  assert.equal(elements['preview-source-link'].href,'https://www.ozon.ru/product/samsung-ssd-12345678/');
 });
 test('photo and title are shown only when the Ozon source confirms them',()=>{
@@ -123,7 +123,7 @@ test('compare button reveals lists but without API never invents other-store pri
  await js(context,'startComparison()');
  assert.equal(elements['comparison-panel'].hidden,false);
  assert.equal(elements['source-panel'].hidden,false);
- assert.ok(elements['message'].textContent.includes('Автоматическое сравнение пока недоступно'));
+ assert.ok(elements['message'].textContent.includes('Источник актуальных цен не подключён'));
  assert.ok(elements['cards'].innerHTML.includes('Подтверждённые предложения пока не найдены'));
 });
 
