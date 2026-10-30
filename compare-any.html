@@ -66,6 +66,7 @@
 .compare-page .preview-actions button:disabled{opacity:.55;cursor:wait}
 .compare-page .preview-actions span{max-width:420px}
 @media(max-width:680px){.compare-page .preview-layout{grid-template-columns:1fr;gap:16px}.compare-page .preview-photo{height:240px}.compare-page .preview-actions button{width:100%}}
+.compare-page [hidden]{display:none!important}.compare-page .compare-section-label{grid-column:1/-1;font-size:17px;color:#985627;padding:9px 0 4px;margin:10px 0 0}.compare-page .offer-unverified{border-style:dashed;border-color:#efcaa6;background:#fffbf6}
 </style></head><body class="compare-page"><div class="app-shell">
 <header class="compare-head"><a class="compare-brand" href="./"><svg width="45" height="45" viewBox="0 0 48 48" fill="none" stroke="#0c1c38" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h7l7 28h23l5-22H12M18 21h23"/><circle cx="21" cy="41" r="3"/><circle cx="37" cy="41" r="3"/></svg><span><strong>Где дешевле?</strong><small>Сравнение цен в магазинах</small></span></a><a class="compare-home" href="./">← На главную</a></header>
 <section class="compare-hero">
@@ -283,6 +284,7 @@ function draw(){
  // Never mingle similar or unverified variants into the exact-product price comparison.
  const exact=fromLink?items.filter(x=>x.match==='source'||x.match==='confirmed'):items;
  const otherCount=fromLink?items.length-exact.length:0;
+ const similar=fromLink?items.filter(x=>x.match!=='source'&&x.match!=='confirmed').sort((a,b)=>a.price-b.price):[];
  const data=[...exact].sort((a,b)=>$('order').value==='store'?a.shop.localeCompare(b.shop,'ru'):(a.price??Infinity)-(b.price??Infinity));
  const verified=fromLink?!!resolvedTitle&&items.some(x=>x.match==='confirmed')&&items.some(x=>x.match==='source'):comparable(items)&&items.length>=2;
  const priced=exact.filter(x=>Number.isFinite(x.price)&&x.price>0);
@@ -299,8 +301,8 @@ function draw(){
  }
 
  if(fromLink){$('counter').textContent=data.length+' подтверждённых предложений'+(otherCount?' · '+otherCount+' похожих исключено':'');}
- if(!data.length){$('best').hidden=true;g.innerHTML='<p class="compare-muted">Подтверждённые предложения пока не найдены. Для автоматического поиска по другим площадкам нужен подключённый API, а похожие товары не выдаются за совпадение.</p>';return}
- for(const x of data){const c=document.createElement('article');c.className='compare-card';
+ if(!data.length&&!similar.length){$('best').hidden=true;g.innerHTML='<p class="compare-muted">Подтверждённые предложения пока не найдены. Для автоматического поиска по другим площадкам нужен подключённый API, а похожие товары не выдаются за совпадение.</p>';return}
+ for(const x of [...data,...similar]){if(similar.length&&x===similar[0]){const hd=document.createElement('h3');hd.className='compare-section-label';hd.textContent='Похожие предложения, совпадение модели НЕ подтверждено';g.append(hd)}const c=document.createElement('article');c.className='compare-card'+(x.match==='unverified'?' offer-unverified':'');
  const validImage=https(x.image),validLink=https(x.url);
  const badge=x.source==='api'?'API':x.source==='import'?'Отчёт':'Вручную';
  const status=x.match==='unverified'?' · Похожая модель, совпадение не подтверждено':x.match==='confirmed'?' · Совпадение модели подтверждено':x.match==='source'?' · Исходный товар Ozon':'';
