@@ -197,7 +197,8 @@ async function pollTicket(id,turn,phase){
   recordPoll(data);
   if(phase==='preview'){
    if(data.phase==='preview'&&data.sourceTitle){
-    $('message').textContent='Товар определён. Теперь нажми «Сравнить цены», чтобы проверить другие площадки.';
+    $('message').textContent=compareRequested?'Товар подтверждён. Запускаем сравнение…':'Товар определён. Нажми «Сравнить цены».';
+    if(compareRequested){compareRequested=false;void startComparison();}
     return;
    }
    if(data.phase==='error'||data.done){
@@ -229,30 +230,35 @@ async function preparePreview(query,turn){
  await pollTicket(previewTicket,turn,'preview');
 }
 async function startComparison(){
- if(!current)return;
+ if(!current){$('message').textContent='Сначала вставь ссылку на товар или его название.';return;}
  showPriceSections();
- const info=understandInput(current);
+ if(compareRunning){$('message').textContent='Поиск цен уже выполняется. Результаты появятся ниже.';return;}
  if(!apiMode){
-  $('message').textContent='Автоматическое сравнение пока недоступно: сервер с ключом источника цен не подключён. Ниже доступны магазины для поиска этого же товара.';
+  $('message').textContent='Источник актуальных цен не подключён. Внизу доступны переходы в 18 магазинов, но это не автоматическое сравнение.';
   return;
  }
- if(info.kind==='ozon'){
-  if(!previewTicket||!previewVerified){
-   $('message').textContent='Не удалось подтвердить исходный товар Ozon. Цены других товаров не будут выданы за совпадение.';
+ if(isProductLink(current)){
+  if(!previewVerified||!previewTicket){
+   if(previewTicket){
+    compareRequested=true;
+    $('message').textContent='Дожидаемся точного названия товара. Сравнение начнётся автоматически после подтверждения.';
+   }else{
+    $('message').textContent='Сначала нужно получить товар из источника. Если карточка не найдена, сравнение не запускается.';
+   }
    return;
   }
-  $('compare-now').disabled=true;
-  $('message').textContent='Ищем цены подтверждённой модели на других площадках…';
+  compareRunning=true;renderPreview();
+  $('message').textContent='Проверяем цены идентичного товара на других доступных площадках…';
   try{
-   const r=await fetch('./api/compare',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:previewTicket})});
-   if(!r.ok)throw Error('Не удалось запустить сравнение');
+   const response=await fetch('./api/compare',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:previewTicket})});
+   if(!response.ok)throw Error('Источник не принял проверку');
    await pollTicket(previewTicket,activeSearch,'compare');
-  }catch{$('message').textContent='Источник сравнения недоступен. Попробуй поиск по магазинам ниже.'}
-  finally{$('compare-now').disabled=false}
+  }catch{$('message').textContent='Сравнение пока недоступно. Ты можешь открыть поиск магазинов ниже.'}
+  finally{compareRunning=false;renderPreview()}
  }else{
-  $('compare-now').disabled=true;
-  try{await automate(current,activeSearch)}catch{$('message').textContent='Не удалось получить результаты. Доступны переходы по магазинам.'}
-  finally{$('compare-now').disabled=false}
+  compareRunning=true;renderPreview();
+  try{await automate(current,activeSearch)}catch{$('message').textContent='Автоматический поиск недоступен. Открой поиск магазинов ниже.'}
+  finally{compareRunning=false;renderPreview()}
  }
 }
 function showInputSource(){
@@ -316,7 +322,7 @@ function comparable(offers){
 function addOffer(o){if(!o||!STORES.some(s=>s[0]===o.shop)||!https(o.url)||!Number.isFinite(o.price)||o.price<=0)return false;const item={...o,id:o.id||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),image:https(o.image)||'',delivery:Number.isFinite(o.delivery)&&o.delivery>=0?o.delivery:null,checkedAt:o.checkedAt||null,region:o.region||null};const existing=items.findIndex(z=>z.shop===item.shop&&z.url===item.url);if(existing>=0)items.splice(existing,1);items.unshift(item);items=items.slice(0,200);save();return true}
 $('shop').innerHTML=STORES.map((s,i)=>'<option value="'+i+'">'+safe(s[0])+'</option>').join('');
 $('order').onchange=draw; $('export').onclick=()=>{const blob=new Blob([JSON.stringify({query:current,items},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kupiora-compare.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
-$('clear').onclick=()=>{if(!confirm('Начать новую подборку и удалить локальные предложения?'))return;activeSearch++;items=[];current='';resolvedTitle='';previewTicket=null;previewVerified=false;previewImage='';previewPrice=null;comparing=false;$('query').value='';$('product-preview').hidden=true;$('comparison-panel').hidden=true;$('source-panel').hidden=true;save();draw();searches();showInputSource();$('message').textContent='Подборка очищена.'};
+$('clear').onclick=()=>{if(!confirm('Начать новую подборку и удалить локальные предложения?'))return;activeSearch++;items=[];current='';resolvedTitle='';previewTicket=null;previewVerified=false;previewImage='';previewPrice=null;comparing=false;compareRequested=false;compareRunning=false;$('query').value='';$('product-preview').hidden=true;$('comparison-panel').hidden=true;$('source-panel').hidden=true;save();draw();searches();showInputSource();$('message').textContent='Подборка очищена.'};
 $('add').onsubmit=e=>{e.preventDefault();const url=https($('url').value),shop=STORES[Number($('shop').value)]?.[0],verified=getStore(url);if(!url){$('message').textContent='Нужна корректная HTTPS-ссылка на товар.';return}if(verified&&verified!==shop){$('message').textContent='Выбранный магазин не соответствует домену ссылки.';return}
 const ok=addOffer({shop,title:$('title').value.trim(),url,price:Number($('price').value),delivery:$('delivery').value===''?null:Number($('delivery').value),mpn:$('mpn').value.trim(),sellerName:$('seller').value.trim(),image:$('image').value,region:$('region').value,source:$('origin').value,checkedAt:new Date().toISOString()});if(ok){$('add').reset();draw();$('message').textContent='Предложение добавлено. Сравнивайте только одинаковые модификации.'}};
 function parsedOffer(offer,fallback,region,stamp){
@@ -350,7 +356,7 @@ $('search').onsubmit=async e=>{
  const parsed=understandInput(q);
  if(parsed.kind==='invalid'){$('message').textContent=parsed.reason;return}
  activeSearch++;
- items=[];current=q;resolvedTitle='';previewTicket=null;previewVerified=false;previewImage='';previewPrice=null;comparing=false;
+ items=[];current=q;resolvedTitle='';previewTicket=null;previewVerified=false;previewImage='';previewPrice=null;comparing=false;compareRequested=false;compareRunning=false;
  $('comparison-panel').hidden=true;$('source-panel').hidden=true;
  save();searches();showInputSource();$('title').value=lookupText()||q;
  renderPreview();draw();
