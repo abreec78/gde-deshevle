@@ -14,3 +14,9 @@ test('real offer cards do not include demo product search shortcuts',()=>{
  assert.match(app,/:'';\s*const info=/);
  assert.match(app,/if\(isLive&&C\.safeUrl\(target\)\)/);
 });
+
+test('demo compare call-to-action opens real comparison rather than mock seller prices',()=>{
+ assert.match(app,/C\.mode==='demo'\?'<a class="compare-link demo-compare-live"/);
+ assert.match(app,/Искать настоящие цены/);
+ assert.match(app,/href="compare-any\.html\?q='/);
+});
