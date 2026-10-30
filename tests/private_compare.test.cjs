@@ -52,3 +52,35 @@ test('unknown URLs and empty prices are never treated as offers',()=>{
  assert.equal(js(context,'getStore("https://www.ozon.ru/product/ssd-1234")'),'Ozon');
  assert.equal(js(context,'getStore("https://ozon.ru.evil.test/product/1")'),null);
 });
+
+
+test('Ozon product link is recognized by immutable product ID',()=>{
+ const {context}=setup();
+ context.link='https://www.ozon.ru/product/samsung-ssd-12345678/?from=share';
+ const info=js(context,'understandInput(link)');
+ assert.equal(info.kind,'ozon');
+ assert.equal(info.id,'12345678');
+ assert.equal(info.url,'https://www.ozon.ru/product/samsung-ssd-12345678/');
+ assert.equal(info.query,'samsung ssd');
+});
+test('shortlinks and fake Ozon domains do not impersonate product pages',()=>{
+ const {context}=setup();
+ for(const link of ['https://ozon.ru.evil.test/product/12345','https://www.ozon.ru/search/?text=ssd','https://www.ozon.ru/t/aBcd','http://www.ozon.ru/product/12345']) {
+   context.link=link;
+   assert.equal(js(context,'understandInput(link).kind'),'invalid');
+ }
+});
+test('the cheapest badge is reserved for confirmed matching offers',()=>{
+ const {context}=setup();
+ assert.equal(js(context,'typeof understandInput'),'function');
+ assert.ok(js(context,'document.getElementById("best")'));
+ assert.ok(html.includes("x.match==='confirmed'"));
+ assert.ok(html.includes("items.some(x=>x.match==='source')"));
+ assert.ok(html.includes("Доставка и персональные скидки могут изменить итоговую стоимость"));
+});
+test('the comparison page uses the same blue-white visual identity as homepage',()=>{
+ assert.ok(html.includes('href="./styles.css"'));
+ assert.ok(html.includes('color:#0875ff'));
+ assert.ok(html.includes('Где дешевле?'));
+ assert.ok(html.includes('font-weight:600'));
+});
