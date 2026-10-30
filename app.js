@@ -13,12 +13,15 @@ let storage;try{storage=window.localStorage;}catch{storage=null;}
 const state={query:'',category:'',sort:'default',onlyFav:false,favorites:C.readFavorites(storage),ssdOnly:false,capacity:null,brands:[],interfaces:[],minPrice:null,maxPrice:null,selectedId:1,detailOpen:false};
 let storageTimer,installPrompt=null;
 let automaticDemo=false;
-const demoHomeOrder=(()=>{
+function newHomeOrder(previous=[]){
+  const selected=C.pickFeaturedProducts([1,2,3,4,5,6,7,8,9,10,11,12],6,Math.random,previous);
+  try{storage?.setItem('kupiora:home-last',JSON.stringify(selected));}catch{}
+  return selected;
+}
+let demoHomeOrder=(()=>{
   let previous=[];
   try{const saved=JSON.parse(storage?.getItem('kupiora:home-last')||'[]');if(Array.isArray(saved))previous=saved;}catch{}
-  const current=C.pickFeaturedProducts([1,2,3,4,5,6,7,8,9,10,11,12],6,Math.random,previous);
-  try{storage?.setItem('kupiora:home-last',JSON.stringify(current));}catch{}
-  return current;
+  return newHomeOrder(previous);
 })();
 function favoriteButton(p){return '<button class="favorite-toggle" data-favorite="'+p.id+'" aria-label="Избранное: '+escape(name(p))+'" aria-pressed="'+state.favorites.has(p.id)+'">'+icon('heart')+'</button>';}
 function shopMark(o,i){return !o?'':'<span class="shop"><span class="shop-mark s'+(i+1)+'" aria-hidden="true">'+escape(o.shop.split(' ').pop().slice(0,1))+'</span>'+escape(o.shop)+'</span>';}
@@ -100,6 +103,7 @@ function render(){
   $('results-heading').textContent=state.onlyFav?'Избранное':ssdMode?'SSD '+(state.capacity||'накопители'):state.category|| (state.query?'Результаты поиска':(C.mode==='demo'?'Случайные товары · демо':'Товары магазинов'));
   $('catalog-subtitle').textContent=C.mode==='live'?'Данные фидов · итог только с известной доставкой':active?'Иллюстративный каталог · сравнение с доставкой':'Сравнивайте итоговую стоимость, а не только ценник';
   $('count').textContent=C.countLabel(results.length);
+  $('reshuffle-home').hidden=C.mode!=='demo'||active;
   $('grid').innerHTML=results.length?results.map(p=>renderCard(p,detailMode)).join(''):'<div class="empty-state"><h3>Ничего не найдено</h3><p>Попробуйте другой запрос или сбросьте фильтры.</p><button class="primary" id="empty-reset">Показать все товары</button></div>';
   const selected=results.find(p=>p.id===state.selectedId)||results[0];
   $('detail').hidden=!detailMode||!selected;
@@ -138,6 +142,7 @@ function toggleFavorites(){state.onlyFav=!state.onlyFav;state.detailOpen=false;d
 $('favorites').onclick=toggleFavorites;$('mobile-favorites').onclick=toggleFavorites;
 $('mobile-search').onclick=()=>{$('q').focus();window.scrollTo({top:0,behavior:'smooth'});};
 $('all-categories').onclick=reset;
+$('reshuffle-home').onclick=()=>{demoHomeOrder=newHomeOrder(demoHomeOrder);if(C.mode!=='demo')loadMode('demo');else render();};
 $('real-mode').onclick=()=>loadMode('live');$('demo-mode').onclick=()=>loadMode('demo');
 $('mobile-filters').onclick=()=>document.body.classList.add('filters-open');$('close-filters').onclick=()=>document.body.classList.remove('filters-open');
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.body.classList.remove('filters-open');$('mobile-filters').focus();}});
