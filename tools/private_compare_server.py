@@ -165,12 +165,12 @@ def poll(job):
                 if title:
                     with LOCK:
                         job['sourceTitle']=title
-                        job['phase']='cross'
-                        job['submitted']=False
-                    threading.Thread(target=submit,args=(job,title,job.get('region','Москва'),None,['wbs','ym']),daemon=True).start()
+                        job['sourceImage']=next((x['image'] for x in originals if x.get('image') and str(x['image']).startswith('https://')),None)
+                        job['sourcePrice']=next((x['price'] for x in originals if isinstance(x.get('price'),(int,float)) and x['price']>0),None)
+                        job['phase']='preview'
                 else:
                     with LOCK:
-                        job['phase']='finished'
+                        job['phase']='error'
                         job['errors'].append('Невозможно подтвердить название товара из Ozon')
                 continue
             source=job.get('sourceTitle')
@@ -200,16 +200,40 @@ class Handler(SimpleHTTPRequestHandler):
             if job.get('submitted') and time.time()-job.get('last_poll',0)>8 and not all(x['state'] in ('done','error') for x in job['markets'].values()):
                 job['last_poll']=time.time();threading.Thread(target=poll,args=(job,),daemon=True).start()
             self.reply(200,{'done':job['submitted'] and all(x['state'] in ('done','error') for x in job['markets'].values()),
-                'offers':job['offers'][:100],'errors':job['errors'][-5:],'sourceTitle':job.get('sourceTitle'),'phase':job.get('phase','search')});return
+                'offers':job['offers'][:100],'errors':job['errors'][-5:],'sourceTitle':job.get('sourceTitle'),
+                'sourceImage':job.get('sourceImage'),'sourcePrice':job.get('sourcePrice'),
+                'sourceUrl':job.get('sourceUrl'),'phase':job.get('phase','search')});return
         return super().do_GET()
     def do_POST(self):
-        if urlparse(self.path).path!='/api/search':self.reply(404,{'error':'not found'});return
+        path=urlparse(self.path).path
+        if path not in ('/api/search','/api/compare'):self.reply(404,{'error':'not found'});return
         if not KEY or not ALLOW_CHARGES:self.reply(503,{'error':'provider not enabled'});return
         origin=self.headers.get('Origin','')
         if origin and origin not in ('http://127.0.0.1:'+str(PORT),'http://localhost:'+str(PORT)):
             self.reply(403,{'error':'cross-origin denied'});return
         if self.headers.get('Content-Type','').split(';')[0].strip()!='application/json':
             self.reply(415,{'error':'JSON required'});return
+        if path=='/api/compare':
+            try:
+                size=int(self.headers.get('Content-Length','0'))
+                if not 0<size<500:raise ValueError('size')
+                d=json.loads(self.rfile.read(size))
+                ident=d.get('id','')
+                if not isinstance(ident,str) or len(ident)>150:raise ValueError('id')
+            except (ValueError,TypeError,AttributeError,json.JSONDecodeError):
+                self.reply(400,{'error':'invalid job'});return
+            with LOCK:
+                job=JOBS.get(ident)
+                if not job:self.reply(404,{'error':'unknown job'});return
+                if job.get('phase')!='preview' or not job.get('sourceTitle'):
+                    self.reply(409,{'error':'product preview not ready or already compared'});return
+                job['phase']='cross'
+                job['submitted']=False
+                job['last_poll']=0
+                title=job['sourceTitle']
+                region=job.get('region','Москва')
+            threading.Thread(target=submit,args=(job,title,region,None,['wbs','ym']),daemon=True).start()
+            self.reply(202,{'id':ident,'phase':'cross'});return
         try:
             size=int(self.headers.get('Content-Length','0'))
             if not 0<size<4000:raise ValueError('size')
