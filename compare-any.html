@@ -118,19 +118,32 @@ function externalSearch(store,q){
 function understandInput(raw){
  const text=String(raw||'').trim();
  if(!/^https?:\/\//i.test(text))return {kind:'text',query:text};
- let u;try{u=new URL(text)}catch{return {kind:'invalid',reason:'Не удалось разобрать адрес. Нужна прямая ссылка на товар.'}};
+ let u;try{u=new URL(text)}catch{return {kind:'invalid',reason:'Не удалось разобрать ссылку. Вставь полный HTTPS-адрес карточки товара.'}};
+ if(u.protocol!=='https:'||u.username||u.password)return {kind:'invalid',reason:'Нужна прямая HTTPS-ссылка на карточку товара.'};
  const host=u.hostname.toLowerCase().replace(/^www\./,'');
- if(u.protocol!=='https:')return {kind:'invalid',reason:'Нужна безопасная HTTPS-ссылка на товар.'};
- if(host!=='ozon.ru')return {kind:'invalid',reason:'Автоматическое распознавание ссылки пока поддерживается только для Ozon. Для других магазинов введи название и точную модель.'};
- const m=u.pathname.match(/^\/product\/(?:.*?-)?(\d+)\/?$/);
- if(!m)return {kind:'invalid',reason:'Это не прямая ссылка на карточку Ozon. Открой сам товар и скопируй его полный адрес /product/…'};
- const slug=u.pathname.split('/')[2].replace(/-\d+$/,'');
- let title='';
- try{title=decodeURIComponent(slug).replace(/[-_]+/g,' ').trim()}catch{}
- const direct='https://www.ozon.ru'+u.pathname;
- return {kind:'ozon',id:m[1],url:direct,query:title||'',unverified:true};
+ const path=u.pathname;
+ if(host==='ozon.ru'){
+  const m=path.match(/^\/product\/(?:.*?-)?(\d+)\/?$/i);
+  if(!m)return {kind:'invalid',reason:'Ozon: вставь прямую ссылку на товар вида /product/…'};
+  const slug=path.split('/')[2].replace(/-\d+$/,'');
+  let title='';try{title=decodeURIComponent(slug).replace(/[-_]+/g,' ').trim()}catch{}
+  return {kind:'ozon',id:m[1],store:'Ozon',url:'https://www.ozon.ru'+path,query:title||'',unverified:true};
+ }
+ if(host==='wildberries.ru'){
+  const m=path.match(/^\/catalog\/(\d+)(?:\/detail\.aspx)?\/?$/i);
+  if(!m)return {kind:'invalid',reason:'Wildberries: вставь ссылку на карточку вида /catalog/123456789/detail.aspx'};
+  return {kind:'wb',id:m[1],store:'Wildberries',url:'https://www.wildberries.ru/catalog/'+m[1]+'/detail.aspx',query:'',unverified:true};
+ }
+ if(host==='market.yandex.ru'){
+  const m=path.match(/^\/(card|p)\/(.+)\/(\d+)\/?$/i);
+  if(!m)return {kind:'invalid',reason:'Яндекс Маркет: вставь прямую ссылку на карточку, а не поисковую выдачу.'};
+  let slug='';try{slug=decodeURIComponent(m[2]).replace(/[-_]+/g,' ').trim()}catch{}
+  return {kind:'ym',id:m[3],store:'Яндекс Маркет',url:'https://market.yandex.ru'+path,query:slug,unverified:true};
+ }
+ return {kind:'invalid',reason:'Прямые ссылки пока поддерживаются для Ozon, Wildberries и Яндекс Маркета. Из других магазинов можно искать по точному названию или артикулу.'};
 }
-let items=[], current='', apiMode=false, activeSearch=0, resolvedTitle='', previewTicket=null, previewVerified=false, previewImage='', previewPrice=null, comparing=false;
+function isProductLink(v){return ['ozon','wb','ym'].includes(understandInput(v).kind)}
+let items=[], current='', apiMode=false, activeSearch=0, resolvedTitle='', previewTicket=null, previewVerified=false, previewImage='', previewPrice=null, comparing=false, compareRequested=false, compareRunning=false;
 function lookupText(){return resolvedTitle||understandInput(current).query||''}
 
 function renderPreview(){
