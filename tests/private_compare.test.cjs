@@ -54,10 +54,16 @@ test('unknown URLs and empty prices are never treated as offers',()=>{
 });
 
 
-test('homepage-to-comparison navigation auto-runs only when backend is enabled',()=>{
+test('homepage navigation opens product preview, never directly runs price comparison',()=>{
+ assert.ok(html.includes('id="product-preview"'));
+ assert.ok(html.includes('id="preview-photo"'));
+ assert.ok(html.includes('id="compare-now"'));
+ assert.ok(html.includes('id="comparison-panel" hidden'));
+ assert.ok(html.includes('id="source-panel" hidden'));
  assert.ok(html.includes("detectAPI().then("));
- assert.ok(html.includes("if(apiMode&&typeof $('search').requestSubmit==='function')"));
- assert.ok(html.includes("Без API нельзя получить и сравнить актуальные цены"));
+ assert.ok(html.includes("$('search').requestSubmit()"));
+ assert.ok(html.includes("if(phase==='preview')"));
+ assert.ok(html.includes("'/api/compare'"));
 });
 test('Ozon product link is recognized by immutable product ID',()=>{
  const {context}=setup();
@@ -88,4 +94,35 @@ test('the comparison page uses the same blue-white visual identity as homepage',
  assert.ok(html.includes('color:#0875ff'));
  assert.ok(html.includes('Где дешевле?'));
  assert.ok(html.includes('font-weight:600'));
+});
+
+
+test('product preview appears with Ozon link before comparison and no fabricated photo',()=>{
+ const {context,elements}=setup();
+ js(context,"current='https://www.ozon.ru/product/samsung-ssd-12345678/';renderPreview()");
+ assert.equal(elements['product-preview'].hidden,false);
+ assert.equal(elements['comparison-panel'].hidden,undefined);
+ assert.equal(elements['preview-title'].textContent,'samsung ssd');
+ assert.ok(elements['preview-photo'].children[0].textContent.includes('Фотография загрузится'));
+ assert.equal(elements['preview-source-link'].href,'https://www.ozon.ru/product/samsung-ssd-12345678/');
+});
+test('photo and title are shown only when the Ozon source confirms them',()=>{
+ const {context,elements}=setup();
+ context.sample={sourceTitle:'Samsung MZ-V8V1T0BW 1 TB',sourceImage:'https://ir.ozone.ru/real-photo.jpg',sourcePrice:27000,
+  offers:[{shop:'Ozon',title:'Samsung MZ-V8V1T0BW 1 TB',url:'https://www.ozon.ru/product/samsung-ssd-12345678/',
+   image:'https://ir.ozone.ru/real-photo.jpg',price:27000,match:'source'}]};
+ js(context,"current='https://www.ozon.ru/product/samsung-ssd-12345678/';recordPoll(sample)");
+ assert.equal(elements['preview-state'].textContent,'Карточка подтверждена источником');
+ assert.equal(elements['preview-title'].textContent,'Samsung MZ-V8V1T0BW 1 TB');
+ assert.equal(elements['preview-photo'].children[0].src,'https://ir.ozone.ru/real-photo.jpg');
+ assert.equal(elements['comparison-panel'].hidden,undefined);
+});
+test('compare button reveals lists but without API never invents other-store prices',async()=>{
+ const {context,elements}=setup();
+ js(context,"current='https://www.ozon.ru/product/samsung-ssd-12345678/';renderPreview()");
+ await js(context,'startComparison()');
+ assert.equal(elements['comparison-panel'].hidden,false);
+ assert.equal(elements['source-panel'].hidden,false);
+ assert.ok(elements['message'].textContent.includes('Автоматическое сравнение пока недоступно'));
+ assert.ok(elements['cards'].innerHTML.includes('Подтверждённые предложения пока не найдены'));
 });
