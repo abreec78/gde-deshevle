@@ -130,6 +130,11 @@ class Handler(SimpleHTTPRequestHandler):
     def do_POST(self):
         if urlparse(self.path).path!='/api/search':self.reply(404,{'error':'not found'});return
         if not KEY or not ALLOW_CHARGES:self.reply(503,{'error':'provider not enabled'});return
+        origin=self.headers.get('Origin','')
+        if origin and origin not in ('http://127.0.0.1:'+str(PORT),'http://localhost:'+str(PORT)):
+            self.reply(403,{'error':'cross-origin denied'});return
+        if self.headers.get('Content-Type','').split(';')[0].strip()!='application/json':
+            self.reply(415,{'error':'JSON required'});return
         try:
             size=int(self.headers.get('Content-Length','0'))
             if not 0<size<4000:raise ValueError('size')
