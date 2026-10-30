@@ -3,7 +3,7 @@
 Run from repository root: PARSER_MARKET_API_KEY=... python tools/private_compare_server.py
 Only bind 127.0.0.1. The provider charges checks; set explicit opt-in before using.
 """
-import json, os, secrets, time, threading
+import json, os, re, secrets, time, threading
 from urllib.parse import urlparse, quote, parse_qs
 from urllib.request import Request, urlopen
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
@@ -38,12 +38,17 @@ def match_report_records(report,market):
                 if price<=0 or price>100_000_000:continue
                 url=offer.get('ShopUrl') or row.get('link') or ''
                 if not permitted_store_url(url,market):continue
+                # A search results page is not an individual product URL.
+                path=urlparse(url).path.lower()
+                if market=='ozons' and '/product/' not in path:continue
+                if market=='ym' and not any(x in path for x in ('/card/','/p/','/product')):continue
+                if market=='wbs' and not re.search(r'/catalog/\d+/',path):continue
                 title=str(offer.get('Name') or row.get('sku',{}).get('Name_found') or '').strip()
                 if not title:continue
                 pics=[p for p in offer.get('Offer_pics',[]) if isinstance(p,str) and p.startswith('https://')]
                 out.append({'shop':STORES[market],'title':title[:240],'url':url,'price':price,'delivery':None,
                     'image':pics[0] if pics else None,'region':report.get('regioncode') or 'Москва',
-                    'checkedAt':stamp,'source':'api','mpn':''})
+                    'checkedAt':stamp,'source':'api','mpn':next(iter(re.findall(r'\b(?:[A-Z]{2,}-)?[A-Z][A-Z0-9]+-[A-Z0-9-]{5,}\b',title,flags=re.I)),'')})
             except (KeyError,TypeError,ValueError,OverflowError,AttributeError):continue
     return out
 def permitted_store_url(value,market):
@@ -72,7 +77,7 @@ def make_link(market,query):
 def submit(job,query,region):
     for market in STORES:
         tag=secrets.token_hex(6)
-        payload={'regionid':region if market!='ym' else 'Москва','market':market,'userlabel':tag,
+        payload={'regionid':region if market!='ym' else '213','market':market,'userlabel':tag,
                  'products':[{'name':query,'linkset':[make_link(market,query)],'donotsearch':16 if market=='ozons' else 12 if market=='wbs' else 0}]}
         try:
             response=provider_post('send-order',payload)
