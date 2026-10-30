@@ -22,7 +22,7 @@ test('comparison page accepts query without requiring an API key',()=>{
  const source=read('compare-any.html');
  assert.match(source,/new URLSearchParams\(location\.search\)\.get\('q'\)/);
  assert.match(source,/if\(incoming&&incoming\.trim\(\)\.length>=2\)/);
- assert.match(source,/if\(apiMode\)try/);
+ assert.match(source,/if\(apiMode&&parsed\.kind==='ozon'\)try/);
 });
 test('offline app shell keeps both pages independent',()=>{
  const src=read('sw.js');
