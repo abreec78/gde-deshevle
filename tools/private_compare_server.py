@@ -17,7 +17,7 @@ KEY=os.environ.get('PARSER_MARKET_API_KEY','').strip()
 ALLOW_CHARGES=os.environ.get('KUPIORA_ENABLE_PAID_CHECKS','')=='yes'
 JOBS={}
 LOCK=threading.Lock()
-STORES={'ozons':'Ozon','wbs':'Wildberries','ym':'Яндекс Маркет'}
+STORES={'ozons':'Ozon','ozon':'Ozon','wbs':'Wildberries','ym':'Яндекс Маркет'}
 def provider_post(endpoint,payload):
     req=Request(API+endpoint, data=json.dumps({'apikey':KEY,**payload},ensure_ascii=False).encode(),headers={'Content-Type':'application/json','User-Agent':'KupioraPrivateTest/1.0'},method='POST')
     with urlopen(req,timeout=20) as r:
@@ -40,7 +40,7 @@ def match_report_records(report,market):
                 if not permitted_store_url(url,market):continue
                 # A search results page is not an individual product URL.
                 path=urlparse(url).path.lower()
-                if market=='ozons' and '/product/' not in path:continue
+                if market in ('ozon','ozons') and '/product/' not in path:continue
                 if market=='ym' and not any(x in path for x in ('/card/','/p/','/product')):continue
                 if market=='wbs' and not re.search(r'/catalog/\d+/',path):continue
                 title=str(offer.get('Name') or row.get('sku',{}).get('Name_found') or '').strip()
@@ -54,7 +54,7 @@ def match_report_records(report,market):
 def permitted_store_url(value,market):
     try:
         p=urlparse(value);host=p.hostname or ''
-        bases={'ozons':'ozon.ru','wbs':'wildberries.ru','ym':'market.yandex.ru'}
+        bases={'ozons':'ozon.ru','ozon':'ozon.ru','wbs':'wildberries.ru','ym':'market.yandex.ru'}
         base=bases[market]
         return p.scheme=='https' and (host==base or host.endswith('.'+base)) and not p.username and not p.password
     except (ValueError,KeyError):return False
@@ -112,13 +112,13 @@ def product_match(reference,candidate):
     return bool(left and right and left&right and (not lc or not rc or lc==rc))
 
 def submit(job,query,region,source_url=None,markets=None):
-    market_list=['ozons'] if source_url else list(markets or STORES)
+    market_list=['ozon'] if source_url else list(markets or STORES)
     search_text=slug_label(source_url) if source_url else query
     for market in market_list:
         label=secrets.token_hex(6)
         link=source_url if source_url and market=='ozons' else make_link(market,search_text)
-        payload={'regionid':'213' if market=='ym' else region,'market':market,'userlabel':label,
-                 'products':[{'name':search_text,'linkset':[link],'donotsearch':16 if market=='ozons' else 12 if market=='wbs' else 0}]}
+        payload={'regionid':'Москва' if market=='ym' else region,'market':market,'userlabel':label,
+                 'products':[{'name':search_text,'linkset':[link],'donotsearch':16 if market in ('ozon','ozons') else 12 if market=='wbs' else 0}]}
         try:
             response=unpack_pairs(provider_post('send-order',payload))
             if response.get('result')!='success':raise ValueError('Provider did not accept search')
@@ -149,7 +149,7 @@ def poll(job):
             report=get_report(link)
             if not isinstance(report,dict):continue
             found=match_report_records(report,market)
-            if job.get('sourceUrl') and job.get('phase')=='source' and market=='ozons':
+            if job.get('sourceUrl') and job.get('phase')=='source' and market=='ozon':
                 pid=product_id(job['sourceUrl'])
                 originals=[x for x in found if product_id(x['url'])==pid]
                 title=originals[0]['title'] if originals else ''
