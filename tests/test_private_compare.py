@@ -69,10 +69,11 @@ class PrivateCompareTests(unittest.TestCase):
         self.assertEqual([p[1]['market'] for p in calls],['ozon'])
         self.assertEqual(calls[0][1]['products'][0]['linkset'],[source])
 
-    def test_source_product_then_cross_market_matching(self):
+    def test_source_preview_waits_for_compare_click_and_includes_real_photo(self):
         source='https://www.ozon.ru/product/samsung-980-mz-v8v1t0bw-12345678/'
         src_report={"data":[{"link":source,"sku":{"Name_found":"Samsung 980 MZ-V8V1T0BW 1 TB"},
-          "offers":[{"Name":"Samsung 980 MZ-V8V1T0BW 1 TB","Price":27000}]}]}
+          "offers":[{"Name":"Samsung 980 MZ-V8V1T0BW 1 TB","Price":27000,
+                     "Offer_pics":["https://ir.ozone.ru/matched-photo.jpg"]}]}]}
         job={"markets":{"ozon":{"label":"l-ozon","state":"waiting"}},"offers":[],"errors":[],
              "submitted":True,"sourceUrl":source,"sourceTitle":None,"phase":"source","region":"Москва"}
         response=[{"result":"success"},{"data":[[
@@ -80,10 +81,25 @@ class PrivateCompareTests(unittest.TestCase):
             {"report_json":"https://files.parser.market/_filestorage/x/demo.json"}]]}]
         with patch.object(srv,"provider_post",return_value=response),patch.object(srv,"get_report",return_value=src_report),patch.object(srv.threading,"Thread") as thread:
             srv.poll(job)
-        self.assertEqual(job["phase"],"cross")
+        self.assertEqual(job["phase"],"preview")
         self.assertEqual(job["sourceTitle"],"Samsung 980 MZ-V8V1T0BW 1 TB")
+        self.assertEqual(job["sourceImage"],"https://ir.ozone.ru/matched-photo.jpg")
+        self.assertEqual(job["sourcePrice"],27000)
         self.assertEqual(job["offers"][0]["match"],"source")
-        thread.assert_called_once()
+        self.assertEqual(job["markets"]["ozon"]["state"],"done")
+        thread.assert_not_called()
+
+    def test_cross_market_work_is_separate_after_preview(self):
+        calls=[]
+        def fake(endpoint,payload):
+            calls.append(payload)
+            return [{"result":"success"}]
+        job={"markets":{"ozon":{"label":"source","state":"done"}},"offers":[],"errors":[],"submitted":False}
+        with patch.object(srv,"provider_post",side_effect=fake):
+            srv.submit(job,"Samsung 980 MZ-V8V1T0BW","Москва",None,['wbs','ym'])
+        self.assertEqual([item['market'] for item in calls],['wbs','ym'])
+        self.assertTrue(job['submitted'])
+
 
     def test_model_matching_does_not_accept_different_mpn(self):
         self.assertTrue(srv.product_match("SSD Samsung MZ-V8V1T0BW 1 TB","Samsung MZ-V8V1T0BW 1 ТБ"))
