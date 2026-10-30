@@ -7,3 +7,12 @@
 .generic-detail #catalog{grid-template-columns:minmax(0,1fr) 360px}.generic-detail .category-tree{display:none}@media(max-width:980px){.generic-detail #catalog{grid-template-columns:minmax(0,1fr)}.generic-detail .product-detail{grid-column:1}}
 @media(min-width:681px){#mobile-filters{display:none!important}}
 .source-switch{display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap;font-size:12px}.source-switch button{border:1px solid #e0eaf8;border-radius:20px;padding:8px 14px}.source-switch button[aria-pressed=true]{background:#0875ff;color:white}.source-switch span{color:#72809b;margin-left:auto}.source-stamp{display:block;color:#72809b;font-size:10px;margin:5px 0}.merchant-link{color:#0875ff;font-weight:600}.real-status{background:#edf8f1;border-color:#d8efe0}@media(max-width:680px){.source-switch span{width:100%;margin:0}.source-switch{font-size:11px}}
+
+/* Universal product search is discoverable on both desktop and mobile. */
+.universal-search-banner{display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(120deg,#eafbf7,#eef5ff);border:1px solid #d8e8e8;border-radius:18px;padding:18px 20px;margin:6px 0 16px}
+.universal-search-banner strong{font-size:17px;color:#13574f}
+.universal-search-banner p{font-size:13px;color:#506b75;margin:6px 0 0;max-width:790px}
+.universal-search-link{display:inline-flex;align-items:center;justify-content:center;gap:9px;background:#0c9884;color:white;border-radius:14px;padding:14px 17px;white-space:nowrap;font-size:14px;font-weight:750;text-decoration:none}
+.universal-search-link:hover{background:#087d70}
+.universal-mobile-link{color:#087d70!important;font-weight:700}
+@media(max-width:700px){.universal-search-banner{align-items:stretch;flex-direction:column;padding:13px}.universal-search-link{white-space:normal;text-align:center}.universal-search-banner strong{font-size:15px}}

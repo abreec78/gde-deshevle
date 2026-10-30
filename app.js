@@ -108,7 +108,7 @@ document.addEventListener('click',event=>{
   if(button.id==='empty-reset')reset();
 });
 $('q').addEventListener('input',()=>{state.query=$('q').value;state.ssdOnly=false;state.capacity=null;state.detailOpen=false;document.body.classList.remove('show-detail');render();syncRoute();});
-$('search-form').addEventListener('submit',e=>{e.preventDefault();$('catalog').scrollIntoView({block:'start'});});
+$('search-form').addEventListener('submit',e=>{e.preventDefault();const q=$('q').value.trim();const url=new URL('./compare-any.html',location.href);if(q)url.searchParams.set('q',q);location.assign(url.href);});
 $('category').addEventListener('change',()=>selectCategory($('category').value));
 $('sort').addEventListener('change',()=>{state.sort=$('sort').value;render();syncRoute();});
 function toggleFavorites(){state.onlyFav=!state.onlyFav;state.detailOpen=false;document.body.classList.remove('show-detail');render();syncRoute();}

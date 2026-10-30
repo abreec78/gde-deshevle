@@ -41,6 +41,7 @@ function externalSearch(store,q){
 let items=[], current='', apiMode=false, activeSearch=0;
 const storageKey='kupiora-private-compare-v1';
 try{const saved=JSON.parse(localStorage.getItem(storageKey)||'{}');items=Array.isArray(saved.items)?saved.items.slice(0,200):[];current=typeof saved.query==='string'?saved.query:''}catch{}
+const incoming=new URLSearchParams(location.search).get('q');if(incoming&&incoming.trim().length>=2){current=incoming.trim().slice(0,160);items=[];}
 $('query').value=current;
 function save(){try{localStorage.setItem(storageKey,JSON.stringify({items,query:current}))}catch{}}
 function searches(){const host=$('stores');host.replaceChildren();for(const s of STORES){const a=document.createElement('a');a.className='store';a.textContent=s[0]+' ↗';a.target='_blank';a.rel='noopener noreferrer';a.href=externalSearch(s,current||'товар');a.title=s[2]?'Поиск на площадке':'Поиск страниц магазина через Яндекс'; if(!s[2]){let label=document.createElement('small');label.textContent='через Яндекс';a.append(label)}host.append(a)}}
@@ -111,5 +112,5 @@ $('search').onsubmit=async e=>{e.preventDefault();const q=$('query').value.trim(
  $('message').textContent='Поиск по 18 магазинам подготовлен. Откройте нужные магазины и добавьте цены.'+(apiMode?' Автоматические проверки запущены.':'');
  if(apiMode)try{await automate(q,turn)}catch(err){$('message').textContent='Автоматический источник недоступен. Ручной поиск по магазинам продолжает работать.'}
 };
-searches();draw();detectAPI();
+searches();draw();detectAPI();if(incoming&&current){$('message').textContent='Поиск подготовлен. Откройте магазины ниже и добавьте найденные цены. Для автоматического поиска нужен локальный сервер с API-ключом.';}
 </script></body></html>
