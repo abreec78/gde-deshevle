@@ -31,8 +31,11 @@ function shopMark(o,i){
   const mark='<span class="shop-mark s'+(i%3+1)+'" aria-hidden="true">'+escape(String(shown).slice(0,1).toUpperCase())+'</span>';
   const text='<span class="shop-label">'+escape(shown)+(seller&&seller!==o.shop?'<small> · '+escape(o.shop)+'</small>':'')+'</span>';
   const inner=mark+text;
-  if(isLive&&C.safeUrl(o.url))
-    return '<a class="shop shop-link" href="'+escape(o.url)+'" target="_blank" rel="noopener noreferrer nofollow sponsored" title="Открыть предложение в магазине: '+escape(o.shop)+'">'+inner+' <span class="shop-arrow" aria-hidden="true">↗</span></a>';
+  // Prefer an actual seller profile only when the feed contains one; otherwise open this product offer.
+  const hasSellerUrl=isLive&&C.safeUrl(o.sellerUrl);
+  const target=hasSellerUrl?o.sellerUrl:o.url;
+  if(isLive&&C.safeUrl(target))
+    return '<a class="shop shop-link" href="'+escape(target)+'" target="_blank" rel="noopener noreferrer nofollow sponsored" title="'+(hasSellerUrl?'Открыть страницу продавца: ':'Открыть товар в магазине: ')+escape(shown)+'">'+inner+' <span class="shop-arrow" aria-hidden="true">↗</span></a>';
   return '<span class="shop shop-unlinked" title="'+(isLive?'Нет ссылки на предложение':'Демонстрационный магазин без реальной ссылки')+'">'+inner+(isLive?'':' <small class="shop-demo-note">демо</small>')+'</span>';
 }
 function merchantSummary(o,i){
