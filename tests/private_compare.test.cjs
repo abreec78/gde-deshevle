@@ -54,6 +54,11 @@ test('unknown URLs and empty prices are never treated as offers',()=>{
 });
 
 
+test('homepage-to-comparison navigation auto-runs only when backend is enabled',()=>{
+ assert.ok(html.includes("detectAPI().then("));
+ assert.ok(html.includes("if(apiMode&&typeof $('search').requestSubmit==='function')"));
+ assert.ok(html.includes("Без API нельзя получить и сравнить актуальные цены"));
+});
 test('Ozon product link is recognized by immutable product ID',()=>{
  const {context}=setup();
  context.link='https://www.ozon.ru/product/samsung-ssd-12345678/?from=share';
