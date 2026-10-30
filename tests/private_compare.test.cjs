@@ -180,6 +180,6 @@ test('without backend the Wildberries compare button still opens store links and
 test('verified candidates and merely similar candidates are displayed separately',()=>{
  assert.ok(html.includes('Похожие предложения, совпадение модели НЕ подтверждено'));
  assert.ok(html.includes('offer-unverified'));
- assert.ok(html.includes('x.match===\\'source\\'||x.match===\\'confirmed\\''));
+ assert.ok(html.includes("x.match==='source'||x.match==='confirmed'"));
  assert.ok(html.includes('min'));
 });
