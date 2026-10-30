@@ -43,20 +43,29 @@ const storageKey='kupiora-private-compare-v1';
 try{const saved=JSON.parse(localStorage.getItem(storageKey)||'{}');items=Array.isArray(saved.items)?saved.items.slice(0,200):[];current=typeof saved.query==='string'?saved.query:''}catch{}
 $('query').value=current;
 function save(){try{localStorage.setItem(storageKey,JSON.stringify({items,query:current}))}catch{}}
-function searches(){const host=$('stores');host.replaceChildren();for(const s of STORES){const a=document.createElement('a');a.className='store';a.textContent=s[0]+' ↗';a.target='_blank';a.rel='noopener noreferrer';a.href=externalSearch(s,current||'товар');a.title=s[2]?'Поиск на площадке':'Поиск страниц магазина через Яндекс';host.append(a)}}
+function searches(){const host=$('stores');host.replaceChildren();for(const s of STORES){const a=document.createElement('a');a.className='store';a.textContent=s[0]+' ↗';a.target='_blank';a.rel='noopener noreferrer';a.href=externalSearch(s,current||'товар');a.title=s[2]?'Поиск на площадке':'Поиск страниц магазина через Яндекс'; if(!s[2]){let label=document.createElement('small');label.textContent='через Яндекс';a.append(label)}host.append(a)}}
 function draw(){
- $('counter').textContent=items.length+' предложений';const g=$('cards');g.replaceChildren();
+ $('counter').textContent=items.length+' предложений';
+ $('caution').textContent=comparable(items)?'Подтверждено совпадение артикула производителя (MPN) у предложений. Перед покупкой проверьте комплектацию, скидки и доставку.':'Совпадение товара между магазинами не доказано. Предложения отсортированы по указанной цене, но они могут относиться к разным моделям, объёмам памяти или комплектам.';const g=$('cards');g.replaceChildren();
  const data=[...items].sort((a,b)=>$('order').value==='store'?a.shop.localeCompare(b.shop,'ru'):(a.price??Infinity)-(b.price??Infinity));
  if(!data.length){g.innerHTML='<p class="hint">Пока пусто. Найдите товар в магазинах или импортируйте отчёт. Здесь появятся настоящие предложения.</p>';return}
  for(const x of data){const c=document.createElement('article');c.className='card';
  const validImage=https(x.image),validLink=https(x.url);
  const badge=x.source==='api'?'API':x.source==='import'?'Отчёт':'Вручную';
- const fresh=x.checkedAt&&Date.now()-Date.parse(x.checkedAt)<86400000;
+ const fresh=x.checkedAt&&Date.parse(x.checkedAt)<=Date.now()+300000&&Date.now()-Date.parse(x.checkedAt)<86400000;
  c.innerHTML='<div class="photo">'+(validImage?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+safe(validImage)+'" onerror="this.remove()">':'▣')+'</div><p class="small">'+safe(x.shop)+' · '+safe(badge)+' '+(fresh?'<span class="tag">проверено сегодня</span>':'<span class="danger">дата/актуальность уточняется</span>')+'</p><h3>'+safe(x.title)+'</h3><p class="small">'+safe(x.mpn||'Артикул не указан')+'</p><div class="price">'+(Number.isFinite(x.price)&&x.price>0?rub(x.price):'Цена не установлена')+'</div><p class="small">Доставка: '+(Number.isFinite(x.delivery)&&x.delivery>=0?rub(x.delivery):'неизвестна')+' · '+safe(x.region||'Регион не установлен')+'</p><p class="small">Проверка: '+safe(x.checkedAt?new Date(x.checkedAt).toLocaleString('ru-RU'):'не указана')+'</p><div class="actions"><a href="'+safe(validLink||'#')+'" target="_blank" rel="noopener noreferrer nofollow">Открыть ↗</a><button type="button" data-remove="'+safe(x.id)+'">Удалить</button></div>';
  c.querySelector('a').addEventListener('click',e=>{if(!validLink)e.preventDefault()});
  c.querySelector('button').onclick=()=>{items=items.filter(v=>v.id!==x.id);save();draw()};
  g.append(c);
  }
+}
+function comparable(offers){
+ const canonical=s=>String(s||'').trim().replace(/[^a-z0-9]/gi,'').toUpperCase();
+ const cap=s=>{const m=String(s).match(/(?:\d+(?:[.,]\d+)?)\s*(?:ТБ|TB|ГБ|GB)/i);return m?m[0].replace(/\s/g,'').toUpperCase():''};
+ if(offers.length<2)return false;
+ const mpns=offers.map(o=>canonical(o.mpn));if(mpns.some(x=>!x)||new Set(mpns).size!==1)return false;
+ const capacities=offers.map(o=>cap(o.title)).filter(Boolean);
+ return new Set(capacities).size<=1;
 }
 function addOffer(o){if(!o||!STORES.some(s=>s[0]===o.shop)||!https(o.url)||!Number.isFinite(o.price)||o.price<=0)return false;const item={...o,id:o.id||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),image:https(o.image)||'',delivery:Number.isFinite(o.delivery)&&o.delivery>=0?o.delivery:null,checkedAt:o.checkedAt||null,region:o.region||null};const existing=items.findIndex(z=>z.shop===item.shop&&z.url===item.url);if(existing>=0)items.splice(existing,1);items.unshift(item);items=items.slice(0,200);save();return true}
 $('shop').innerHTML=STORES.map((s,i)=>'<option value="'+i+'">'+safe(s[0])+'</option>').join('');
@@ -66,7 +75,7 @@ $('add').onsubmit=e=>{e.preventDefault();const url=https($('url').value),shop=ST
 const ok=addOffer({shop,title:$('title').value.trim(),url,price:Number($('price').value),delivery:$('delivery').value===''?null:Number($('delivery').value),mpn:$('mpn').value.trim(),image:$('image').value,region:$('region').value,source:$('origin').value,checkedAt:new Date().toISOString()});if(ok){$('add').reset();draw();$('message').textContent='Предложение добавлено. Сравнивайте только одинаковые модификации.'}};
 function parsedOffer(offer,fallback,region,stamp){
  if(!offer||typeof offer!=='object')return null;
- const title=String(offer.Name||fallback?.name||'').trim(),url=https(offer.ShopUrl||fallback?.link||offer.ShopInfo?.marketlink||'');
+ const title=String(offer.Name||fallback?.name||'').trim(),url=https(offer.ShopUrl||fallback?.link||'');
  const market=offer.Market_short||'',shop=market==='OZON'?'Ozon':market==='YM'?'Яндекс Маркет':market==='WB'?'Wildberries':getStore(url);
  const p=Number(offer.Price);
  if(!shop||!url||!title||!Number.isFinite(p)||p<=0)return null;
@@ -98,7 +107,7 @@ async function automate(q,turn){
  }
  $('message').textContent='Поиск продолжается на сервере. Повторите запрос позже.';
 }
-$('search').onsubmit=async e=>{e.preventDefault();const q=$('query').value.trim();if(q.length<2)return;current=q;save();searches();$('title').value=q;const turn=++activeSearch;
+$('search').onsubmit=async e=>{e.preventDefault();const q=$('query').value.trim();if(q.length<2)return;if(q!==current){items=[];draw()}current=q;save();searches();$('title').value=q;const turn=++activeSearch;
  $('message').textContent='Поиск по 18 магазинам подготовлен. Откройте нужные магазины и добавьте цены.'+(apiMode?' Автоматические проверки запущены.':'');
  if(apiMode)try{await automate(q,turn)}catch(err){$('message').textContent='Автоматический источник недоступен. Ручной поиск по магазинам продолжает работать.'}
 };
