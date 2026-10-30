@@ -130,8 +130,118 @@ function understandInput(raw){
  const direct='https://www.ozon.ru'+u.pathname;
  return {kind:'ozon',id:m[1],url:direct,query:title||'',unverified:true};
 }
-let items=[], current='', apiMode=false, activeSearch=0, resolvedTitle='';
+let items=[], current='', apiMode=false, activeSearch=0, resolvedTitle='', previewTicket=null, previewVerified=false, previewImage='', previewPrice=null, comparing=false;
 function lookupText(){return resolvedTitle||understandInput(current).query||''}
+
+function renderPreview(){
+ const info=understandInput(current);
+ const card=$('product-preview');
+ card.hidden=!current||info.kind==='invalid';
+ if(card.hidden)return;
+ $('preview-title').textContent=resolvedTitle||(info.kind==='ozon'?info.query||'Товар Ozon № '+info.id:current);
+ $('preview-state').textContent=previewVerified?'Карточка подтверждена источником':info.kind==='ozon'?'Ozon · предварительное определение':'Поиск по названию · модель не подтверждена';
+ $('preview-description').textContent=previewVerified
+  ?'Название и фото (если есть) получены из отчёта по исходной карточке.'+(Number.isFinite(previewPrice)?' Цена в отчёте Ozon: '+rub(previewPrice)+'.':'')
+  :info.kind==='ozon'?'Товар определён по адресу Ozon. Точное название, фото и цена появятся только при получении ответа источника.':'Укажите точную модель для корректного сопоставления.';
+ const link=$('preview-source-link');
+ link.hidden=info.kind!=='ozon';
+ if(!link.hidden)link.href=info.url;
+ const image=$('preview-photo');image.replaceChildren();
+ const original=https(previewImage);
+ if(original&&previewVerified){
+  const img=document.createElement('img');img.src=original;img.alt='Фото исходного товара Ozon';img.loading='lazy';
+  img.onerror=()=>{image.replaceChildren();const m=document.createElement('span');m.className='preview-photo-message';m.textContent='Фотография недоступна у источника';image.append(m)};
+  image.append(img);
+ }else{
+  const span=document.createElement('span');span.className='preview-photo-message';
+  span.textContent=info.kind==='ozon'?'Фотография загрузится из карточки Ozon, если источник её предоставит':'Фото не получено. Случайные изображения не подставляются.';
+  image.append(span);
+ }
+ const button=$('compare-now');button.disabled=apiMode&&info.kind==='ozon'&&!previewVerified&&!!previewTicket;
+ $('preview-hint').textContent=previewVerified?'Сравнение запустит проверку цен других площадок':apiMode&&previewTicket?'Получаем данные исходного товара…':'Без источника цен доступны ссылки на магазины, но не автоматический рейтинг.';
+}
+function showPriceSections(){
+ comparing=true;
+ $('comparison-panel').hidden=false;
+ $('source-panel').hidden=false;
+ draw();
+}
+function recordPoll(d){
+ if(d.sourceTitle){resolvedTitle=d.sourceTitle;previewVerified=true;searches();}
+ if(d.sourceImage&&https(d.sourceImage))previewImage=d.sourceImage;
+ if(Number.isFinite(d.sourcePrice)&&d.sourcePrice>0)previewPrice=d.sourcePrice;
+ for(const offer of d.offers||[])addOffer(offer);
+ renderPreview();
+ if(comparing)draw();
+}
+async function pollTicket(id,turn,phase){
+ for(let attempt=0;attempt<24;attempt++){
+  if(turn!==activeSearch)return;
+  const response=await fetch('./api/poll?id='+encodeURIComponent(id),{cache:'no-store'});
+  if(!response.ok)throw Error('Ошибка статуса поиска');
+  const data=await response.json();
+  if(turn!==activeSearch)return;
+  recordPoll(data);
+  if(phase==='preview'){
+   if(data.phase==='preview'&&data.sourceTitle){
+    $('message').textContent='Товар определён. Теперь нажми «Сравнить цены», чтобы проверить другие площадки.';
+    return;
+   }
+   if(data.phase==='error'||data.done){
+    previewTicket=null;renderPreview();
+    $('message').textContent='Источник не подтвердил исходную карточку. Можно открыть товар на Ozon или проверить магазины вручную. '+(data.errors||[]).join('; ');
+    return;
+   }
+  }else{
+   if(data.done){
+    $('message').textContent='Проверка магазинов завершена. Показаны только подтверждённые совпадения, цены без гарантии доставки. '+(data.errors||[]).join('; ');
+    return;
+   }
+  }
+  $('message').textContent=phase==='preview'?'Получаем название и фотографию исходного товара…':'Сравниваем цены одинакового товара в магазинах…';
+  await new Promise(resolve=>setTimeout(resolve,4000));
+ }
+ $('message').textContent='Источник ещё обрабатывает запрос. Результаты могут появиться при следующем поиске.';
+}
+async function preparePreview(query,turn){
+ const info=understandInput(query);
+ if(!apiMode||info.kind!=='ozon')return;
+ const response=await fetch('./api/search',{method:'POST',headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({query:query,sourceUrl:info.url,region:$('region').value})});
+ if(!response.ok)throw Error('Источник карточки не ответил');
+ const d=await response.json();
+ if(!d.id)throw Error('Источник не вернул номер задания');
+ if(turn!==activeSearch)return;
+ previewTicket=d.id;renderPreview();
+ await pollTicket(previewTicket,turn,'preview');
+}
+async function startComparison(){
+ if(!current)return;
+ showPriceSections();
+ const info=understandInput(current);
+ if(!apiMode){
+  $('message').textContent='Автоматическое сравнение пока недоступно: сервер с ключом источника цен не подключён. Ниже доступны магазины для поиска этого же товара.';
+  return;
+ }
+ if(info.kind==='ozon'){
+  if(!previewTicket||!previewVerified){
+   $('message').textContent='Не удалось подтвердить исходный товар Ozon. Цены других товаров не будут выданы за совпадение.';
+   return;
+  }
+  $('compare-now').disabled=true;
+  $('message').textContent='Ищем цены подтверждённой модели на других площадках…';
+  try{
+   const r=await fetch('./api/compare',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:previewTicket})});
+   if(!r.ok)throw Error('Не удалось запустить сравнение');
+   await pollTicket(previewTicket,activeSearch,'compare');
+  }catch{$('message').textContent='Источник сравнения недоступен. Попробуй поиск по магазинам ниже.'}
+  finally{$('compare-now').disabled=false}
+ }else{
+  $('compare-now').disabled=true;
+  try{await automate(current,activeSearch)}catch{$('message').textContent='Не удалось получить результаты. Доступны переходы по магазинам.'}
+  finally{$('compare-now').disabled=false}
+ }
+}
 function showInputSource(){
  const target=$('source-origin'),info=understandInput(current);
  if(info.kind==='ozon'){
@@ -193,7 +303,7 @@ function comparable(offers){
 function addOffer(o){if(!o||!STORES.some(s=>s[0]===o.shop)||!https(o.url)||!Number.isFinite(o.price)||o.price<=0)return false;const item={...o,id:o.id||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),image:https(o.image)||'',delivery:Number.isFinite(o.delivery)&&o.delivery>=0?o.delivery:null,checkedAt:o.checkedAt||null,region:o.region||null};const existing=items.findIndex(z=>z.shop===item.shop&&z.url===item.url);if(existing>=0)items.splice(existing,1);items.unshift(item);items=items.slice(0,200);save();return true}
 $('shop').innerHTML=STORES.map((s,i)=>'<option value="'+i+'">'+safe(s[0])+'</option>').join('');
 $('order').onchange=draw; $('export').onclick=()=>{const blob=new Blob([JSON.stringify({query:current,items},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kupiora-compare.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
-$('clear').onclick=()=>{if(!confirm('Начать новую подборку и удалить локальные предложения?'))return;items=[];current='';resolvedTitle='';$('query').value='';save();draw();searches();showInputSource();$('message').textContent='Подборка очищена.'};
+$('clear').onclick=()=>{if(!confirm('Начать новую подборку и удалить локальные предложения?'))return;activeSearch++;items=[];current='';resolvedTitle='';previewTicket=null;previewVerified=false;previewImage='';previewPrice=null;comparing=false;$('query').value='';$('product-preview').hidden=true;$('comparison-panel').hidden=true;$('source-panel').hidden=true;save();draw();searches();showInputSource();$('message').textContent='Подборка очищена.'};
 $('add').onsubmit=e=>{e.preventDefault();const url=https($('url').value),shop=STORES[Number($('shop').value)]?.[0],verified=getStore(url);if(!url){$('message').textContent='Нужна корректная HTTPS-ссылка на товар.';return}if(verified&&verified!==shop){$('message').textContent='Выбранный магазин не соответствует домену ссылки.';return}
 const ok=addOffer({shop,title:$('title').value.trim(),url,price:Number($('price').value),delivery:$('delivery').value===''?null:Number($('delivery').value),mpn:$('mpn').value.trim(),sellerName:$('seller').value.trim(),image:$('image').value,region:$('region').value,source:$('origin').value,checkedAt:new Date().toISOString()});if(ok){$('add').reset();draw();$('message').textContent='Предложение добавлено. Сравнивайте только одинаковые модификации.'}};
 function parsedOffer(offer,fallback,region,stamp){
@@ -215,35 +325,29 @@ function parseReport(data){
 $('import').onchange=async e=>{let added=0,rejected=0;for(const file of e.target.files){try{if(file.size>4000000)throw Error('слишком большой файл');const result=parseReport(JSON.parse(await file.text()));if(!result.length)throw Error('нет подходящих предложений');for(const o of result){if(addOffer(o))added++;else rejected++}}catch(err){rejected++;}}$('import-status').textContent='Импортировано предложений: '+added+'; файлов/строк с ошибкой: '+rejected+'.';draw()};
 async function detectAPI(){try{const c=new AbortController();const t=setTimeout(()=>c.abort(),1200);const r=await fetch('./api/status',{signal:c.signal,cache:'no-store'});clearTimeout(t);if(!r.ok)throw Error();const d=await r.json();apiMode=!!d.enabled;$('mode').textContent=d.enabled?'Автопоиск включён: '+d.provider:'Без API-ключа: ручной поиск';}catch{apiMode=false;$('mode').textContent='Без API-ключа: ручной поиск'}}
 async function automate(q,turn){
- const start=await fetch('./api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,sourceUrl:understandInput(q).kind==='ozon'?understandInput(q).url:null,region:$('region').value})});
- if(!start.ok)throw Error('Автоматический поиск недоступен');const ticket=await start.json();if(!ticket.id)throw Error('Не получено задание');
- for(let attempt=0;attempt<24;attempt++){
- if(turn!==activeSearch)return;
- const r=await fetch('./api/poll?id='+encodeURIComponent(ticket.id),{cache:'no-store'});
- if(!r.ok)throw Error('Ошибка проверки результатов');
- const d=await r.json();
- if(d.sourceTitle&&!resolvedTitle){resolvedTitle=d.sourceTitle;searches();}
- for(const offer of d.offers||[])addOffer(offer);
- draw();
- $('message').textContent='Автоматический поиск: '+(d.done?'завершён.':'обрабатывается…')+' Получено '+(d.offers||[]).length+' предложений. '+(d.errors||[]).join('; ');
- if(d.done)return;
- await new Promise(resolve=>setTimeout(resolve,4000));
- }
- $('message').textContent='Поиск продолжается на сервере. Повторите запрос позже.';
+ const response=await fetch('./api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,region:$('region').value})});
+ if(!response.ok)throw Error('Автоматический поиск недоступен');
+ const ticket=await response.json();if(!ticket.id)throw Error('Не получено задание');
+ await pollTicket(ticket.id,turn,'compare');
 }
-$('search').onsubmit=async e=>{e.preventDefault();const q=$('query').value.trim();if(q.length<2)return;const parsed=understandInput(q);if(parsed.kind==='invalid'){$('message').textContent=parsed.reason;return;}if(q!==current){items=[];resolvedTitle='';draw()}current=q;resolvedTitle='';save();searches();showInputSource();$('title').value=lookupText()||q;const turn=++activeSearch;
- $('message').textContent=parsed.kind==='ozon'?(apiMode?'Проверяем карточку Ozon и ищем подтверждённые совпадения в магазинах.':'Ссылка Ozon распознана. Без подключённого API нельзя автоматически получить точную модель и сравнить цены; ссылки ниже ищут по предварительному названию из URL.'):'Поиск товаров подготовлен. '+(apiMode?'Автоматическая проверка источников запущена.':'Без API автоматическое сравнение недоступно; ниже ссылки на магазины.');
- if(apiMode)try{await automate(q,turn)}catch(err){$('message').textContent='Автоматический источник недоступен. Ручной поиск по магазинам продолжает работать.'}
-};
-searches();draw();showInputSource();
-detectAPI().then(()=>{
- if(incoming&&current){
-   if(apiMode&&typeof $('search').requestSubmit==='function'){
-     $('message').textContent='Запускаем автоматическую проверку по введённой ссылке или названию…';
-     $('search').requestSubmit();
-   }else{
-     $('message').textContent=understandInput(current).kind==='ozon'?'Ссылка Ozon распознана. Без API нельзя получить и сравнить актуальные цены. Ниже доступны ссылки поиска по предварительному названию.':'Без API автоматическое сравнение недоступно. Выберите магазин ниже.';
-   }
+$('compare-now').onclick=()=>startComparison();
+$('search').onsubmit=async e=>{
+ e.preventDefault();
+ const q=$('query').value.trim();if(q.length<2)return;
+ const parsed=understandInput(q);
+ if(parsed.kind==='invalid'){$('message').textContent=parsed.reason;return}
+ activeSearch++;
+ items=[];current=q;resolvedTitle='';previewTicket=null;previewVerified=false;previewImage='';previewPrice=null;comparing=false;
+ $('comparison-panel').hidden=true;$('source-panel').hidden=true;
+ save();searches();showInputSource();$('title').value=lookupText()||q;
+ renderPreview();draw();
+ $('message').textContent=parsed.kind==='ozon'?(apiMode?'Получаем товар и фотографию с Ozon…':'Ссылка принята. Источник данных не подключён: фото и цены не подтверждены. Нажми «Сравнить цены», чтобы открыть магазины.'):'Товар выбран. Нажми «Сравнить цены», чтобы проверить доступные предложения.';
+ if(apiMode&&parsed.kind==='ozon')try{await preparePreview(q,activeSearch)}catch{
+  previewTicket=null;renderPreview();$('message').textContent='Не удалось получить данные карточки Ozon от источника. Товар можно открыть по ссылке.';
  }
+};
+searches();draw();showInputSource();renderPreview();
+detectAPI().then(()=>{
+ if(incoming&&current&&typeof $('search').requestSubmit==='function')$('search').requestSubmit();
 });
 </script></body></html>
