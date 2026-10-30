@@ -31,6 +31,13 @@ test('real seller label uses supplied seller name and shows marketplace too',()=
  assert.match(result,/class="shop shop-link"/);
 });
 
+test('real seller profile URL takes priority over product offer URL only when provided',()=>{
+ const o={shop:'Ozon',sellerName:'Позитроника',sellerUrl:'https://www.ozon.ru/seller/pozitronika-123/',url:'https://www.ozon.ru/product/test-1234/'};
+ const result=make('live').merchantSummary(o,0);
+ assert.match(result,/href="https:\/\/www\.ozon\.ru\/seller\/pozitronika-123\//);
+ assert.match(result,/Открыть страницу продавца/);
+});
+
 test('fake demo seller never gets a fabricated purchase link',()=>{
  const o={shop:'Магазин Б',price:1234,url:'https://example.org/should-not-open'};
  const result=make('demo').merchantSummary(o,1);
