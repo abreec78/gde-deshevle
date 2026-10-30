@@ -61,7 +61,7 @@ function draw(){
 }
 function comparable(offers){
  const canonical=s=>String(s||'').trim().replace(/[^a-z0-9]/gi,'').toUpperCase();
- const cap=s=>{const m=String(s).match(/(?:\d+(?:[.,]\d+)?)\s*(?:ТБ|TB|ГБ|GB)/i);return m?m[0].replace(/\s/g,'').toUpperCase():''};
+ const cap=s=>{const m=String(s).match(/(?:\d+(?:[.,]\d+)?)\s*(?:ТБ|TB|ГБ|GB)/i);return m?m[0].replace(/\s/g,'').toUpperCase().replace('ТБ','TB').replace('ГБ','GB'):''};
  if(offers.length<2)return false;
  const mpns=offers.map(o=>canonical(o.mpn));if(mpns.some(x=>!x)||new Set(mpns).size!==1)return false;
  const capacities=offers.map(o=>cap(o.title)).filter(Boolean);
