@@ -92,18 +92,55 @@ function externalSearch(store,q){
  if(host==='market.yandex.ru')return 'https://market.yandex.ru/search?text='+v;
  return 'https://yandex.ru/search/?text='+encodeURIComponent('site:'+host+' '+q);
 }
+function understandInput(raw){
+ const text=String(raw||'').trim();
+ if(!/^https?:\/\//i.test(text))return {kind:'text',query:text};
+ let u;try{u=new URL(text)}catch{return {kind:'invalid',reason:'Не удалось разобрать адрес. Нужна прямая ссылка на товар.'}};
+ const host=u.hostname.toLowerCase().replace(/^www\./,'');
+ if(u.protocol!=='https:')return {kind:'invalid',reason:'Нужна безопасная HTTPS-ссылка на товар.'};
+ if(host!=='ozon.ru')return {kind:'invalid',reason:'Автоматическое распознавание ссылки пока поддерживается только для Ozon. Для других магазинов введи название и точную модель.'};
+ const m=u.pathname.match(/^\/product\/(?:.*?-)?(\d+)\/?$/);
+ if(!m)return {kind:'invalid',reason:'Это не прямая ссылка на карточку Ozon. Открой сам товар и скопируй его полный адрес /product/…'};
+ const slug=u.pathname.split('/')[2].replace(/-\d+$/,'');
+ let title='';
+ try{title=decodeURIComponent(slug).replace(/[-_]+/g,' ').trim()}catch{}
+ const direct='https://www.ozon.ru'+u.pathname;
+ return {kind:'ozon',id:m[1],url:direct,query:title||'',unverified:true};
+}
 let items=[], current='', apiMode=false, activeSearch=0;
+function lookupText(){return understandInput(current).query||''}
+function showInputSource(){
+ const target=$('source-origin'),info=understandInput(current);
+ if(info.kind==='ozon'){
+  target.hidden=false;
+  target.innerHTML='Карточка Ozon № '+safe(info.id)+': <a href="'+safe(info.url)+'" target="_blank" rel="noopener noreferrer">открыть оригинал ↗</a>. <span>Название из URL предварительное, точная модель будет проверена по данным источника.</span>';
+ }else{target.hidden=true;target.textContent=''}
+}
 const storageKey='kupiora-private-compare-v1';
 try{const saved=JSON.parse(localStorage.getItem(storageKey)||'{}');items=Array.isArray(saved.items)?saved.items.slice(0,200):[];current=typeof saved.query==='string'?saved.query:''}catch{}
-const incoming=new URLSearchParams(location.search).get('q');if(incoming&&incoming.trim().length>=2){current=incoming.trim().slice(0,160);items=[];}
+const incoming=new URLSearchParams(location.search).get('q');if(incoming&&incoming.trim().length>=2){current=incoming.trim().slice(0,1200);items=[];}
 $('query').value=current;
 function save(){try{localStorage.setItem(storageKey,JSON.stringify({items,query:current}))}catch{}}
-function searches(){const host=$('stores');host.replaceChildren();for(const s of STORES){const a=document.createElement('a');a.className='compare-source';a.textContent=s[0]+' ↗';a.target='_blank';a.rel='noopener noreferrer';a.href=externalSearch(s,current||'товар');a.title=s[2]?'Поиск на площадке':'Поиск страниц магазина через Яндекс'; if(!s[2]){let label=document.createElement('small');label.textContent='через Яндекс';a.append(label)}host.append(a)}}
+function searches(){const host=$('stores');host.replaceChildren();for(const s of STORES){const a=document.createElement('a');a.className='compare-source';a.textContent=s[0]+' ↗';a.target='_blank';a.rel='noopener noreferrer';a.href=externalSearch(s,lookupText()||'товар');a.title=s[2]?'Поиск на площадке':'Поиск страниц магазина через Яндекс'; if(!s[2]){let label=document.createElement('small');label.textContent='через Яндекс';a.append(label)}host.append(a)}}
 function draw(){
  $('counter').textContent=items.length+' предложений';
  $('caution').textContent=comparable(items)?'Подтверждено совпадение артикула производителя (MPN) у предложений. Перед покупкой проверьте комплектацию, скидки и доставку.':'Совпадение товара между магазинами не доказано. Предложения отсортированы по указанной цене, но они могут относиться к разным моделям, объёмам памяти или комплектам.';const g=$('cards');g.replaceChildren();
  const data=[...items].sort((a,b)=>$('order').value==='store'?a.shop.localeCompare(b.shop,'ru'):(a.price??Infinity)-(b.price??Infinity));
- if(!data.length){g.innerHTML='<p class="hint">Пока пусто. Найдите товар в магазинах или импортируйте отчёт. Здесь появятся настоящие предложения.</p>';return}
+ const verified=comparable(items)&&items.length>=2;
+ const priced=items.filter(x=>Number.isFinite(x.price)&&x.price>0);
+ const winner=priced.length?priced.reduce((a,b)=>a.price<=b.price?a:b):null;
+ const best=$('best');
+ best.hidden=!verified||!winner;
+ if(verified&&winner){
+   best.textContent='';
+   const strong=document.createElement('strong');strong.textContent='Самая низкая из найденных цен: '+rub(winner.price)+' · '+winner.shop+'. ';
+   best.append(strong);
+   const link=document.createElement('a');link.href=https(winner.url);link.target='_blank';link.rel='noopener noreferrer nofollow sponsored';link.textContent='Перейти к предложению ↗';
+   best.append(link);
+   const note=document.createElement('span');note.textContent=' Доставка и персональные скидки могут изменить итоговую стоимость.';best.append(note);
+ }
+
+ if(!data.length){$('best').hidden=true;g.innerHTML='<p class="hint">Пока пусто. Найдите товар в магазинах или импортируйте отчёт. Здесь появятся настоящие предложения.</p>';return}
  for(const x of data){const c=document.createElement('article');c.className='compare-card';
  const validImage=https(x.image),validLink=https(x.url);
  const badge=x.source==='api'?'API':x.source==='import'?'Отчёт':'Вручную';
@@ -125,7 +162,7 @@ function comparable(offers){
 function addOffer(o){if(!o||!STORES.some(s=>s[0]===o.shop)||!https(o.url)||!Number.isFinite(o.price)||o.price<=0)return false;const item={...o,id:o.id||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),image:https(o.image)||'',delivery:Number.isFinite(o.delivery)&&o.delivery>=0?o.delivery:null,checkedAt:o.checkedAt||null,region:o.region||null};const existing=items.findIndex(z=>z.shop===item.shop&&z.url===item.url);if(existing>=0)items.splice(existing,1);items.unshift(item);items=items.slice(0,200);save();return true}
 $('shop').innerHTML=STORES.map((s,i)=>'<option value="'+i+'">'+safe(s[0])+'</option>').join('');
 $('order').onchange=draw; $('export').onclick=()=>{const blob=new Blob([JSON.stringify({query:current,items},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kupiora-compare.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
-$('clear').onclick=()=>{if(!confirm('Начать новую подборку и удалить локальные предложения?'))return;items=[];current='';$('query').value='';save();draw();searches();$('message').textContent='Подборка очищена.'};
+$('clear').onclick=()=>{if(!confirm('Начать новую подборку и удалить локальные предложения?'))return;items=[];current='';$('query').value='';save();draw();searches();showInputSource();$('message').textContent='Подборка очищена.'};
 $('add').onsubmit=e=>{e.preventDefault();const url=https($('url').value),shop=STORES[Number($('shop').value)]?.[0],verified=getStore(url);if(!url){$('message').textContent='Нужна корректная HTTPS-ссылка на товар.';return}if(verified&&verified!==shop){$('message').textContent='Выбранный магазин не соответствует домену ссылки.';return}
 const ok=addOffer({shop,title:$('title').value.trim(),url,price:Number($('price').value),delivery:$('delivery').value===''?null:Number($('delivery').value),mpn:$('mpn').value.trim(),sellerName:$('seller').value.trim(),image:$('image').value,region:$('region').value,source:$('origin').value,checkedAt:new Date().toISOString()});if(ok){$('add').reset();draw();$('message').textContent='Предложение добавлено. Сравнивайте только одинаковые модификации.'}};
 function parsedOffer(offer,fallback,region,stamp){
@@ -147,7 +184,7 @@ function parseReport(data){
 $('import').onchange=async e=>{let added=0,rejected=0;for(const file of e.target.files){try{if(file.size>4000000)throw Error('слишком большой файл');const result=parseReport(JSON.parse(await file.text()));if(!result.length)throw Error('нет подходящих предложений');for(const o of result){if(addOffer(o))added++;else rejected++}}catch(err){rejected++;}}$('import-status').textContent='Импортировано предложений: '+added+'; файлов/строк с ошибкой: '+rejected+'.';draw()};
 async function detectAPI(){try{const c=new AbortController();const t=setTimeout(()=>c.abort(),1200);const r=await fetch('./api/status',{signal:c.signal,cache:'no-store'});clearTimeout(t);if(!r.ok)throw Error();const d=await r.json();apiMode=!!d.enabled;$('mode').textContent=d.enabled?'Автопоиск включён: '+d.provider:'Без API-ключа: ручной поиск';}catch{apiMode=false;$('mode').textContent='Без API-ключа: ручной поиск'}}
 async function automate(q,turn){
- const start=await fetch('./api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,region:$('region').value})});
+ const start=await fetch('./api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,sourceUrl:understandInput(q).kind==='ozon'?understandInput(q).url:null,region:$('region').value})});
  if(!start.ok)throw Error('Автоматический поиск недоступен');const ticket=await start.json();if(!ticket.id)throw Error('Не получено задание');
  for(let attempt=0;attempt<24;attempt++){
  if(turn!==activeSearch)return;
@@ -162,9 +199,9 @@ async function automate(q,turn){
  }
  $('message').textContent='Поиск продолжается на сервере. Повторите запрос позже.';
 }
-$('search').onsubmit=async e=>{e.preventDefault();const q=$('query').value.trim();if(q.length<2)return;if(q!==current){items=[];draw()}current=q;save();searches();$('title').value=q;const turn=++activeSearch;
- $('message').textContent='Поиск по 18 магазинам подготовлен. Откройте нужные магазины и добавьте цены.'+(apiMode?' Автоматические проверки запущены.':'');
+$('search').onsubmit=async e=>{e.preventDefault();const q=$('query').value.trim();if(q.length<2)return;const parsed=understandInput(q);if(parsed.kind==='invalid'){$('message').textContent=parsed.reason;return;}if(q!==current){items=[];draw()}current=q;save();searches();showInputSource();$('title').value=lookupText()||q;const turn=++activeSearch;
+ $('message').textContent=parsed.kind==='ozon'?(apiMode?'Проверяем карточку Ozon и ищем подтверждённые совпадения в магазинах.':'Ссылка Ozon распознана. Без подключённого API нельзя автоматически получить точную модель и сравнить цены; ссылки ниже ищут по предварительному названию из URL.'):'Поиск товаров подготовлен. '+(apiMode?'Автоматическая проверка источников запущена.':'Без API автоматическое сравнение недоступно; ниже ссылки на магазины.');
  if(apiMode)try{await automate(q,turn)}catch(err){$('message').textContent='Автоматический источник недоступен. Ручной поиск по магазинам продолжает работать.'}
 };
-searches();draw();detectAPI();if(incoming&&current){$('message').textContent='Поиск подготовлен. Откройте магазины ниже и добавьте найденные цены. Для автоматического поиска нужен локальный сервер с API-ключом.';}
+searches();draw();showInputSource();detectAPI();if(incoming&&current){$('message').textContent=understandInput(current).kind==='ozon'?'Ссылка Ozon распознана. Без API доступны переходы в магазины, но точная модель и лучшая цена не подтверждены.':'Поиск подготовлен. Без API автоматическое сравнение недоступно.';}
 </script></body></html>
