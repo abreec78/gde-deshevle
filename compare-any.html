@@ -212,5 +212,15 @@ $('search').onsubmit=async e=>{e.preventDefault();const q=$('query').value.trim(
  $('message').textContent=parsed.kind==='ozon'?(apiMode?'Проверяем карточку Ozon и ищем подтверждённые совпадения в магазинах.':'Ссылка Ozon распознана. Без подключённого API нельзя автоматически получить точную модель и сравнить цены; ссылки ниже ищут по предварительному названию из URL.'):'Поиск товаров подготовлен. '+(apiMode?'Автоматическая проверка источников запущена.':'Без API автоматическое сравнение недоступно; ниже ссылки на магазины.');
  if(apiMode)try{await automate(q,turn)}catch(err){$('message').textContent='Автоматический источник недоступен. Ручной поиск по магазинам продолжает работать.'}
 };
-searches();draw();showInputSource();detectAPI();if(incoming&&current){$('message').textContent=understandInput(current).kind==='ozon'?'Ссылка Ozon распознана. Без API доступны переходы в магазины, но точная модель и лучшая цена не подтверждены.':'Поиск подготовлен. Без API автоматическое сравнение недоступно.';}
+searches();draw();showInputSource();
+detectAPI().then(()=>{
+ if(incoming&&current){
+   if(apiMode&&typeof $('search').requestSubmit==='function'){
+     $('message').textContent='Запускаем автоматическую проверку по введённой ссылке или названию…';
+     $('search').requestSubmit();
+   }else{
+     $('message').textContent=understandInput(current).kind==='ozon'?'Ссылка Ozon распознана. Без API нельзя получить и сравнить актуальные цены. Ниже доступны ссылки поиска по предварительному названию.':'Без API автоматическое сравнение недоступно. Выберите магазин ниже.';
+   }
+ }
+});
 </script></body></html>
