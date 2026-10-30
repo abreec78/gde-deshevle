@@ -126,3 +126,60 @@ test('compare button reveals lists but without API never invents other-store pri
  assert.ok(elements['message'].textContent.includes('Автоматическое сравнение пока недоступно'));
  assert.ok(elements['cards'].innerHTML.includes('Подтверждённые предложения пока не найдены'));
 });
+
+
+test('Wildberries card links from the browser are recognized by exact article ID',()=>{
+ const {context}=setup();
+ context.wb='https://www.wildberries.ru/catalog/247318779/detail.aspx?targetUrl=EX';
+ const result=js(context,'understandInput(wb)');
+ assert.equal(result.kind,'wb');
+ assert.equal(result.id,'247318779');
+ assert.equal(result.store,'Wildberries');
+ assert.equal(result.url,'https://www.wildberries.ru/catalog/247318779/detail.aspx');
+ assert.equal(js(context,'isProductLink(wb)'),true);
+});
+test('Wildberries product IDs with short catalogue URLs are normalized but search pages rejected',()=>{
+ const {context}=setup();
+ context.wb='https://wildberries.ru/catalog/247318779';
+ assert.equal(js(context,'understandInput(wb).url'),'https://www.wildberries.ru/catalog/247318779/detail.aspx');
+ for(const candidate of ['https://wildberries.ru.evil.test/catalog/247318779/detail.aspx',
+ 'http://www.wildberries.ru/catalog/247318779/detail.aspx',
+ 'https://www.wildberries.ru/catalog/0/search.aspx?search=ssd',
+ 'https://www.wildberries.ru/seller/247318779']){
+  context.wb=candidate;
+  assert.equal(js(context,'understandInput(wb).kind'),'invalid');
+ }
+});
+test('Yandex Market individual cards are accepted, site search remains unverified',()=>{
+ const {context}=setup();
+ context.url='https://market.yandex.ru/card/elektrobritva-braun/103683837950?sku=42';
+ assert.equal(js(context,'understandInput(url).kind'),'ym');
+ context.url='https://market.yandex.ru/search?text=braun';
+ assert.equal(js(context,'understandInput(url).kind'),'invalid');
+});
+test('comparison button remains clickable during card lookup and queues comparison',async()=>{
+ const {context,elements}=setup();
+ js(context,"current='https://www.wildberries.ru/catalog/247318779/detail.aspx';apiMode=true;previewTicket='job-123';renderPreview()");
+ assert.equal(elements['compare-now'].disabled,false);
+ await js(context,'startComparison()');
+ assert.equal(js(context,'compareRequested'),true);
+ assert.equal(elements['comparison-panel'].hidden,false);
+ assert.equal(elements['source-panel'].hidden,false);
+ assert.ok(elements['message'].textContent.includes('Сравнение начнётся автоматически'));
+});
+test('without backend the Wildberries compare button still opens store links and gives honest status',async()=>{
+ const {context,elements}=setup();
+ js(context,"current='https://www.wildberries.ru/catalog/247318779/detail.aspx';renderPreview()");
+ await js(context,'startComparison()');
+ assert.equal(elements['compare-now'].disabled,false);
+ assert.equal(elements['comparison-panel'].hidden,false);
+ assert.equal(elements['source-panel'].hidden,false);
+ assert.ok(elements['message'].textContent.includes('Источник актуальных цен не подключён'));
+ assert.equal(js(context,'STORES.length'),18);
+});
+test('verified candidates and merely similar candidates are displayed separately',()=>{
+ assert.ok(html.includes('Похожие предложения, совпадение модели НЕ подтверждено'));
+ assert.ok(html.includes('offer-unverified'));
+ assert.ok(html.includes('x.match===\\'source\\'||x.match===\\'confirmed\\''));
+ assert.ok(html.includes('min'));
+});
