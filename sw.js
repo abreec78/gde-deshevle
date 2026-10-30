@@ -1,6 +1,6 @@
 'use strict';
 const PREFIX='gde-deshevle-'+encodeURIComponent(new URL(self.registration.scope).pathname)+'-';
-const CACHE=PREFIX+'v6-link-compare-design';
+const CACHE=PREFIX+'v7-wb-product-link';
 const SHELL=["./","./index.html","./compare-any.html","./styles.css","./core.js","./app.js","./manifest.webmanifest","./catalog-loader.js","./data/catalog.json","./assets/category-0.webp","./assets/category-1.webp","./assets/category-10.webp","./assets/category-11.webp","./assets/category-2.webp","./assets/category-3.webp","./assets/category-4.webp","./assets/category-5.webp","./assets/category-6.webp","./assets/category-7.webp","./assets/category-8.webp","./assets/category-9.webp","./assets/headphones.webp","./assets/icon-192.png","./assets/icon-512.png","./assets/kettle.webp","./assets/keyboard.webp","./assets/kingston.webp","./assets/laptop.webp","./assets/phone.webp","./assets/robot.webp","./assets/samsung-sata.webp","./assets/ssd-sata.webp","./assets/ssd.webp","./assets/tv.webp","./assets/washer.webp","./assets/wd.webp"];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith(PREFIX)&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
