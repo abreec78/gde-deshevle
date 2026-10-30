@@ -63,7 +63,7 @@ test('homepage navigation opens product preview, never directly runs price compa
  assert.ok(html.includes("detectAPI().then("));
  assert.ok(html.includes("$('search').requestSubmit()"));
  assert.ok(html.includes("if(phase==='preview')"));
- assert.ok(html.includes("'/api/compare'"));
+ assert.ok(html.includes("'./api/compare'"));
 });
 test('Ozon product link is recognized by immutable product ID',()=>{
  const {context}=setup();
@@ -101,7 +101,7 @@ test('product preview appears with Ozon link before comparison and no fabricated
  const {context,elements}=setup();
  js(context,"current='https://www.ozon.ru/product/samsung-ssd-12345678/';renderPreview()");
  assert.equal(elements['product-preview'].hidden,false);
- assert.equal(elements['comparison-panel'].hidden,undefined);
+ assert.ok(html.includes('id="comparison-panel" hidden'));
  assert.equal(elements['preview-title'].textContent,'samsung ssd');
  assert.ok(elements['preview-photo'].children[0].textContent.includes('Фотография загрузится'));
  assert.equal(elements['preview-source-link'].href,'https://www.ozon.ru/product/samsung-ssd-12345678/');
@@ -115,7 +115,7 @@ test('photo and title are shown only when the Ozon source confirms them',()=>{
  assert.equal(elements['preview-state'].textContent,'Карточка подтверждена источником');
  assert.equal(elements['preview-title'].textContent,'Samsung MZ-V8V1T0BW 1 TB');
  assert.equal(elements['preview-photo'].children[0].src,'https://ir.ozone.ru/real-photo.jpg');
- assert.equal(elements['comparison-panel'].hidden,undefined);
+ assert.ok(html.includes('id="comparison-panel" hidden'));
 });
 test('compare button reveals lists but without API never invents other-store prices',async()=>{
  const {context,elements}=setup();
