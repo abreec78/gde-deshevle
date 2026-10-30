@@ -24,14 +24,29 @@ let demoHomeOrder=(()=>{
   return newHomeOrder(previous);
 })();
 function favoriteButton(p){return '<button class="favorite-toggle" data-favorite="'+p.id+'" aria-label="Избранное: '+escape(name(p))+'" aria-pressed="'+state.favorites.has(p.id)+'">'+icon('heart')+'</button>';}
-function shopMark(o,i){return !o?'':'<span class="shop"><span class="shop-mark s'+(i+1)+'" aria-hidden="true">'+escape(o.shop.split(' ').pop().slice(0,1))+'</span>'+escape(o.shop)+'</span>';}
+function shopMark(o,i){
+  if(!o)return '<span class="shop-unknown">Магазин не указан</span>';
+  const isLive=C.mode==='live',seller=typeof o.sellerName==='string'?o.sellerName.trim():'';
+  const shown=seller||o.shop;
+  const mark='<span class="shop-mark s'+(i%3+1)+'" aria-hidden="true">'+escape(String(shown).slice(0,1).toUpperCase())+'</span>';
+  const text='<span class="shop-label">'+escape(shown)+(seller&&seller!==o.shop?'<small> · '+escape(o.shop)+'</small>':'')+'</span>';
+  const inner=mark+text;
+  if(isLive&&C.safeUrl(o.url))
+    return '<a class="shop shop-link" href="'+escape(o.url)+'" target="_blank" rel="noopener noreferrer nofollow sponsored" title="Открыть предложение в магазине: '+escape(o.shop)+'">'+inner+' <span class="shop-arrow" aria-hidden="true">↗</span></a>';
+  return '<span class="shop shop-unlinked" title="'+(isLive?'Нет ссылки на предложение':'Демонстрационный магазин без реальной ссылки')+'">'+inner+(isLive?'':' <small class="shop-demo-note">демо</small>')+'</span>';
+}
+function merchantSummary(o,i){
+  if(!o)return '<span class="seller-status">Магазин не указан</span>';
+  const label=C.mode==='demo'?'Демо-магазин':typeof o.sellerName==='string'&&o.sellerName.trim()?'Продавец':'Магазин';
+  return '<div class="seller-inline"><span class="seller-caption">'+label+':</span>'+shopMark(o,i)+'</div>';
+}
 function specs(p){return '<div class="specs">'+p.specs.map(s=>'<span>'+escape(s)+'</span>').join('')+'</div>';}
 function renderCategories(){
   $('categories').innerHTML=C.categories.map((category,i)=>'<button class="category-card '+(state.category===category?'active':'')+'" data-category="'+escape(category)+'" aria-pressed="'+(state.category===category)+'"><img src="assets/category-'+i+'.webp" width="233" height="150" alt="" decoding="async" '+(i>5?'loading="lazy"':'')+'><span class="category-copy"><strong>'+category+'</strong><small>'+C.countLabel(C.filterProducts({category}).length)+(C.mode==='demo'?' в демокаталоге':' в каталоге')+'</small>'+icon('arrow')+'</span></button>').join('');
 }
 function renderCard(p,detailMode){
   const offers=C.sortedOffers(p.id),image='<img class="product-image" src="'+escape(imagePath(p))+'" width="300" height="180" alt="'+escape(name(p))+(C.mode==='demo'?' — иллюстрация':'')+'" loading="lazy" decoding="async">';
-  const info='<div class="card-info"><h3><button data-open="'+p.id+'">'+escape(name(p))+'</button></h3>'+(detailMode?'<p class="card-subtitle">'+escape(p.specs.join(', '))+'</p>'+specs(p):'<div class="price">'+money(C.bestPrice(p))+'</div><p class="card-note">с известной доставкой'+(C.mode==='demo'?' · демо':' · '+escape(offers[0]?.region||''))+'</p>'+shopMark(offers[0],0))+'</div>';
+  const info='<div class="card-info"><h3><button data-open="'+p.id+'">'+escape(name(p))+'</button></h3>'+(detailMode?'<p class="card-subtitle">'+escape(p.specs.join(', '))+'</p>'+specs(p)+merchantSummary(offers[0],0):'<div class="price">'+money(C.bestPrice(p))+'</div><p class="card-note">с известной доставкой'+(C.mode==='demo'?' · демо':' · '+escape(offers[0]?.region||''))+'</p>'+merchantSummary(offers[0],0))+'</div>';
   const open='<button class="compare-link" data-open="'+p.id+'">Сравнить цены ('+offers.length+') '+icon('arrow')+'</button>';
   return '<article class="product-card" data-product="'+p.id+'">'+favoriteButton(p)+'<button class="product-image-button" data-open="'+p.id+'" aria-label="Сравнить '+escape(name(p))+'">'+image+'</button>'+info+(detailMode?'<div class="card-offers"><div class="price">'+money(C.bestPrice(p))+'</div><p class="card-note">итого с доставкой'+(C.mode==='demo'?' · демо':' · '+escape(offers[0]?.region||''))+'</p>'+offers.map((o,i)=>'<div class="mini-offer">'+shopMark(o,i)+'<b>'+money(C.total(o))+'</b></div>').join('')+open+'</div>':open)+'</article>';
 }
@@ -48,9 +63,9 @@ function chart(p){
 }
 function renderDetail(p){
   const offers=C.sortedOffers(p.id);
-  $('detail').innerHTML='<button class="back-results" id="back-results">‹ К списку товаров</button><div class="detail-image"><img src="'+escape(imagePath(p))+'" alt="'+escape(name(p))+(C.mode==='demo'?' — иллюстрация':'')+'" width="320" height="180">'+favoriteButton(p)+'</div><h2>'+escape(name(p))+'</h2><p class="detail-subtitle">'+escape(p.specs.join(', '))+'</p>'+specs(p)+'<section class="detail-section"><h3>Сравнение цен в магазинах</h3><div class="offer-head"><span>'+(C.mode==='demo'?'Демонстрационные предложения':'Данные подключённых фидов')+'</span><span>Итого</span></div>'+offers.map((o,i)=>'<div class="offer-row '+(!i?'best':'')+'">'+shopMark(o,i)+'<b>'+money(C.total(o))+'</b><small>'+(C.mode==='demo'?'демо':'наблюдение')+'</small></div><div class="offer-detail">Товар: '+money(o.price)+' · Доставка: '+(o.delivery===null?'уточняется':money(o.delivery))+'</div>').join('')+'<button disabled class="disabled-shop">Ссылки появятся после подключения магазинов</button></section><section class="detail-section"><h3>История цены</h3>'+chart(p)+'</section><p class="filter-note">Изображение иллюстративное. Реальные цены, наличие и характеристики требуют проверки источника.</p>';
+  $('detail').innerHTML='<button class="back-results" id="back-results">‹ К списку товаров</button><div class="detail-image"><img src="'+escape(imagePath(p))+'" alt="'+escape(name(p))+(C.mode==='demo'?' — иллюстрация':'')+'" width="320" height="180">'+favoriteButton(p)+'</div><h2>'+escape(name(p))+'</h2><p class="detail-subtitle">'+escape(p.specs.join(', '))+'</p>'+specs(p)+'<section class="detail-section"><h3>Сравнение цен в магазинах</h3><div class="offer-head"><span>'+(C.mode==='demo'?'Демонстрационные предложения':'Данные подключённых фидов')+'</span><span>Итого</span></div>'+offers.map((o,i)=>'<div class="offer-row '+(!i?'best':'')+'">'+shopMark(o,i)+'<b>'+money(C.total(o))+'</b><small>'+(C.mode==='demo'?'демо':'наблюдение')+'</small></div><div class="offer-detail">Товар: '+money(o.price)+' · Доставка: '+(o.delivery===null?'уточняется':money(o.delivery))+'</div>').join('')+(C.mode==='demo'?'<p class="shop-link-note">Это демонстрация: настоящих ссылок на тестовых продавцов нет.</p>':'<p class="shop-link-note">Нажмите на магазин или продавца, чтобы открыть предложение ↗</p>')+'</section><section class="detail-section"><h3>История цены</h3>'+chart(p)+'</section><p class="filter-note">Изображение иллюстративное. Реальные цены, наличие и характеристики требуют проверки источника.</p>';
 }
-function realOfferLinks(offers){return offers.map(o=>'<p class="source-stamp">'+escape(o.shop)+' · '+escape(o.region)+' · проверено '+new Date(o.checkedAt).toLocaleString('ru-RU')+'<br><a class="merchant-link" href="'+escape(o.url)+'" target="_blank" rel="noopener noreferrer nofollow sponsored">Проверить цену в магазине ↗</a></p>').join('');}
+function realOfferLinks(offers){return offers.map(o=>'<p class="source-stamp">'+escape(o.shop)+' · '+escape(o.region)+' · проверено '+new Date(o.checkedAt).toLocaleString('ru-RU')+'</p>').join('');}
 function renderDataStatus(){
   const demo=C.mode==='demo',notice=$('data-notice');
   $('real-mode').setAttribute('aria-pressed',String(!demo));$('demo-mode').setAttribute('aria-pressed',String(demo));
