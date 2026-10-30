@@ -1,24 +1,76 @@
-<!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Купиора · Сравнить любой товар</title>
-<style>
-:root{font-family:Inter,"Segoe UI",Arial,sans-serif;color:#14243a;background:#f7f9fc}*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}a{color:inherit}button{cursor:pointer}header{background:#fff;border-bottom:1px solid #e4eaf1;padding:17px max(22px,calc((100vw - 1240px)/2));display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.logo{font-size:24px;font-weight:850;letter-spacing:-.8px;color:#1268ca}.logo span{color:#13a884}header a{font-size:13px;color:#53657b;text-decoration:none}.wrap{max-width:1240px;margin:auto;padding:28px 22px 70px}.hero{background:linear-gradient(120deg,#fff 40%,#d8f9ee);border:1px solid #e4edf3;padding:32px 36px;border-radius:28px;box-shadow:0 10px 35px #2f52640a}h1{font-size:clamp(28px,4.4vw,46px);margin:0 0 10px;letter-spacing:-1.5px}p{line-height:1.55}.hero p{color:#556b7b;max-width:820px;margin:0 0 22px}.searchbar{display:flex;gap:8px;max-width:900px}.searchbar input{flex:1;min-width:0;padding:16px 18px;border:1px solid #bfd2df;background:white;border-radius:14px;outline-color:#08a88d}.btn{border:0;border-radius:13px;background:#0d9a86;color:#fff;padding:14px 21px;font-weight:700}.btn.secondary{background:#e9f5f2;color:#067365}.btn.ghost{background:white;color:#0c8292;border:1px solid #cddce6}.btn:disabled{opacity:.55;cursor:wait}.badge{font-size:12px;border:1px solid #cbdde4;background:#fff;border-radius:99px;padding:5px 10px}.hint{font-size:13px;color:#647789}.toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:15px 0}.toolbar select,.toolbar input{border:1px solid #d6e0e9;border-radius:9px;padding:9px;background:white}.panel{background:white;border:1px solid #e2e9f1;border-radius:22px;padding:22px;margin-top:20px;box-shadow:0 7px 25px #283f5b07}h2{margin:0 0 12px;font-size:22px}h3{margin:0 0 8px;font-size:17px}.chips{display:flex;gap:9px;flex-wrap:wrap}.chip{background:#eef5fc;padding:8px 11px;border-radius:10px;font-size:12px;color:#34506b}.stores{display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:9px;margin-top:15px}.store{border:1px solid #e3e8ef;border-radius:12px;padding:12px;background:#fff;display:flex;justify-content:space-between;align-items:center;gap:8px;text-decoration:none;font-weight:650;font-size:14px}.store:hover{border-color:#10aa8e;background:#f1fcfa}.store small{font-size:11px;color:#759098}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:13px}.card{border:1px solid #e1e9ee;border-radius:17px;padding:13px;background:#fff}.photo{height:180px;border-radius:12px;background:linear-gradient(135deg,#eff6fa,#dcf2eb);display:flex;align-items:center;justify-content:center;overflow:hidden;color:#90a7ad;font-size:36px}.photo img{width:100%;height:100%;object-fit:contain}.price{font-size:23px;font-weight:850;color:#0c7b6c;margin:7px 0}.small{font-size:12px;color:#63798d}.card .actions{display:flex;justify-content:space-between;gap:5px;margin-top:12px}.card .actions a,.card .actions button{border:1px solid #dce9e9;padding:7px;border-radius:8px;text-decoration:none;font-size:12px;background:#fff;color:#126a74}.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.form-grid input,.form-grid select{width:100%;padding:12px;border:1px solid #ccdbe6;border-radius:10px}.form-grid label{font-size:12px;color:#5a7183}.form-grid label span{display:block;margin-bottom:5px}.notice{padding:12px 16px;background:#fff8e9;border:1px solid #f1deac;border-radius:12px;font-size:13px;color:#80612b}.status{font-size:13px;color:#3a6671}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.foot{color:#5d7484;font-size:12px;margin-top:25px}.tag{background:#e1f5ed;color:#117752;border-radius:6px;padding:3px 7px;font-size:11px}.danger{color:#a94137}.hidden{display:none!important}@media(max-width:730px){.hero{padding:20px}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.searchbar{flex-direction:column}h1{letter-spacing:-.8px}}@media(max-width:420px){.form-grid{grid-template-columns:1fr}.wrap{padding:16px 11px}.panel{padding:15px}header{padding:13px}}
-.merchant-direct{font-weight:700;color:#067c91;text-decoration:underline;text-underline-offset:3px}.merchant-direct:hover{color:#055565}.merchant-direct:focus-visible{outline:2px solid #0a91a4;outline-offset:3px}
-.merchant-muted{font-weight:650;color:#6b7887}
-</style></head><body>
-<header><div class="logo">Купи<span>ора</span> <span class="badge">Личный тест</span></div><a href="./">← Каталог проекта</a></header>
-<div class="wrap">
-<section class="hero"><h1>Сравни любой товар</h1><p>Ищи в магазинах, добавляй найденные предложения в одно сравнение. С API-ключом и запущенным локальным сервером предложения Ozon, Wildberries и Яндекс Маркета запрашиваются автоматически; без ключа доступны поиск по магазинам и ручная фиксация реальных цен.</p>
-<form id="search" class="searchbar"><input id="query" autocomplete="off" required minlength="2" maxlength="160" placeholder="Например: Samsung Galaxy A55 256 ГБ, кофемашина, кроссовки…"><button class="btn" type="submit">Найти товар</button></form>
-<div class="toolbar"><span id="mode" class="badge">Проверка источников…</span><label class="hint">Регион <select id="region"><option>Москва</option><option>Санкт-Петербург</option><option>Казань</option><option>Екатеринбург</option><option>Новосибирск</option></select></label><button class="btn ghost" id="clear" type="button">Новая подборка</button></div>
-<div id="message" class="status" role="status">Введите товар. Данные не подменяются выдуманными ценами.</div></section>
-<section class="panel"><div class="row"><h2>Найти предложения в магазинах</h2><span class="small">Кнопки открывают поиск, цены автоматически не извлекаются</span></div><div class="stores" id="stores"></div></section>
-<section class="panel"><div class="row"><h2>Сравнение цен <span id="counter" class="badge">0 предложений</span></h2><div class="toolbar"><select id="order"><option value="price">Сначала дешевле</option><option value="store">По магазинам</option></select><button class="btn secondary" id="export" type="button">Сохранить JSON</button></div></div>
-<div class="notice" id="caution">Сравнивайте только одинаковые модели, объём памяти, комплектацию и регион. Предложения без подтверждённой цены не ранжируются.</div><div class="cards" id="cards" style="margin-top:16px"></div></section>
-<section class="panel"><h2>Добавить предложение</h2><p class="hint">Без API: открой магазин, проверь цену и скопируй ссылку. Фото можно подтянуть по прямому HTTPS-адресу изображения или из подключённых данных.</p>
-<form id="add"><div class="form-grid"><label><span>Магазин</span><select id="shop" required></select></label><label><span>Цена, ₽</span><input type="number" id="price" min="0.01" max="999999999" step=".01" required placeholder="Например, 3790"></label><label><span>Название / точная модель</span><input id="title" required maxlength="240" placeholder="Точная модификация"></label><label><span>Ссылка на товар</span><input type="url" id="url" required placeholder="https://…"></label><label><span>Фото товара (необязательно)</span><input type="url" id="image" placeholder="https://…jpg"></label><label><span>Доставка, ₽ (если известна)</span><input type="number" id="delivery" min="0" step=".01" placeholder="Неизвестно"></label><label><span>Артикул производителя (MPN)</span><input id="mpn" maxlength="80" placeholder="Для точного сопоставления"></label><label><span>Продавец (если известен)</span><input id="seller" maxlength="120" placeholder="Название продавца"></label><label><span>Источник</span><select id="origin"><option value="manual">Проверено вручную</option><option value="import">Импортированный отчёт</option></select></label></div><div class="toolbar"><button class="btn" type="submit">Добавить в сравнение</button></div></form></section>
-<section class="panel"><h2>Загрузить реальные отчёты с фотографиями</h2><p class="hint">Принимаются JSON-отчёты Parser.market, в том числе присланные Ozon и Яндекс Маркетом. Фото и цены берутся из отчёта, а не генерируются. Старые отчёты отмечаются как устаревшие.</p><input id="import" type="file" accept=".json,application/json" multiple><div id="import-status" class="status"></div></section>
-<p class="foot">Личный тестовый интерфейс. Нет подтверждения наличия, доставки и акционных условий до проверки в магазине. Сайт не покупает и не резервирует товары. Ключ API не хранится в браузере.</p></div>
-<script>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0875ff"><title>Сравнить товар по ссылке · Где дешевле?</title><link rel="stylesheet" href="./styles.css"><link rel="icon" href="./assets/icon-192.png"><style>
+/* Matched to the existing blue-white Kupiora identity. */
+.compare-page{color:#10172b;background:radial-gradient(ellipse at 50% 0,#fff,#f7fbff 75%);font-weight:600}
+.compare-page .compare-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 0 20px}
+.compare-page .compare-brand{display:flex;align-items:center;gap:12px;color:#10172b}
+.compare-page .compare-brand strong{font-size:32px;letter-spacing:-1.1px;font-weight:800}
+.compare-page .compare-brand small{display:block;font-size:16px;color:#72809b}
+.compare-page .compare-home{color:#0875ff;font-weight:700;font-size:16px}
+.compare-page .compare-home:hover{text-decoration:underline}
+.compare-page .compare-hero{border:1px solid #e6edf5;border-radius:19px;padding:24px;background:linear-gradient(130deg,#fff 50%,#eaf4ff);margin-bottom:20px}
+.compare-page .compare-hero h1{font-size:30px;margin:0 0 9px}
+.compare-page .compare-hero p{color:#596a86;margin:0 0 19px;font-size:16px;max-width:930px}
+.compare-page .comparison-search{display:flex;gap:10px;max-width:1050px}
+.compare-page .comparison-search input{background:#fff;border:1px solid #d5e5f8;border-radius:24px;padding:13px 18px;outline-color:#0875ff;flex:1;min-width:0;font-size:17px}
+.compare-page .compare-btn{display:inline-flex;align-items:center;justify-content:center;background:#0875ff;color:#fff;border:0;border-radius:20px;padding:12px 22px;font-size:16px;font-weight:750;cursor:pointer}
+.compare-page .compare-btn:hover{background:#0459c4}
+.compare-page .compare-btn.subtle{background:#eef5ff;color:#075cad;border:1px solid #dce8fa}
+.compare-page .compare-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px;font-size:15px}
+.compare-page .compare-toolbar select{font-size:15px}
+.compare-page .compare-badge{background:#fff;border:1px solid #dae5f4;border-radius:20px;padding:7px 12px;color:#55708e;font-size:14px}
+.compare-page .compare-status{padding:10px 0 0;color:#506b8b;font-size:15px}
+.compare-page .compare-panel{padding:21px;background:#fff;border:1px solid #e6edf5;border-radius:18px;box-shadow:0 3px 12px #304b7010;margin:0 0 19px}
+.compare-page .compare-panel h2{font-size:24px;margin:0 0 12px}
+.compare-page .compare-row{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.compare-page .compare-muted{color:#71849b;font-size:14px}
+.compare-page .compare-warning{background:#eef5ff;border-radius:10px;padding:11px 13px;color:#4a6484;font-size:15px;margin:0 0 14px}
+.compare-page .compare-best{background:#eaf7f1;color:#0d6645;border:1px solid #cee9dc;padding:13px 15px;border-radius:12px;font-size:17px;margin-bottom:14px}
+.compare-page .compare-best a{font-weight:800;text-decoration:underline}
+.compare-page .compare-offers{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px}
+.compare-page .compare-card{border:1px solid #e2eaf5;border-radius:15px;padding:14px;background:#fff}
+.compare-page .compare-photo{height:179px;border-radius:11px;background:#f4f8fc;display:flex;justify-content:center;align-items:center;color:#829bb5;overflow:hidden}
+.compare-page .compare-photo img{width:100%;height:100%;object-fit:contain}
+.compare-page .compare-card h3{font-size:18px;line-height:1.3;margin:11px 0 7px}
+.compare-page .compare-price{font-size:25px;color:#078735;font-weight:800;margin:9px 0 3px}
+.compare-page .compare-small{font-size:14px;color:#667b95;line-height:1.5}
+.compare-page .compare-card a{color:#0875df;font-weight:700}
+.compare-page .compare-card a:hover{text-decoration:underline}
+.compare-page .compare-card-actions{display:flex;justify-content:space-between;gap:9px;margin-top:12px;border-top:1px solid #e8eef6;padding-top:10px}
+.compare-page .compare-card-actions button{color:#526e8a;font-size:14px}
+.compare-page .compare-sources{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:9px}
+.compare-page .compare-source{border:1px solid #e1eaf8;border-radius:12px;padding:10px 12px;color:#155eac;font-size:15px;text-decoration:none;display:flex;align-items:center;justify-content:space-between}
+.compare-page .compare-source:hover{background:#eef5ff}
+.compare-page .compare-source small{font-size:13px;color:#71849b}
+.compare-page .compare-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.compare-page .compare-fields label{font-size:14px;color:#536a84;display:block}
+.compare-page .compare-fields label span{display:block;margin-bottom:5px}
+.compare-page .compare-fields input,.compare-page .compare-fields select{width:100%;border:1px solid #d5e1ef;border-radius:9px;padding:9px;font-size:16px;background:#fff}
+.compare-page details summary{font-size:18px;font-weight:750;cursor:pointer}
+.compare-page details>p{color:#62798f;font-size:15px}
+.compare-page .compare-report{font-size:15px;margin:12px 0}
+.compare-page .compare-footer{font-size:13px;color:#74849a;padding:20px 0 35px;border-top:1px solid #e6edf5}
+.compare-page .compare-origin{border-left:3px solid #0875ff;padding:10px 12px;margin-top:14px;background:#f2f7ff;border-radius:7px;font-size:15px;color:#455c78}
+.compare-page .compare-origin a{color:#0875ff;text-decoration:underline}
+@media(max-width:800px){.compare-page .compare-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.compare-page .compare-head{padding:15px 0}.compare-page .compare-hero{padding:17px}}
+@media(max-width:520px){.compare-page .comparison-search{flex-direction:column}.compare-page .compare-fields{grid-template-columns:1fr}.compare-page .compare-offers{grid-template-columns:1fr}.compare-page .compare-hero h1{font-size:26px}}
+</style></head><body class="compare-page"><div class="app-shell">
+<header class="compare-head"><a class="compare-brand" href="./"><svg width="45" height="45" viewBox="0 0 48 48" fill="none" stroke="#0c1c38" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h7l7 28h23l5-22H12M18 21h23"/><circle cx="21" cy="41" r="3"/><circle cx="37" cy="41" r="3"/></svg><span><strong>Где дешевле?</strong><small>Сравнение цен в магазинах</small></span></a><a class="compare-home" href="./">← На главную</a></header>
+<section class="compare-hero">
+<h1>Вставь ссылку на товар, найдём дешевле</h1>
+<p>Поддерживается прямая ссылка Ozon или название товара. Подтверждённые одинаковые модели сравниваются по цене; цена доставки и доступность скидок отмечаются отдельно. Без подключённого источника поиск покажет, что можно проверить, но не придумает лучший вариант.</p>
+<form id="search" class="comparison-search"><input id="query" type="search" required minlength="2" maxlength="1200" autocomplete="off" placeholder="https://www.ozon.ru/product/… или название модели" aria-label="Ссылка на товар или название"><button class="compare-btn" type="submit">Сравнить цены</button></form>
+<div id="source-origin" class="compare-origin" hidden></div>
+<div class="compare-toolbar"><span id="mode" class="compare-badge">Проверяем источник цен…</span><label>Регион <select id="region"><option>Москва</option><option>Санкт-Петербург</option><option>Казань</option><option>Екатеринбург</option><option>Новосибирск</option></select></label><button id="clear" class="compare-btn subtle" type="button">Очистить</button></div>
+<div id="message" class="compare-status" role="status">Вставь ссылку на Ozon или точное название модели.</div></section>
+<section class="compare-panel"><div class="compare-row"><h2>Сравнение предложений <span id="counter" class="compare-badge">0 предложений</span></h2><div class="compare-toolbar"><select id="order" aria-label="Сортировка"><option value="price">Сначала дешевле</option><option value="store">По магазинам</option></select><button id="export" type="button" class="compare-btn subtle">Сохранить результаты</button></div></div>
+<div id="best" class="compare-best" hidden></div>
+<div id="caution" class="compare-warning">Показываем только полученные цены. Похожие модели не считаются одинаковыми без проверки.</div><div id="cards" class="compare-offers"></div></section>
+<section class="compare-panel"><div class="compare-row"><h2>Проверить магазины</h2><span class="compare-muted">Без API это переход к результатам поиска, а не автоматическое сравнение.</span></div><div id="stores" class="compare-sources"></div></section>
+<section class="compare-panel"><details><summary>Добавить цену вручную или загрузить отчёт</summary><p>Можно добавить предложение со ссылкой на карточку товара либо импортировать JSON, полученный от поставщика данных. Без API ручные предложения не считаются автоматически проверенными.</p>
+<form id="add"><div class="compare-fields"><label><span>Магазин</span><select id="shop" required></select></label><label><span>Цена, ₽</span><input type="number" id="price" min="0.01" max="999999999" step=".01" required></label><label><span>Точное название / модель</span><input id="title" required maxlength="240"></label><label><span>Ссылка на карточку</span><input type="url" id="url" required></label><label><span>Ссылка на фотографию (необязательно)</span><input type="url" id="image"></label><label><span>Доставка, ₽, если известна</span><input id="delivery" type="number" min="0" step=".01"></label><label><span>Артикул производителя</span><input id="mpn" maxlength="80"></label><label><span>Продавец (если известен)</span><input id="seller" maxlength="120"></label><label><span>Источник данных</span><select id="origin"><option value="manual">Проверено вручную</option><option value="import">Импорт из отчёта</option></select></label></div><div class="compare-toolbar"><button class="compare-btn" type="submit">Добавить предложение</button></div></form>
+<div class="compare-report"><b>Загрузить JSON-отчёты</b> <input id="import" type="file" accept=".json,application/json" multiple><div id="import-status" role="status"></div></div></details></section>
+<footer class="compare-footer">Где дешевле? · Тестовый инструмент. Не все магазины подключены к автоматическому сбору. Цены и доставка требуют проверки перед покупкой.</footer>
+</div><script>
 'use strict';
 const STORES=[
  ['Ozon','ozon.ru','native'],['Wildberries','wildberries.ru','native'],['Яндекс Маркет','market.yandex.ru','native'],
@@ -40,23 +92,68 @@ function externalSearch(store,q){
  if(host==='market.yandex.ru')return 'https://market.yandex.ru/search?text='+v;
  return 'https://yandex.ru/search/?text='+encodeURIComponent('site:'+host+' '+q);
 }
-let items=[], current='', apiMode=false, activeSearch=0;
+function understandInput(raw){
+ const text=String(raw||'').trim();
+ if(!/^https?:\/\//i.test(text))return {kind:'text',query:text};
+ let u;try{u=new URL(text)}catch{return {kind:'invalid',reason:'Не удалось разобрать адрес. Нужна прямая ссылка на товар.'}};
+ const host=u.hostname.toLowerCase().replace(/^www\./,'');
+ if(u.protocol!=='https:')return {kind:'invalid',reason:'Нужна безопасная HTTPS-ссылка на товар.'};
+ if(host!=='ozon.ru')return {kind:'invalid',reason:'Автоматическое распознавание ссылки пока поддерживается только для Ozon. Для других магазинов введи название и точную модель.'};
+ const m=u.pathname.match(/^\/product\/(?:.*?-)?(\d+)\/?$/);
+ if(!m)return {kind:'invalid',reason:'Это не прямая ссылка на карточку Ozon. Открой сам товар и скопируй его полный адрес /product/…'};
+ const slug=u.pathname.split('/')[2].replace(/-\d+$/,'');
+ let title='';
+ try{title=decodeURIComponent(slug).replace(/[-_]+/g,' ').trim()}catch{}
+ const direct='https://www.ozon.ru'+u.pathname;
+ return {kind:'ozon',id:m[1],url:direct,query:title||'',unverified:true};
+}
+let items=[], current='', apiMode=false, activeSearch=0, resolvedTitle='';
+function lookupText(){return resolvedTitle||understandInput(current).query||''}
+function showInputSource(){
+ const target=$('source-origin'),info=understandInput(current);
+ if(info.kind==='ozon'){
+  target.hidden=false;
+  target.innerHTML='Карточка Ozon № '+safe(info.id)+': <a href="'+safe(info.url)+'" target="_blank" rel="noopener noreferrer">открыть оригинал ↗</a>. <span>Название из URL предварительное, точная модель будет проверена по данным источника.</span>';
+ }else{target.hidden=true;target.textContent=''}
+}
 const storageKey='kupiora-private-compare-v1';
 try{const saved=JSON.parse(localStorage.getItem(storageKey)||'{}');items=Array.isArray(saved.items)?saved.items.slice(0,200):[];current=typeof saved.query==='string'?saved.query:''}catch{}
-const incoming=new URLSearchParams(location.search).get('q');if(incoming&&incoming.trim().length>=2){current=incoming.trim().slice(0,160);items=[];}
+const incoming=new URLSearchParams(location.search).get('q');if(incoming&&incoming.trim().length>=2){current=incoming.trim().slice(0,1200);items=[];}
 $('query').value=current;
 function save(){try{localStorage.setItem(storageKey,JSON.stringify({items,query:current}))}catch{}}
-function searches(){const host=$('stores');host.replaceChildren();for(const s of STORES){const a=document.createElement('a');a.className='store';a.textContent=s[0]+' ↗';a.target='_blank';a.rel='noopener noreferrer';a.href=externalSearch(s,current||'товар');a.title=s[2]?'Поиск на площадке':'Поиск страниц магазина через Яндекс'; if(!s[2]){let label=document.createElement('small');label.textContent='через Яндекс';a.append(label)}host.append(a)}}
+function searches(){const host=$('stores');host.replaceChildren();for(const s of STORES){const a=document.createElement('a');a.className='compare-source';a.textContent=s[0]+' ↗';a.target='_blank';a.rel='noopener noreferrer';a.href=externalSearch(s,lookupText()||'товар');a.title=s[2]?'Поиск на площадке':'Поиск страниц магазина через Яндекс'; if(!s[2]){let label=document.createElement('small');label.textContent='через Яндекс';a.append(label)}host.append(a)}}
 function draw(){
  $('counter').textContent=items.length+' предложений';
- $('caution').textContent=comparable(items)?'Подтверждено совпадение артикула производителя (MPN) у предложений. Перед покупкой проверьте комплектацию, скидки и доставку.':'Совпадение товара между магазинами не доказано. Предложения отсортированы по указанной цене, но они могут относиться к разным моделям, объёмам памяти или комплектам.';const g=$('cards');g.replaceChildren();
- const data=[...items].sort((a,b)=>$('order').value==='store'?a.shop.localeCompare(b.shop,'ru'):(a.price??Infinity)-(b.price??Infinity));
- if(!data.length){g.innerHTML='<p class="hint">Пока пусто. Найдите товар в магазинах или импортируйте отчёт. Здесь появятся настоящие предложения.</p>';return}
- for(const x of data){const c=document.createElement('article');c.className='card';
+ $('caution').textContent=understandInput(current).kind==='ozon'
+  ?'В сравнении только исходный товар и подтверждённые совпадения. Неподтверждённые похожие варианты исключены. Доставка и персональные скидки могут изменить итог.'
+  :comparable(items)?'Подтверждено совпадение артикула производителя (MPN) у предложений. Перед покупкой проверьте комплектацию, скидки и доставку.':'Совпадение товара между магазинами не доказано. Предложения могут относиться к разным моделям.';const g=$('cards');g.replaceChildren();
+ const fromLink=understandInput(current).kind==='ozon';
+ // Never mingle similar or unverified variants into the exact-product price comparison.
+ const exact=fromLink?items.filter(x=>x.match==='source'||x.match==='confirmed'):items;
+ const otherCount=fromLink?items.length-exact.length:0;
+ const data=[...exact].sort((a,b)=>$('order').value==='store'?a.shop.localeCompare(b.shop,'ru'):(a.price??Infinity)-(b.price??Infinity));
+ const verified=fromLink?!!resolvedTitle&&items.some(x=>x.match==='confirmed')&&items.some(x=>x.match==='source'):comparable(items)&&items.length>=2;
+ const priced=exact.filter(x=>Number.isFinite(x.price)&&x.price>0);
+ const winner=priced.length?priced.reduce((a,b)=>a.price<=b.price?a:b):null;
+ const best=$('best');
+ best.hidden=!verified||!winner;
+ if(verified&&winner){
+   best.textContent='';
+   const strong=document.createElement('strong');strong.textContent='Самая низкая из найденных цен: '+rub(winner.price)+' · '+winner.shop+'. ';
+   best.append(strong);
+   const link=document.createElement('a');link.href=https(winner.url);link.target='_blank';link.rel='noopener noreferrer nofollow sponsored';link.textContent='Перейти к предложению ↗';
+   best.append(link);
+   const note=document.createElement('span');note.textContent=' Доставка и персональные скидки могут изменить итоговую стоимость.';best.append(note);
+ }
+
+ if(fromLink){$('counter').textContent=data.length+' подтверждённых предложений'+(otherCount?' · '+otherCount+' похожих исключено':'');}
+ if(!data.length){$('best').hidden=true;g.innerHTML='<p class="compare-muted">Подтверждённые предложения пока не найдены. Для автоматического поиска по другим площадкам нужен подключённый API, а похожие товары не выдаются за совпадение.</p>';return}
+ for(const x of data){const c=document.createElement('article');c.className='compare-card';
  const validImage=https(x.image),validLink=https(x.url);
  const badge=x.source==='api'?'API':x.source==='import'?'Отчёт':'Вручную';
+ const status=x.match==='unverified'?' · Похожая модель, совпадение не подтверждено':x.match==='confirmed'?' · Совпадение модели подтверждено':x.match==='source'?' · Исходный товар Ozon':'';
  const fresh=x.checkedAt&&Date.parse(x.checkedAt)<=Date.now()+300000&&Date.now()-Date.parse(x.checkedAt)<86400000;
- c.innerHTML='<div class="photo">'+(validImage?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+safe(validImage)+'" onerror="this.remove()">':'▣')+'</div><p class="small">'+(x.sellerName?'Продавец: ':'Магазин: ')+(validLink?'<a class="merchant-direct" href="'+safe(https(x.sellerUrl)||validLink)+'" target="_blank" rel="noopener noreferrer nofollow sponsored">'+safe(x.sellerName||x.shop)+' ↗</a>':'<span class="merchant-muted">'+safe(x.sellerName||x.shop)+'</span>')+(x.sellerName?' · '+safe(x.shop):'')+' · '+safe(badge)+' '+(fresh?'<span class="tag">проверено сегодня</span>':'<span class="danger">дата/актуальность уточняется</span>')+'</p><h3>'+safe(x.title)+'</h3><p class="small">'+safe(x.mpn||'Артикул не указан')+'</p><div class="price">'+(Number.isFinite(x.price)&&x.price>0?rub(x.price):'Цена не установлена')+'</div><p class="small">Доставка: '+(Number.isFinite(x.delivery)&&x.delivery>=0?rub(x.delivery):'неизвестна')+' · '+safe(x.region||'Регион не установлен')+'</p><p class="small">Проверка: '+safe(x.checkedAt?new Date(x.checkedAt).toLocaleString('ru-RU'):'не указана')+'</p><div class="actions"><a href="'+safe(validLink||'#')+'" target="_blank" rel="noopener noreferrer nofollow">Открыть ↗</a><button type="button" data-remove="'+safe(x.id)+'">Удалить</button></div>';
+ c.innerHTML='<div class="compare-photo">'+(validImage?'<img alt="" loading="lazy" referrerpolicy="no-referrer" src="'+safe(validImage)+'" onerror="this.remove()">':'▣')+'</div><p class="compare-small">'+(x.sellerName?'Продавец: ':'Магазин: ')+(validLink?'<a class="merchant-direct" href="'+safe(https(x.sellerUrl)||validLink)+'" target="_blank" rel="noopener noreferrer nofollow sponsored">'+safe(x.sellerName||x.shop)+' ↗</a>':'<span class="merchant-muted">'+safe(x.sellerName||x.shop)+'</span>')+(x.sellerName?' · '+safe(x.shop):'')+' · '+safe(badge)+safe(status)+' '+(fresh?'<span class="tag">проверено сегодня</span>':'<span class="danger">дата/актуальность уточняется</span>')+'</p><h3>'+safe(x.title)+'</h3><p class="small">'+safe(x.mpn||'Артикул не указан')+'</p><div class="compare-price">'+(Number.isFinite(x.price)&&x.price>0?rub(x.price):'Цена не установлена')+'</div><p class="small">Доставка: '+(Number.isFinite(x.delivery)&&x.delivery>=0?rub(x.delivery):'неизвестна')+' · '+safe(x.region||'Регион не установлен')+'</p><p class="small">Проверка: '+safe(x.checkedAt?new Date(x.checkedAt).toLocaleString('ru-RU'):'не указана')+'</p><div class="compare-card-actions"><a href="'+safe(validLink||'#')+'" target="_blank" rel="noopener noreferrer nofollow">Открыть ↗</a><button type="button" data-remove="'+safe(x.id)+'">Удалить</button></div>';
  c.querySelector('a').addEventListener('click',e=>{if(!validLink)e.preventDefault()});
  c.querySelector('button').onclick=()=>{items=items.filter(v=>v.id!==x.id);save();draw()};
  g.append(c);
@@ -73,7 +170,7 @@ function comparable(offers){
 function addOffer(o){if(!o||!STORES.some(s=>s[0]===o.shop)||!https(o.url)||!Number.isFinite(o.price)||o.price<=0)return false;const item={...o,id:o.id||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),image:https(o.image)||'',delivery:Number.isFinite(o.delivery)&&o.delivery>=0?o.delivery:null,checkedAt:o.checkedAt||null,region:o.region||null};const existing=items.findIndex(z=>z.shop===item.shop&&z.url===item.url);if(existing>=0)items.splice(existing,1);items.unshift(item);items=items.slice(0,200);save();return true}
 $('shop').innerHTML=STORES.map((s,i)=>'<option value="'+i+'">'+safe(s[0])+'</option>').join('');
 $('order').onchange=draw; $('export').onclick=()=>{const blob=new Blob([JSON.stringify({query:current,items},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kupiora-compare.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
-$('clear').onclick=()=>{if(!confirm('Начать новую подборку и удалить локальные предложения?'))return;items=[];current='';$('query').value='';save();draw();searches();$('message').textContent='Подборка очищена.'};
+$('clear').onclick=()=>{if(!confirm('Начать новую подборку и удалить локальные предложения?'))return;items=[];current='';resolvedTitle='';$('query').value='';save();draw();searches();showInputSource();$('message').textContent='Подборка очищена.'};
 $('add').onsubmit=e=>{e.preventDefault();const url=https($('url').value),shop=STORES[Number($('shop').value)]?.[0],verified=getStore(url);if(!url){$('message').textContent='Нужна корректная HTTPS-ссылка на товар.';return}if(verified&&verified!==shop){$('message').textContent='Выбранный магазин не соответствует домену ссылки.';return}
 const ok=addOffer({shop,title:$('title').value.trim(),url,price:Number($('price').value),delivery:$('delivery').value===''?null:Number($('delivery').value),mpn:$('mpn').value.trim(),sellerName:$('seller').value.trim(),image:$('image').value,region:$('region').value,source:$('origin').value,checkedAt:new Date().toISOString()});if(ok){$('add').reset();draw();$('message').textContent='Предложение добавлено. Сравнивайте только одинаковые модификации.'}};
 function parsedOffer(offer,fallback,region,stamp){
@@ -95,13 +192,14 @@ function parseReport(data){
 $('import').onchange=async e=>{let added=0,rejected=0;for(const file of e.target.files){try{if(file.size>4000000)throw Error('слишком большой файл');const result=parseReport(JSON.parse(await file.text()));if(!result.length)throw Error('нет подходящих предложений');for(const o of result){if(addOffer(o))added++;else rejected++}}catch(err){rejected++;}}$('import-status').textContent='Импортировано предложений: '+added+'; файлов/строк с ошибкой: '+rejected+'.';draw()};
 async function detectAPI(){try{const c=new AbortController();const t=setTimeout(()=>c.abort(),1200);const r=await fetch('./api/status',{signal:c.signal,cache:'no-store'});clearTimeout(t);if(!r.ok)throw Error();const d=await r.json();apiMode=!!d.enabled;$('mode').textContent=d.enabled?'Автопоиск включён: '+d.provider:'Без API-ключа: ручной поиск';}catch{apiMode=false;$('mode').textContent='Без API-ключа: ручной поиск'}}
 async function automate(q,turn){
- const start=await fetch('./api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,region:$('region').value})});
+ const start=await fetch('./api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,sourceUrl:understandInput(q).kind==='ozon'?understandInput(q).url:null,region:$('region').value})});
  if(!start.ok)throw Error('Автоматический поиск недоступен');const ticket=await start.json();if(!ticket.id)throw Error('Не получено задание');
  for(let attempt=0;attempt<24;attempt++){
  if(turn!==activeSearch)return;
  const r=await fetch('./api/poll?id='+encodeURIComponent(ticket.id),{cache:'no-store'});
  if(!r.ok)throw Error('Ошибка проверки результатов');
  const d=await r.json();
+ if(d.sourceTitle&&!resolvedTitle){resolvedTitle=d.sourceTitle;searches();}
  for(const offer of d.offers||[])addOffer(offer);
  draw();
  $('message').textContent='Автоматический поиск: '+(d.done?'завершён.':'обрабатывается…')+' Получено '+(d.offers||[]).length+' предложений. '+(d.errors||[]).join('; ');
@@ -110,9 +208,9 @@ async function automate(q,turn){
  }
  $('message').textContent='Поиск продолжается на сервере. Повторите запрос позже.';
 }
-$('search').onsubmit=async e=>{e.preventDefault();const q=$('query').value.trim();if(q.length<2)return;if(q!==current){items=[];draw()}current=q;save();searches();$('title').value=q;const turn=++activeSearch;
- $('message').textContent='Поиск по 18 магазинам подготовлен. Откройте нужные магазины и добавьте цены.'+(apiMode?' Автоматические проверки запущены.':'');
+$('search').onsubmit=async e=>{e.preventDefault();const q=$('query').value.trim();if(q.length<2)return;const parsed=understandInput(q);if(parsed.kind==='invalid'){$('message').textContent=parsed.reason;return;}if(q!==current){items=[];resolvedTitle='';draw()}current=q;resolvedTitle='';save();searches();showInputSource();$('title').value=lookupText()||q;const turn=++activeSearch;
+ $('message').textContent=parsed.kind==='ozon'?(apiMode?'Проверяем карточку Ozon и ищем подтверждённые совпадения в магазинах.':'Ссылка Ozon распознана. Без подключённого API нельзя автоматически получить точную модель и сравнить цены; ссылки ниже ищут по предварительному названию из URL.'):'Поиск товаров подготовлен. '+(apiMode?'Автоматическая проверка источников запущена.':'Без API автоматическое сравнение недоступно; ниже ссылки на магазины.');
  if(apiMode)try{await automate(q,turn)}catch(err){$('message').textContent='Автоматический источник недоступен. Ручной поиск по магазинам продолжает работать.'}
 };
-searches();draw();detectAPI();if(incoming&&current){$('message').textContent='Поиск подготовлен. Откройте магазины ниже и добавьте найденные цены. Для автоматического поиска нужен локальный сервер с API-ключом.';}
+searches();draw();showInputSource();detectAPI();if(incoming&&current){$('message').textContent=understandInput(current).kind==='ozon'?'Ссылка Ozon распознана. Без API доступны переходы в магазины, но точная модель и лучшая цена не подтверждены.':'Поиск подготовлен. Без API автоматическое сравнение недоступно.';}
 </script></body></html>

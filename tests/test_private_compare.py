@@ -47,8 +47,48 @@ class PrivateCompareTests(unittest.TestCase):
         with patch.object(srv,"provider_post",side_effect=fake_post):
             srv.submit(job,"Samsung Galaxy A55","Москва")
         self.assertEqual([p[1]["market"] for p in calls],["ozons","wbs","ym"])
-        self.assertEqual(calls[-1][1]["regionid"],"213")
+        self.assertEqual(calls[-1][1]["regionid"],"Москва")
         self.assertTrue(job["submitted"])
+
+    def test_ozon_source_link_is_exact_and_safe(self):
+        self.assertEqual(srv.product_id('https://www.ozon.ru/product/samsung-ssd-12345678/?utm_source=shop'), '12345678')
+        self.assertIsNone(srv.ozon_product_link('https://ozon.ru.evil.test/product/samsung-12345678/'))
+        self.assertIsNone(srv.ozon_product_link('http://www.ozon.ru/product/12345678/'))
+        self.assertIsNone(srv.ozon_product_link('https://www.ozon.ru/search/?text=ssd'))
+        self.assertEqual(srv.slug_label('https://www.ozon.ru/product/samsung-ssd-12345678/'),'samsung ssd')
+
+    def test_direct_ozon_card_uses_ozon_not_search_mode(self):
+        calls=[]
+        def fake(endpoint,payload):
+            calls.append((endpoint,payload))
+            return [{"result":"success"}]
+        job={"markets":{},"offers":[],"errors":[],"submitted":False}
+        source='https://www.ozon.ru/product/samsung-ssd-12345678/'
+        with patch.object(srv,"provider_post",side_effect=fake):
+            srv.submit(job,source,"Москва",source)
+        self.assertEqual([p[1]['market'] for p in calls],['ozon'])
+        self.assertEqual(calls[0][1]['products'][0]['linkset'],[source])
+
+    def test_source_product_then_cross_market_matching(self):
+        source='https://www.ozon.ru/product/samsung-980-mz-v8v1t0bw-12345678/'
+        src_report={"data":[{"link":source,"sku":{"Name_found":"Samsung 980 MZ-V8V1T0BW 1 TB"},
+          "offers":[{"Name":"Samsung 980 MZ-V8V1T0BW 1 TB","Price":27000}]}]}
+        job={"markets":{"ozon":{"label":"l-ozon","state":"waiting"}},"offers":[],"errors":[],
+             "submitted":True,"sourceUrl":source,"sourceTitle":None,"phase":"source","region":"Москва"}
+        response=[{"result":"success"},{"data":[[
+            {"userlabel":"l-ozon"},{"status":"completed"},
+            {"report_json":"https://files.parser.market/_filestorage/x/demo.json"}]]}]
+        with patch.object(srv,"provider_post",return_value=response),patch.object(srv,"get_report",return_value=src_report),patch.object(srv.threading,"Thread") as thread:
+            srv.poll(job)
+        self.assertEqual(job["phase"],"cross")
+        self.assertEqual(job["sourceTitle"],"Samsung 980 MZ-V8V1T0BW 1 TB")
+        self.assertEqual(job["offers"][0]["match"],"source")
+        thread.assert_called_once()
+
+    def test_model_matching_does_not_accept_different_mpn(self):
+        self.assertTrue(srv.product_match("SSD Samsung MZ-V8V1T0BW 1 TB","Samsung MZ-V8V1T0BW 1 ТБ"))
+        self.assertFalse(srv.product_match("SSD Samsung MZ-V8V1T0BW 1TB","Samsung MZ-V8V2T0BW 2TB"))
+        self.assertFalse(srv.product_match("Samsung A55 8/128","Samsung A55 8/256"))
 
     def test_receives_provider_report_by_label(self):
         job={"markets":{"ym":{"label":"test123","state":"waiting"}},"offers":[],"errors":[],"submitted":True}
