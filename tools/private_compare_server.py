@@ -112,11 +112,11 @@ def product_match(reference,candidate):
     return bool(left and right and left&right and (not lc or not rc or lc==rc))
 
 def submit(job,query,region,source_url=None,markets=None):
-    market_list=['ozon'] if source_url else list(markets or STORES)
+    market_list=['ozon'] if source_url else list(markets or ('ozons','wbs','ym'))
     search_text=slug_label(source_url) if source_url else query
     for market in market_list:
         label=secrets.token_hex(6)
-        link=source_url if source_url and market=='ozons' else make_link(market,search_text)
+        link=source_url if source_url and market=='ozon' else make_link(market,search_text)
         payload={'regionid':'Москва' if market=='ym' else region,'market':market,'userlabel':label,
                  'products':[{'name':search_text,'linkset':[link],'donotsearch':16 if market in ('ozon','ozons') else 12 if market=='wbs' else 0}]}
         try:
