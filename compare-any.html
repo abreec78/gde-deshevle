@@ -71,19 +71,19 @@
 <header class="compare-head"><a class="compare-brand" href="./"><svg width="45" height="45" viewBox="0 0 48 48" fill="none" stroke="#0c1c38" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h7l7 28h23l5-22H12M18 21h23"/><circle cx="21" cy="41" r="3"/><circle cx="37" cy="41" r="3"/></svg><span><strong>Где дешевле?</strong><small>Сравнение цен в магазинах</small></span></a><a class="compare-home" href="./">← На главную</a></header>
 <section class="compare-hero">
 <h1>Вставь ссылку на товар, найдём дешевле</h1>
-<p>Поддерживается прямая ссылка Ozon или название товара. Подтверждённые одинаковые модели сравниваются по цене; цена доставки и доступность скидок отмечаются отдельно. Без подключённого источника поиск покажет, что можно проверить, но не придумает лучший вариант.</p>
-<form id="search" class="comparison-search"><input id="query" type="search" required minlength="2" maxlength="1200" autocomplete="off" placeholder="https://www.ozon.ru/product/… или название модели" aria-label="Ссылка на товар или название"><button class="compare-btn" type="submit">Показать товар</button></form>
+<p>Поддерживаются прямые ссылки Wildberries, Ozon, Яндекс Маркета или название товара. Подтверждённые одинаковые модели сравниваются по цене; цена доставки и доступность скидок отмечаются отдельно. Без подключённого источника поиск покажет, что можно проверить, но не придумает лучший вариант.</p>
+<form id="search" class="comparison-search"><input id="query" type="search" required minlength="2" maxlength="1200" autocomplete="off" placeholder="Ссылка Wildberries / Ozon / Яндекс Маркет или модель" aria-label="Ссылка на товар или название"><button class="compare-btn" type="submit">Показать товар</button></form>
 <div id="source-origin" class="compare-origin" hidden></div>
 <div class="compare-toolbar"><span id="mode" class="compare-badge">Проверяем источник цен…</span><label>Регион <select id="region"><option>Москва</option><option>Санкт-Петербург</option><option>Казань</option><option>Екатеринбург</option><option>Новосибирск</option></select></label><button id="clear" class="compare-btn subtle" type="button">Очистить</button></div>
-<div id="message" class="compare-status" role="status">Вставь ссылку на Ozon или точное название модели.</div></section>
+<div id="message" class="compare-status" role="status">Вставь ссылку Wildberries, Ozon, Яндекс Маркета или точное название модели.</div></section>
 <section id="product-preview" class="compare-panel preview-panel" hidden aria-label="Карточка выбранного товара">
 <div class="preview-layout">
-<div class="preview-photo" id="preview-photo" aria-label="Фотография товара"><span class="preview-photo-message">Фото станет доступно после получения данных карточки</span></div>
+<div class="preview-photo" id="preview-photo" aria-label="Фотография товара"><span class="preview-photo-message">Реальное фото появится, если его вернёт источник карточки</span></div>
 <div class="preview-description">
 <span id="preview-state" class="compare-badge">Товар из Ozon · проверка не выполнена</span>
 <h2 id="preview-title">Товар</h2>
 <p class="compare-muted" id="preview-description">Модель и фотография ещё не получены из магазина.</p>
-<a id="preview-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Открыть оригинальную карточку на Ozon ↗</a>
+<a id="preview-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Открыть исходную карточку товара ↗</a>
 <div class="preview-actions"><button id="compare-now" class="compare-btn" type="button">Сравнить цены</button><span class="compare-muted" id="preview-hint">После нажатия появятся цены из подключённых магазинов или ссылки для проверки</span></div>
 </div></div></section>
 <section class="compare-panel" id="comparison-panel" hidden><div class="compare-row"><h2>Сравнение предложений <span id="counter" class="compare-badge">0 предложений</span></h2><div class="compare-toolbar"><select id="order" aria-label="Сортировка"><option value="price">Сначала дешевле</option><option value="store">По магазинам</option></select><button id="export" type="button" class="compare-btn subtle">Сохранить результаты</button></div></div>
@@ -145,7 +145,7 @@ function understandInput(raw){
 }
 function isProductLink(v){return ['ozon','wb','ym'].includes(understandInput(v).kind)}
 let items=[], current='', apiMode=false, activeSearch=0, resolvedTitle='', previewTicket=null, previewVerified=false, previewImage='', previewPrice=null, comparing=false, compareRequested=false, compareRunning=false;
-function lookupText(){return resolvedTitle||understandInput(current).query||''}
+function lookupText(){const i=understandInput(current);return resolvedTitle||i.query||(i.kind==='wb'?'артикул Wildberries '+i.id:'')}
 
 function renderPreview(){
  const info=understandInput(current);
