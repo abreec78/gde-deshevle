@@ -190,7 +190,7 @@ def poll(job):
             report=get_report(link)
             if not isinstance(report,dict):continue
             found=match_report_records(report,market)
-            if job.get('sourceUrl') and job.get('phase')=='source' and market==job.get('sourceMarket'):
+            if job.get('sourceUrl') and job.get('phase')=='source' and market==(job.get('sourceMarket') or (identify_product_link(job['sourceUrl']) or {}).get('market')):
                 pid=source_product_id(job['sourceUrl'],market)
                 originals=[x for x in found if source_product_id(x['url'],market)==pid]
                 title=originals[0]['title'] if originals else ''
@@ -273,7 +273,7 @@ class Handler(SimpleHTTPRequestHandler):
                 job['last_poll']=0
                 title=job['sourceTitle']
                 region=job.get('region','Москва')
-            markets=[m for m in ('ozons','wbs','ym') if {'ozons':'ozon','wbs':'wb','ym':'ym'}[m]!=job.get('sourceMarket')]
+            markets=[m for m in ('ozons','wbs','ym') if {'ozons':'ozon','wbs':'wb','ym':'ym'}[m]!=(job.get('sourceMarket') or (identify_product_link(job.get('sourceUrl')) or {}).get('market'))]
             threading.Thread(target=submit,args=(job,title,region,None,markets),daemon=True).start()
             self.reply(202,{'id':ident,'phase':'cross'});return
         try:
