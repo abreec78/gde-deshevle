@@ -124,11 +124,16 @@ function save(){try{localStorage.setItem(storageKey,JSON.stringify({items,query:
 function searches(){const host=$('stores');host.replaceChildren();for(const s of STORES){const a=document.createElement('a');a.className='compare-source';a.textContent=s[0]+' ↗';a.target='_blank';a.rel='noopener noreferrer';a.href=externalSearch(s,lookupText()||'товар');a.title=s[2]?'Поиск на площадке':'Поиск страниц магазина через Яндекс'; if(!s[2]){let label=document.createElement('small');label.textContent='через Яндекс';a.append(label)}host.append(a)}}
 function draw(){
  $('counter').textContent=items.length+' предложений';
- $('caution').textContent=comparable(items)?'Подтверждено совпадение артикула производителя (MPN) у предложений. Перед покупкой проверьте комплектацию, скидки и доставку.':'Совпадение товара между магазинами не доказано. Предложения отсортированы по указанной цене, но они могут относиться к разным моделям, объёмам памяти или комплектам.';const g=$('cards');g.replaceChildren();
- const data=[...items].sort((a,b)=>$('order').value==='store'?a.shop.localeCompare(b.shop,'ru'):(a.price??Infinity)-(b.price??Infinity));
+ $('caution').textContent=understandInput(current).kind==='ozon'
+  ?'В сравнении только исходный товар и подтверждённые совпадения. Неподтверждённые похожие варианты исключены. Доставка и персональные скидки могут изменить итог.'
+  :comparable(items)?'Подтверждено совпадение артикула производителя (MPN) у предложений. Перед покупкой проверьте комплектацию, скидки и доставку.':'Совпадение товара между магазинами не доказано. Предложения могут относиться к разным моделям.';const g=$('cards');g.replaceChildren();
  const fromLink=understandInput(current).kind==='ozon';
+ // Never mingle similar or unverified variants into the exact-product price comparison.
+ const exact=fromLink?items.filter(x=>x.match==='source'||x.match==='confirmed'):items;
+ const otherCount=fromLink?items.length-exact.length:0;
+ const data=[...exact].sort((a,b)=>$('order').value==='store'?a.shop.localeCompare(b.shop,'ru'):(a.price??Infinity)-(b.price??Infinity));
  const verified=fromLink?!!resolvedTitle&&items.some(x=>x.match==='confirmed')&&items.some(x=>x.match==='source'):comparable(items)&&items.length>=2;
- const priced=items.filter(x=>Number.isFinite(x.price)&&x.price>0&&(!fromLink||x.match==='confirmed'||x.match==='source'));
+ const priced=exact.filter(x=>Number.isFinite(x.price)&&x.price>0);
  const winner=priced.length?priced.reduce((a,b)=>a.price<=b.price?a:b):null;
  const best=$('best');
  best.hidden=!verified||!winner;
@@ -141,7 +146,8 @@ function draw(){
    const note=document.createElement('span');note.textContent=' Доставка и персональные скидки могут изменить итоговую стоимость.';best.append(note);
  }
 
- if(!data.length){$('best').hidden=true;g.innerHTML='<p class="hint">Пока пусто. Найдите товар в магазинах или импортируйте отчёт. Здесь появятся настоящие предложения.</p>';return}
+ if(fromLink){$('counter').textContent=data.length+' подтверждённых предложений'+(otherCount?' · '+otherCount+' похожих исключено':'');}
+ if(!data.length){$('best').hidden=true;g.innerHTML='<p class="compare-muted">Подтверждённые предложения пока не найдены. Для автоматического поиска по другим площадкам нужен подключённый API, а похожие товары не выдаются за совпадение.</p>';return}
  for(const x of data){const c=document.createElement('article');c.className='compare-card';
  const validImage=https(x.image),validLink=https(x.url);
  const badge=x.source==='api'?'API':x.source==='import'?'Отчёт':'Вручную';
