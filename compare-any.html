@@ -151,13 +151,13 @@ function renderPreview(){
  const card=$('product-preview');
  card.hidden=!current||info.kind==='invalid';
  if(card.hidden)return;
- $('preview-title').textContent=resolvedTitle||(info.kind==='ozon'?info.query||'Товар Ozon № '+info.id:current);
- $('preview-state').textContent=previewVerified?'Карточка подтверждена источником':info.kind==='ozon'?'Ozon · предварительное определение':'Поиск по названию · модель не подтверждена';
+ $('preview-title').textContent=resolvedTitle||(isProductLink(current)?info.query||'Товар '+info.store+' № '+info.id:current);
+ $('preview-state').textContent=previewVerified?'Карточка подтверждена источником':isProductLink(current)?info.store+' · карточка распознана по ссылке':'Поиск по названию · модель не подтверждена';
  $('preview-description').textContent=previewVerified
   ?'Название и фото (если есть) получены из отчёта по исходной карточке.'+(Number.isFinite(previewPrice)?' Цена в отчёте Ozon: '+rub(previewPrice)+'.':'')
-  :info.kind==='ozon'?'Товар определён по адресу Ozon. Точное название, фото и цена появятся только при получении ответа источника.':'Укажите точную модель для корректного сопоставления.';
+  :isProductLink(current)?'Адрес товара распознан. Точное название, фото и цена появятся только при получении данных из магазина.':'Укажите точную модель для корректного сопоставления.';
  const link=$('preview-source-link');
- link.hidden=info.kind!=='ozon';
+ link.hidden=!isProductLink(current);
  if(!link.hidden)link.href=info.url;
  const image=$('preview-photo');image.replaceChildren();
  const original=https(previewImage);
@@ -167,11 +167,11 @@ function renderPreview(){
   image.append(img);
  }else{
   const span=document.createElement('span');span.className='preview-photo-message';
-  span.textContent=info.kind==='ozon'?'Фотография загрузится из карточки Ozon, если источник её предоставит':'Фото не получено. Случайные изображения не подставляются.';
+  span.textContent=isProductLink(current)?'Фотография появится из оригинальной карточки, если источник её предоставит':'Фото не получено. Случайные изображения не подставляются.';
   image.append(span);
  }
- const button=$('compare-now');button.disabled=apiMode&&info.kind==='ozon'&&!previewVerified&&!!previewTicket;
- $('preview-hint').textContent=previewVerified?'Сравнение запустит проверку цен других площадок':apiMode&&previewTicket?'Получаем данные исходного товара…':'Без источника цен доступны ссылки на магазины, но не автоматический рейтинг.';
+ const button=$('compare-now');button.disabled=false;button.textContent=compareRunning?'Поиск выполняется…':'Сравнить цены';
+ $('preview-hint').textContent=previewVerified?'Проверка цен начнётся только после нажатия':apiMode&&previewTicket?'Получаем данные товара. Сравнение можно запросить сейчас.':'Без API доступны ссылки на магазины, но не автоматический рейтинг.';
 }
 function showPriceSections(){
  comparing=true;
@@ -218,7 +218,7 @@ async function pollTicket(id,turn,phase){
 }
 async function preparePreview(query,turn){
  const info=understandInput(query);
- if(!apiMode||info.kind!=='ozon')return;
+ if(!apiMode||!isProductLink(query))return;
  const response=await fetch('./api/search',{method:'POST',headers:{'Content-Type':'application/json'},
   body:JSON.stringify({query:query,sourceUrl:info.url,region:$('region').value})});
  if(!response.ok)throw Error('Источник карточки не ответил');
@@ -257,9 +257,9 @@ async function startComparison(){
 }
 function showInputSource(){
  const target=$('source-origin'),info=understandInput(current);
- if(info.kind==='ozon'){
+ if(isProductLink(current)){
   target.hidden=false;
-  target.innerHTML='Карточка Ozon № '+safe(info.id)+': <a href="'+safe(info.url)+'" target="_blank" rel="noopener noreferrer">открыть оригинал ↗</a>. <span>Название из URL предварительное, точная модель будет проверена по данным источника.</span>';
+  target.innerHTML='Карточка '+safe(info.store)+' № '+safe(info.id)+': <a href="'+safe(info.url)+'" target="_blank" rel="noopener noreferrer">открыть оригинал ↗</a>. <span>Точная модель требует подтверждения из источника.</span>';
  }else{target.hidden=true;target.textContent=''}
 }
 const storageKey='kupiora-private-compare-v1';
@@ -270,10 +270,10 @@ function save(){try{localStorage.setItem(storageKey,JSON.stringify({items,query:
 function searches(){const host=$('stores');host.replaceChildren();for(const s of STORES){const a=document.createElement('a');a.className='compare-source';a.textContent=s[0]+' ↗';a.target='_blank';a.rel='noopener noreferrer';a.href=externalSearch(s,lookupText()||'товар');a.title=s[2]?'Поиск на площадке':'Поиск страниц магазина через Яндекс'; if(!s[2]){let label=document.createElement('small');label.textContent='через Яндекс';a.append(label)}host.append(a)}}
 function draw(){
  $('counter').textContent=items.length+' предложений';
- $('caution').textContent=understandInput(current).kind==='ozon'
+ $('caution').textContent=isProductLink(current)
   ?'В сравнении только исходный товар и подтверждённые совпадения. Неподтверждённые похожие варианты исключены. Доставка и персональные скидки могут изменить итог.'
   :comparable(items)?'Подтверждено совпадение артикула производителя (MPN) у предложений. Перед покупкой проверьте комплектацию, скидки и доставку.':'Совпадение товара между магазинами не доказано. Предложения могут относиться к разным моделям.';const g=$('cards');g.replaceChildren();
- const fromLink=understandInput(current).kind==='ozon';
+ const fromLink=isProductLink(current);
  // Never mingle similar or unverified variants into the exact-product price comparison.
  const exact=fromLink?items.filter(x=>x.match==='source'||x.match==='confirmed'):items;
  const otherCount=fromLink?items.length-exact.length:0;
@@ -354,9 +354,9 @@ $('search').onsubmit=async e=>{
  $('comparison-panel').hidden=true;$('source-panel').hidden=true;
  save();searches();showInputSource();$('title').value=lookupText()||q;
  renderPreview();draw();
- $('message').textContent=parsed.kind==='ozon'?(apiMode?'Получаем товар и фотографию с Ozon…':'Ссылка принята. Источник данных не подключён: фото и цены не подтверждены. Нажми «Сравнить цены», чтобы открыть магазины.'):'Товар выбран. Нажми «Сравнить цены», чтобы проверить доступные предложения.';
- if(apiMode&&parsed.kind==='ozon')try{await preparePreview(q,activeSearch)}catch{
-  previewTicket=null;renderPreview();$('message').textContent='Не удалось получить данные карточки Ozon от источника. Товар можно открыть по ссылке.';
+ $('message').textContent=isProductLink(q)?(apiMode?'Получаем товар и фотографию из '+parsed.store+'…':'Ссылка '+parsed.store+' принята. Без API невозможно автоматически получить фото и цены других магазинов. Нажми «Сравнить цены», чтобы открыть поиск по площадкам.'):'Товар выбран. Нажми «Сравнить цены», чтобы проверить доступные предложения.';
+ if(apiMode&&isProductLink(q))try{await preparePreview(q,activeSearch)}catch{
+  previewTicket=null;renderPreview();$('message').textContent='Не удалось получить товар из источника. Ссылка на оригинальную карточку остаётся доступной.';
  }
 };
 searches();draw();showInputSource();renderPreview();
