@@ -13,7 +13,7 @@ test('all six original PR2 product IDs, names and prices remain available',()=>{
 test('demo disclosure is persistent, no fabricated sale or review labels',()=>{
   assert.match(html,/Цены ниже вымышленные/);
   const app=readFileSync(join(root,'app.js'),'utf8');
-  assert.match(app,/Вымышленная история/);assert.match(app,/disabled class="disabled-shop"/);
+  assert.match(app,/Вымышленная история/);assert.match(app,/настоящих ссылок на тестовых продавцов нет/);
   assert.doesNotMatch(app,/124 товара|1 248 отзыв|Лучша[яи] цена|-25%/);
 });
 test('search trims spaces, ignores case and matches SSD specifications',()=>{
