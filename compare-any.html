@@ -66,7 +66,7 @@ $('add').onsubmit=e=>{e.preventDefault();const url=https($('url').value),shop=ST
 const ok=addOffer({shop,title:$('title').value.trim(),url,price:Number($('price').value),delivery:$('delivery').value===''?null:Number($('delivery').value),mpn:$('mpn').value.trim(),image:$('image').value,region:$('region').value,source:$('origin').value,checkedAt:new Date().toISOString()});if(ok){$('add').reset();draw();$('message').textContent='Предложение добавлено. Сравнивайте только одинаковые модификации.'}};
 function parsedOffer(offer,fallback,region,stamp){
  if(!offer||typeof offer!=='object')return null;
- const title=String(offer.Name||fallback||'').trim(),url=https(offer.ShopUrl||offer.ShopInfo?.marketlink||'');
+ const title=String(offer.Name||fallback?.name||'').trim(),url=https(offer.ShopUrl||fallback?.link||offer.ShopInfo?.marketlink||'');
  const market=offer.Market_short||'',shop=market==='OZON'?'Ozon':market==='YM'?'Яндекс Маркет':market==='WB'?'Wildberries':getStore(url);
  const p=Number(offer.Price);
  if(!shop||!url||!title||!Number.isFinite(p)||p<=0)return null;
@@ -76,7 +76,7 @@ function parseReport(data){
  const result=[];const region=data.regioncode||'Москва';
  for(const row of (Array.isArray(data.data)?data.data:[])){
  const stamp=row.sku?.history?.[0]?.record_date||null;
- for(const o of (Array.isArray(row.offers)?row.offers:[])){const item=parsedOffer(o,row.sku?.Name_found,region,stamp);if(item)result.push(item)}
+ for(const o of (Array.isArray(row.offers)?row.offers:[])){const item=parsedOffer(o,{name:row.sku?.Name_found,link:row.link},region,stamp);if(item)result.push(item)}
  }
  return result;
 }
