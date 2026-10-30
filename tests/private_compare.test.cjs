@@ -10,7 +10,7 @@ function setup(){
   });
   const document={getElementById(k){return elements[k]??(elements[k]=el())},createElement(){return el()}};
   const ls={getItem(){return null},setItem(){}};
-  const context=vm.createContext({document,localStorage:ls,URL,Date,Number,String,Array,Math,Set,JSON,Blob,Intl,
+  const context=vm.createContext({document,localStorage:ls,location:{search:''},URL,URLSearchParams,Date,Number,String,Array,Math,Set,JSON,Blob,Intl,
     fetch:async()=>{throw Error('offline')},setTimeout(){return 1},clearTimeout(){},confirm:()=>true});
   vm.runInContext(code,context,{timeout:3000});
   return {context,elements};

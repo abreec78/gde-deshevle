@@ -8,10 +8,21 @@ const parseId=value=>String(value).startsWith('live:')?value:Number(value);
 const imagePath=p=>C.mode==='live'?p.imageUrl:'assets/'+p.image+'.webp';
 const emptyLive={schemaVersion:1,mode:'live',sources:[],products:[]};
 let catalogueError='';
-C.useLive(emptyLive);
+C.useDemo();
 let storage;try{storage=window.localStorage;}catch{storage=null;}
 const state={query:'',category:'',sort:'default',onlyFav:false,favorites:C.readFavorites(storage),ssdOnly:false,capacity:null,brands:[],interfaces:[],minPrice:null,maxPrice:null,selectedId:1,detailOpen:false};
 let storageTimer,installPrompt=null;
+let automaticDemo=false;
+function newHomeOrder(previous=[]){
+  const selected=C.pickFeaturedProducts([1,2,3,4,5,6,7,8,9,10,11,12],6,Math.random,previous);
+  try{storage?.setItem('kupiora:home-last',JSON.stringify(selected));}catch{}
+  return selected;
+}
+let demoHomeOrder=(()=>{
+  let previous=[];
+  try{const saved=JSON.parse(storage?.getItem('kupiora:home-last')||'[]');if(Array.isArray(saved))previous=saved;}catch{}
+  return newHomeOrder(previous);
+})();
 function favoriteButton(p){return '<button class="favorite-toggle" data-favorite="'+p.id+'" aria-label="Избранное: '+escape(name(p))+'" aria-pressed="'+state.favorites.has(p.id)+'">'+icon('heart')+'</button>';}
 function shopMark(o,i){return !o?'':'<span class="shop"><span class="shop-mark s'+(i+1)+'" aria-hidden="true">'+escape(o.shop.split(' ').pop().slice(0,1))+'</span>'+escape(o.shop)+'</span>';}
 function specs(p){return '<div class="specs">'+p.specs.map(s=>'<span>'+escape(s)+'</span>').join('')+'</div>';}
@@ -46,17 +57,32 @@ function renderDataStatus(){
   notice.classList.toggle('real-status',!demo);const regions=[...new Set(C.products.flatMap(p=>C.offersFor(p.id).map(o=>o.region)))];document.querySelector('.city').textContent=demo?'Москва · демо':regions.length===1?regions[0]:'Регион: из фида';
   notice.querySelector('strong').textContent=demo?'Демонстрационная версия.':'Данные магазинов.';
   notice.querySelector('span:not(.demo-dot)').textContent=demo?'Цены ниже вымышленные. Предложения и история цен — для примера.':'Доставка и цены зависят от региона и условий магазина. Неизвестная доставка не считается бесплатной.';
-  $('source-status').textContent=demo?'Вымышленные данные':catalogueError||(!C.sources.length?'Источник пока не подключён':C.sources.filter(s=>s.status==='ok').length+' источников обновлено · '+C.countLabel(C.filterProducts().length));
+  $('source-status').textContent=demo?(catalogueError||'Вымышленные данные'):catalogueError||(!C.sources.length?'Источник пока не подключён':C.sources.filter(s=>s.status==='ok').length+' источников обновлено · '+C.countLabel(C.filterProducts().length));
   document.querySelector('.results-meta span:last-child').textContent=demo?'Иллюстративные цены · ₽':'Рубли · актуальность до 24 часов';
   document.querySelector('footer small').textContent=demo?'Демонстрация · Цены и история вымышлены · Покупка недоступна':'Цены из разрешённых фидов · Окончательные условия уточняйте в магазине';
 }
 let modeRequest=0;
 async function loadMode(mode){
   const request=++modeRequest;catalogueError='';
+  automaticDemo=mode==='auto';
   if(mode==='demo'){C.useDemo();render();syncRoute();return;}
-  C.useLive(emptyLive);render();
-  try{const snapshot=await window.loadPublicCatalog();if(request!==modeRequest)return;C.useLive(snapshot);}
-  catch{if(request!==modeRequest)return;catalogueError='Источник недоступен. Демоданные не подставлены.';}
+  if(mode==='auto')C.useDemo();else C.useLive(emptyLive);
+  render();
+  try{
+    const snapshot=await window.loadPublicCatalog();
+    if(request!==modeRequest)return;
+    C.useLive(snapshot);
+    if(mode==='auto'&&!C.products.length){
+      C.useDemo();
+      catalogueError='Свежих цен нет. Показаны демонстрационные товары.';
+    }else if(C.products.length)automaticDemo=false;
+  }catch{
+    if(request!==modeRequest)return;
+    if(mode==='auto'){
+      C.useDemo();
+      catalogueError='Источник цен недоступен. Показаны демонстрационные товары.';
+    }else catalogueError='Источник цен недоступен. Демоданные не подставлены.';
+  }
   render();syncRoute();
 }
 function render(){
@@ -71,12 +97,13 @@ function render(){
   $('filters').hidden=!computerMode;$('mobile-filters').hidden=!computerMode;$('benefits').hidden=active;$('breadcrumbs').hidden=!active;
   $('breadcrumbs').innerHTML='<a href="#">Главная</a><span>›</span><button class="text-button" data-category="'+escape(state.category||C.categories[1])+'">'+escape(state.category|| (detailMode?C.categories[1]:'Каталог'))+'</button>'+(detailMode?'<span>›</span><button class="text-button" id="breadcrumb-ssd">Накопители → SSD</button><span>›</span><span>'+escape(state.capacity||'Все объёмы')+'</span>':'');
   let results=C.filterProducts(state);
-  // Home uses the six popular items from the approved composition; search includes all legacy items.
-  const homeOrder=[1,4,10,11,2,12];
-  if(C.mode==='demo'&&!active&&state.sort==='default')results=homeOrder.map(id=>C.products.find(p=>p.id===id));
-  $('results-heading').textContent=state.onlyFav?'Избранное':ssdMode?'SSD '+(state.capacity||'накопители'):state.category|| (state.query?'Результаты поиска':(C.mode==='demo'?'Популярные товары':'Товары магазинов'));
+  // Stable for this page load; changes on a fresh opening, not during every render.
+  if(C.mode==='demo'&&!active&&state.sort==='default')
+    results=demoHomeOrder.map(id=>C.products.find(p=>p.id===id)).filter(Boolean);
+  $('results-heading').textContent=state.onlyFav?'Избранное':ssdMode?'SSD '+(state.capacity||'накопители'):state.category|| (state.query?'Результаты поиска':(C.mode==='demo'?'Случайные товары · демо':'Товары магазинов'));
   $('catalog-subtitle').textContent=C.mode==='live'?'Данные фидов · итог только с известной доставкой':active?'Иллюстративный каталог · сравнение с доставкой':'Сравнивайте итоговую стоимость, а не только ценник';
   $('count').textContent=C.countLabel(results.length);
+  $('reshuffle-home').hidden=C.mode!=='demo'||active;
   $('grid').innerHTML=results.length?results.map(p=>renderCard(p,detailMode)).join(''):'<div class="empty-state"><h3>Ничего не найдено</h3><p>Попробуйте другой запрос или сбросьте фильтры.</p><button class="primary" id="empty-reset">Показать все товары</button></div>';
   const selected=results.find(p=>p.id===state.selectedId)||results[0];
   $('detail').hidden=!detailMode||!selected;
@@ -94,7 +121,7 @@ function render(){
 function selectCategory(category){state.category=category;state.ssdOnly=false;state.capacity=null;state.detailOpen=false;state.query='';$('q').value='';state.brands=[];state.interfaces=[];state.minPrice=null;state.maxPrice=null;clearFilterInputs();document.body.classList.remove('show-detail');render();syncRoute();}
 function clearFilterInputs(){document.querySelectorAll('#filters input[type=checkbox]').forEach(el=>el.checked=false);$('min-price').value='';$('max-price').value='';$('filter-error').hidden=true;}
 function reset(){Object.assign(state,{query:'',category:'',sort:'default',onlyFav:false,ssdOnly:false,capacity:null,brands:[],interfaces:[],minPrice:null,maxPrice:null,selectedId:1,detailOpen:false});$('q').value='';clearFilterInputs();render();syncRoute();}
-function syncRoute(){const p=new URLSearchParams();if(state.query)p.set('q',state.query);if(state.category)p.set('category',state.category);if(state.ssdOnly)p.set('ssd','1');if(state.capacity)p.set('capacity',state.capacity);if(state.onlyFav)p.set('favorites','1');if(state.sort!=='default')p.set('sort',state.sort);if(state.selectedId!==1)p.set('product',state.selectedId);if(state.detailOpen)p.set('view','product');if(state.brands.length)p.set('brands',state.brands.join(','));if(state.interfaces.length)p.set('interfaces',state.interfaces.join(','));if(state.minPrice!==null)p.set('min',state.minPrice);if(state.maxPrice!==null)p.set('max',state.maxPrice);if(C.mode==='demo')p.set('data','demo');const hash=p.toString();history.replaceState(null,'',location.pathname+location.search+(hash?'#'+hash:''));}
+function syncRoute(){const p=new URLSearchParams();if(state.query)p.set('q',state.query);if(state.category)p.set('category',state.category);if(state.ssdOnly)p.set('ssd','1');if(state.capacity)p.set('capacity',state.capacity);if(state.onlyFav)p.set('favorites','1');if(state.sort!=='default')p.set('sort',state.sort);if(state.selectedId!==1)p.set('product',state.selectedId);if(state.detailOpen)p.set('view','product');if(state.brands.length)p.set('brands',state.brands.join(','));if(state.interfaces.length)p.set('interfaces',state.interfaces.join(','));if(state.minPrice!==null)p.set('min',state.minPrice);if(state.maxPrice!==null)p.set('max',state.maxPrice);if(C.mode==='demo'&&!automaticDemo)p.set('data','demo');const hash=p.toString();history.replaceState(null,'',location.pathname+location.search+(hash?'#'+hash:''));}
 function readRoute(){const p=new URLSearchParams(location.hash.slice(1));state.detailOpen=p.get('view')==='product';state.query=p.get('q')||'';state.category=C.categories.includes(p.get('category'))?p.get('category'):'';state.ssdOnly=p.get('ssd')==='1';state.capacity=['1 ТБ','500 ГБ','2 ТБ','4 ТБ'].includes(p.get('capacity'))?p.get('capacity'):null;state.onlyFav=p.get('favorites')==='1';state.sort=['asc','desc'].includes(p.get('sort'))?p.get('sort'):'default';state.selectedId=parseId(p.get('product'))||1;state.brands=(p.get('brands')||'').split(',').filter(v=>['Samsung','Kingston','WD'].includes(v));state.interfaces=(p.get('interfaces')||'').split(',').filter(v=>['SATA','NVMe'].includes(v));const min=p.has('min')?Number(p.get('min')):null,max=p.has('max')?Number(p.get('max')):null;state.minPrice=C.validatePriceRange(min,max)?min:null;state.maxPrice=C.validatePriceRange(min,max)?max:null;$('q').value=state.query;$('min-price').value=state.minPrice??'';$('max-price').value=state.maxPrice??'';document.querySelectorAll('input[name=brand]').forEach(el=>el.checked=state.brands.includes(el.value));render();if(state.detailOpen)document.body.classList.add('show-detail');}
 document.addEventListener('click',event=>{
   if(event.target.closest('a[href="#"]')){event.preventDefault();reset();return;}
@@ -115,6 +142,7 @@ function toggleFavorites(){state.onlyFav=!state.onlyFav;state.detailOpen=false;d
 $('favorites').onclick=toggleFavorites;$('mobile-favorites').onclick=toggleFavorites;
 $('mobile-search').onclick=()=>{$('q').focus();window.scrollTo({top:0,behavior:'smooth'});};
 $('all-categories').onclick=reset;
+$('reshuffle-home').onclick=()=>{demoHomeOrder=newHomeOrder(demoHomeOrder);if(C.mode!=='demo')loadMode('demo');else render();};
 $('real-mode').onclick=()=>loadMode('live');$('demo-mode').onclick=()=>loadMode('demo');
 $('mobile-filters').onclick=()=>document.body.classList.add('filters-open');$('close-filters').onclick=()=>document.body.classList.remove('filters-open');
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.body.classList.remove('filters-open');$('mobile-filters').focus();}});
@@ -134,5 +162,5 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installProm
 $('install-button').onclick=async()=>{if(!installPrompt)return;await installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;$('install-button').hidden=true;};
 window.addEventListener('appinstalled',()=>{$('install-button').hidden=true;installPrompt=null;});
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{showHelp(true);$('install-help').prepend('Офлайн-кеш сейчас недоступен. ');});
-readRoute();networkStatus();loadMode(new URLSearchParams(location.hash.slice(1)).get('data')==='demo'?'demo':'live');
+readRoute();networkStatus();loadMode(new URLSearchParams(location.hash.slice(1)).get('data')==='demo'?'demo':new URLSearchParams(location.hash.slice(1)).get('data')==='live'?'live':'auto');
 setInterval(()=>{if(C.mode==='live')render();},60000);

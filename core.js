@@ -57,7 +57,21 @@
   function saveFavorites(storage,favorites){try{storage.setItem('favorites',JSON.stringify([...favorites]));return true;}catch{return false;}}
   function toggleFavorite(favorites,id){if(!products.some(p=>p.id===id))return;favorites.has(id)?favorites.delete(id):favorites.add(id);}
   function countLabel(n){const r=n%100,last=n%10;return n+' '+(r>=11&&r<=14?'товаров':last===1?'товар':last>=2&&last<=4?'товара':'товаров');}
+  // Select a changing, stable-per-page-load home assortment; never alter real offers or prices.
+  function pickFeaturedProducts(ids,count=6,random=Math.random,previous=[]){
+    const ordered=[...ids];
+    for(let i=ordered.length-1;i>0;i--){
+      const sample=Number(random());
+      const j=Number.isFinite(sample)?Math.min(i,Math.max(0,Math.floor(sample*(i+1)))):0;
+      [ordered[i],ordered[j]]=[ordered[j],ordered[i]];
+    }
+    const selected=ordered.slice(0,Math.max(0,Math.min(ordered.length,count)));
+    if(selected.length>1&&Array.isArray(previous)&&selected.join(',')===previous.join(',')){
+      [selected[0],selected[1]]=[selected[1],selected[0]];
+    }
+    return selected;
+  }
   function validatePriceRange(min,max){return (min==null||Number.isFinite(min)&&min>=0)&&(max==null||Number.isFinite(max)&&max>=0)&&(min==null||max==null||min<=max);}
-  const api={categories,products,offersFor,total,sortedOffers,bestPrice,isSSD,filterProducts,readFavorites,saveFavorites,toggleFavorite,countLabel,validatePriceRange,safeUrl,fresh,useLive,useDemo,get mode(){return mode;},get sources(){return sourceInfo;}};
+  const api={categories,products,offersFor,total,sortedOffers,bestPrice,isSSD,filterProducts,readFavorites,saveFavorites,toggleFavorite,countLabel,pickFeaturedProducts,validatePriceRange,safeUrl,fresh,useLive,useDemo,get mode(){return mode;},get sources(){return sourceInfo;}};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Catalog=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
