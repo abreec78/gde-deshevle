@@ -11,12 +11,16 @@ self.addEventListener('fetch',event=>{
   if(request.mode!=='navigate'&&!inShell)return;
   event.respondWith((async()=>{
     const cache=await caches.open(CACHE);
+    const rootPath=new URL('./',self.registration.scope).pathname;
+    const key=request.mode!=='navigate'?request:url.pathname===rootPath
+      ?new URL('./index.html',self.registration.scope).href
+      :new URL(url.pathname,self.location.origin).href;
     try{
       const response=await fetch(request);
-      if(response.ok){const key=request.mode==='navigate'?new URL(url.pathname,self.location.origin).href:request;await cache.put(key,response.clone());}
+      if(response.ok)await cache.put(key,response.clone());
       return response;
     }catch{
-      const cached=await cache.match(request.mode==='navigate'?new URL(url.pathname,self.location.origin).href:request);
+      const cached=await cache.match(key);
       return cached||new Response('Offline asset unavailable',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}});
     }
   })());
