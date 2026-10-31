@@ -39,6 +39,29 @@ class HostedServerTests(unittest.TestCase):
             got=server.follow_ozon_shortlink("https://ozon.ru/t/bTByYAY")
         self.assertEqual(got,"https://www.ozon.ru/product/item-123456789/")
 
+    def test_get_fallback_reads_only_ozon_product_canonical(self):
+        class FakeResponse:
+            status = 200
+            headers = {}
+            def __init__(self, content):
+                self.content=content
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                return False
+            def read(self, n=-1):
+                return self.content[:n]
+
+        class FakeOpener:
+            def open(self, req, timeout):
+                if req.get_method() == "HEAD":
+                    raise HTTPError(req.full_url,405,"Method Not Allowed",{},None)
+                return FakeResponse(b'<link rel="canonical" href="https://www.ozon.ru/product/test-item-123456789/">')
+
+        with patch.object(server,"build_opener",return_value=FakeOpener()):
+            self.assertEqual(server.follow_ozon_shortlink("https://ozon.ru/t/bTByYAY"),
+                             "https://www.ozon.ru/product/test-item-123456789/")
+
     def test_external_redirect_is_rejected(self):
         fake=FakeRedirect(302,"https://evil.example/product/item-12345/")
         class FakeOpener:
