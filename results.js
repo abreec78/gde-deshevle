@@ -193,7 +193,7 @@
       }catch{}
       if(turn!==state.turn)return;
       state.done=true;renderSearchLinks();
-      status('Ozon не предоставил полный адрес товара. Без него нельзя точно определить модель и сравнить реальные цены. Открой ссылку и скопируй адрес карточки.');
+      status('Короткая ссылка Ozon принята. Ozon не предоставил полный адрес товара. Без него нельзя точно определить модель и сравнить реальные цены. Открой ссылку и скопируй адрес карточки.');
       return;
     }
     const u=new URL(location.href);u.searchParams.set('q',state.query);u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);
