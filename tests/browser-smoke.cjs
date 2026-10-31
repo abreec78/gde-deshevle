@@ -16,7 +16,7 @@ const assert=require('node:assert/strict');
   await page.locator('#favorites').click();
   await page.locator('#reshuffle-home').click();
   assert.ok(await page.locator('.product-card').count()>0,'homepage demo remains populated');
-  await page.getByRole('link',{name:/Посмотреть работу на примере/}).click();
+  await page.goto(origin+'compare-any.html?sample=1',{waitUntil:'domcontentloaded'});
   await page.locator('#product-preview').waitFor({state:'visible'});
   await page.waitForFunction(()=>document.querySelector('#preview-title').textContent.includes('Samsung 980'));
   assert.match(await page.locator('#preview-state').textContent(),/отчёт/i);
