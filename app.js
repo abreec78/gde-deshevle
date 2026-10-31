@@ -14,7 +14,7 @@ const state={query:'',category:'',sort:'default',onlyFav:false,favorites:C.readF
 let storageTimer,installPrompt=null;
 let automaticDemo=false;
 function newHomeOrder(previous=[]){
-  const selected=C.pickFeaturedProducts([1,2,3,4,5,6,7,8,9,10,11,12],6,Math.random,previous);
+  const selected=C.pickFeaturedProducts([1,2,3,4,5,6,7,8,9,10,11,12],12,Math.random,previous);
   try{storage?.setItem('kupiora:home-last',JSON.stringify(selected));}catch{}
   return selected;
 }
@@ -49,9 +49,9 @@ function renderCategories(){
 }
 function renderCard(p,detailMode){
   const offers=C.sortedOffers(p.id),image='<img class="product-image" src="'+escape(imagePath(p))+'" width="300" height="180" alt="'+escape(name(p))+(C.mode==='demo'?' — иллюстрация':'')+'" loading="lazy" decoding="async">';
-  const demoSearch=C.mode==='demo'?'<a class="demo-find-link" href="compare-any.html?q='+encodeURIComponent(name(p))+'">Найти реальные предложения ↗</a>':'';
+  const demoSearch=C.mode==='demo'?'<a class="demo-find-link" href="results.html?q='+encodeURIComponent(name(p))+'">Найти реальные предложения ↗</a>':'';
   const info='<div class="card-info"><h3><button data-open="'+p.id+'">'+escape(name(p))+'</button></h3>'+(detailMode?'<p class="card-subtitle">'+escape(p.specs.join(', '))+'</p>'+specs(p)+merchantSummary(offers[0],0):'<div class="price">'+money(C.bestPrice(p))+'</div><p class="card-note">с известной доставкой'+(C.mode==='demo'?' · демо':' · '+escape(offers[0]?.region||''))+'</p>'+merchantSummary(offers[0],0))+demoSearch+'</div>';
-  const open=C.mode==='demo'?'<a class="compare-link demo-compare-live" href="compare-any.html?q='+encodeURIComponent(name(p))+'">Искать настоящие цены ↗</a>':'<button class="compare-link" data-open="'+p.id+'">Сравнить цены ('+offers.length+') '+icon('arrow')+'</button>';
+  const open=C.mode==='demo'?'<a class="compare-link demo-compare-live" href="results.html?q='+encodeURIComponent(name(p))+'">Искать настоящие цены ↗</a>':'<button class="compare-link" data-open="'+p.id+'">Сравнить цены ('+offers.length+') '+icon('arrow')+'</button>';
   return '<article class="product-card" data-product="'+p.id+'">'+favoriteButton(p)+'<button class="product-image-button" data-open="'+p.id+'" aria-label="Сравнить '+escape(name(p))+'">'+image+'</button>'+info+(detailMode?'<div class="card-offers"><div class="price">'+money(C.bestPrice(p))+'</div><p class="card-note">итого с доставкой'+(C.mode==='demo'?' · демо':' · '+escape(offers[0]?.region||''))+'</p>'+offers.map((o,i)=>'<div class="mini-offer">'+shopMark(o,i)+'<b>'+money(C.total(o))+'</b></div>').join('')+open+'</div>':open)+'</article>';
 }
 function chart(p){
@@ -119,7 +119,7 @@ function render(){
   // Stable for this page load; changes on a fresh opening, not during every render.
   if(C.mode==='demo'&&!active&&state.sort==='default')
     results=demoHomeOrder.map(id=>C.products.find(p=>p.id===id)).filter(Boolean);
-  $('results-heading').textContent=state.onlyFav?'Избранное':ssdMode?'SSD '+(state.capacity||'накопители'):state.category|| (state.query?'Результаты поиска':(C.mode==='demo'?'Случайные товары · демо':'Товары магазинов'));
+  $('results-heading').textContent=state.onlyFav?'Избранное':ssdMode?'SSD '+(state.capacity||'накопители'):state.category|| (state.query?'Результаты поиска':(C.mode==='demo'?'Товары для вас · пример':'Товары магазинов'));
   $('catalog-subtitle').textContent=C.mode==='live'?'Данные фидов · итог только с известной доставкой':active?'Иллюстративный каталог · сравнение с доставкой':'Сравнивайте итоговую стоимость, а не только ценник';
   $('count').textContent=C.countLabel(results.length);
   $('reshuffle-home').hidden=C.mode!=='demo'||active;
@@ -154,7 +154,7 @@ document.addEventListener('click',event=>{
   if(button.id==='empty-reset')reset();
 });
 $('q').addEventListener('input',()=>{state.query=$('q').value;state.ssdOnly=false;state.capacity=null;state.detailOpen=false;document.body.classList.remove('show-detail');render();syncRoute();});
-$('search-form').addEventListener('submit',e=>{e.preventDefault();const q=$('q').value.trim();const url=new URL('./compare-any.html',location.href);if(q)url.searchParams.set('q',q);location.assign(url.href);});
+$('search-form').addEventListener('submit',e=>{e.preventDefault();const q=$('q').value.trim();const url=new URL('./results.html',location.href);if(q)url.searchParams.set('q',q);location.assign(url.href);});
 $('category').addEventListener('change',()=>selectCategory($('category').value));
 $('sort').addEventListener('change',()=>{state.sort=$('sort').value;render();syncRoute();});
 function toggleFavorites(){state.onlyFav=!state.onlyFav;state.detailOpen=false;document.body.classList.remove('show-detail');render();syncRoute();}
