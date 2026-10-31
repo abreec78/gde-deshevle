@@ -63,43 +63,51 @@ def canonical_ozon(url):
 
 
 def follow_ozon_shortlink(short_url):
-    """Return a canonical Ozon product URL, never a guessed product ID.
-
-    HEAD redirects from Ozon may be blocked or return anti-bot pages. In that
-    case return None; do not fabricate a product from a shortlink token.
-    """
-    if not canonical_ozon(short_url):
+    """Resolve only Ozon-owned redirects or canonical URLs, never guess a product."""
+    canonical = canonical_ozon(short_url)
+    if not canonical:
         return None
     opener = build_opener(NoRedirect())
-    current = short_url
-    for _ in range(6):
-        req = Request(current, headers={
-            "User-Agent": "Mozilla/5.0 (compatible; KupioraLinkResolver/1.0)",
-            "Accept": "text/html,*/*"
-        }, method="HEAD")
-        try:
-            with opener.open(req, timeout=7) as resp:
-                status = resp.status
-                location = resp.headers.get("Location")
-        except HTTPError as ex:
-            status = ex.code
-            location = ex.headers.get("Location")
-        except (URLError, TimeoutError, OSError, HTTPException):
-            return None
-        if status not in (301, 302, 303, 307, 308) or not location:
+    for method in ("HEAD", "GET"):
+        current = canonical
+        for _ in range(6):
+            req = Request(current, headers={
+                "User-Agent": "Mozilla/5.0 (compatible; KupioraLinkResolver/1.0)",
+                "Accept": "text/html,*/*",
+            }, method=method)
+            try:
+                with opener.open(req, timeout=7) as resp:
+                    status = resp.status
+                    location = resp.headers.get("Location")
+                    body = resp.read(80_000) if method == "GET" and status == 200 else b""
+            except HTTPError as ex:
+                status = ex.code
+                location = ex.headers.get("Location")
+                body = b""
+            except (URLError, TimeoutError, OSError, HTTPException):
+                break
+            if status in (301, 302, 303, 307, 308) and location:
+                target = urljoin(current, location)
+                p = urlparse(target)
+                if p.scheme != "https" or p.hostname not in ("ozon.ru", "www.ozon.ru") or p.username or p.password:
+                    return None
+                product = private.ozon_product_link(target)
+                if product:
+                    return product
+                if not SHORT_PATTERN.fullmatch(p.path):
+                    break
+                current = target
+                continue
+            if body:
+                # Some storefronts expose a canonical product link without a redirect.
+                text = body.decode("utf-8", "replace")
+                links = re.findall(r'https://(?:www\.)?ozon\.ru/product/[^\s\x22\x27<>]+', text)
+                for link in links[:30]:
+                    target = private.ozon_product_link(link.replace("&amp;", "&"))
+                    if target:
+                        return target
             break
-        target = urljoin(current, location)
-        p = urlparse(target)
-        if p.scheme != "https" or p.hostname not in ("ozon.ru", "www.ozon.ru") or p.username or p.password:
-            return None
-        product = private.ozon_product_link(target)
-        if product:
-            return product
-        if not SHORT_PATTERN.fullmatch(p.path):
-            return None
-        current = target
     return None
-
 
 def allowed_static(path):
     if path in ALLOWED_FILES:
