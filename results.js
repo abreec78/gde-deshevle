@@ -1,6 +1,21 @@
 'use strict';
 (() => {
   const $=id=>document.getElementById(id);
+  const embedded=Boolean($('inline-compare'));
+  const searchForm=$('product-search')||$('search-form');
+  const searchInput=$('query')||$('q');
+  function showInline(visible){
+    if(!embedded)return;
+    $('inline-compare').hidden=!visible;
+    document.body.classList.toggle('inline-results-open',visible);
+  }
+  function shortHelper(source){
+    const container=$('shortlink-help');
+    if(!container)return;
+    container.hidden=!source||source.kind!=='short';
+    if(source?.kind==='short')$('shortlink-open').href=source.url;
+    if($('offers-section'))$('offers-section').hidden=Boolean(source?.kind==='short');
+  }
   const money=n=>new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:0}).format(n);
   const state={turn:0,query:'',source:null,sourceTitle:'',sourceImage:'',offers:[],api:false,archival:false,reportDate:'',done:false};
   const known=[['Ozon','https://www.ozon.ru/search/?text='],['Wildberries','https://www.wildberries.ru/catalog/0/search.aspx?search='],['Яндекс Маркет','https://market.yandex.ru/search?text='],['Ситилинк','https://www.citilink.ru/search/?text='],['DNS','https://www.dns-shop.ru/search/?q=']];
@@ -15,6 +30,8 @@
     if(!safeUrl(input))return {kind:'invalid',reason:'Используйте безопасную HTTPS-ссылку на карточку товара.'};
     const host=url.hostname.toLowerCase().replace(/^www\./,'');
     if(host==='ozon.ru'){
+      const short=url.pathname.match(/^\/t\/([a-zA-Z0-9_-]+)\/?$/);
+      if(short)return {kind:'short',store:'Ozon',id:short[1],url:'https://ozon.ru/t/'+short[1],query:''};
       const match=url.pathname.match(/^\/product\/(?:.*?-)?(\d+)\/?$/);
       if(!match)return {kind:'invalid',reason:'У Ozon нужна полная ссылка /product/… . Короткие ссылки следует раскрыть в браузере.'};
       const path=url.pathname;
@@ -47,7 +64,7 @@
   }
   function renderProduct(){
     const source=state.source;
-    $('product-panel').hidden=!source||source.kind==='invalid'||source.kind==='empty';
+    $('product-panel').hidden=!source||source.kind==='invalid'||source.kind==='empty'||source.kind==='short';
     if($('product-panel').hidden)return;
     $('source-label').textContent=state.archival?'Архивный пример с сохранёнными ценами':source.kind==='product'?'Источник: '+source.store:'Поиск по названию';
     $('product-title').textContent=state.sourceTitle||source.query||(source.kind==='product'?source.store+' · товар № '+source.id:'Поиск товара');
@@ -129,7 +146,7 @@
     state.sourceImage=doc.image;
     state.offers=doc.offers.map(o=>({...o,match:o.match==='source'?'source':'confirmed'}));
     state.archival=true;state.reportDate=doc.sampleDate||'30.10.2026';state.done=true;
-    $('query').value=state.query;
+    searchInput.value=state.query;
     renderProduct();renderOffers();renderSearchLinks();status('Пример сравнения открыт. Это исторические цены, не текущие.');
   }
   async function find(query){
@@ -137,11 +154,19 @@
     state.query=String(query||'').trim().slice(0,1200);
     state.source=parseQuery(state.query);
     state.sourceTitle='';state.sourceImage='';state.offers=[];state.archival=false;state.reportDate='';state.done=false;state.api=false;
-    $('query').value=state.query;
+    searchInput.value=state.query;
     const source=state.source;
+    showInline(source.kind!=='empty');
+    shortHelper(source);
     renderProduct();renderOffers();renderSearchLinks();
     if(source.kind==='empty'){status('Введите ссылку на товар или точную модель.');return}
     if(source.kind==='invalid'){status(source.reason);return}
+    if(source.kind==='short'){
+      const u=new URL(location.href);u.searchParams.set('q',state.query);u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);
+      state.done=true;
+      status('Короткая ссылка Ozon принята. Но браузер не может прочитать её конечный адрес из-за ограничений Ozon. Открой товар и скопируй полную ссылку, всё останется на этой странице.');
+      return;
+    }
     const u=new URL(location.href);u.searchParams.set('q',state.query);u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);
     status(source.kind==='product'?'Ссылка '+source.store+' распознана. Проверяем наличие источника актуальных цен…':'Ищем по названию. Проверяем наличие источника цен…');
     try{
@@ -185,9 +210,33 @@
       status('Сервер цен не смог завершить запрос. Неподтверждённые цены не показываются.');
     }
   }
-  $('product-search').addEventListener('submit',event=>{event.preventDefault();void find($('query').value)});
+  searchForm.addEventListener('submit',event=>{
+    event.preventDefault();
+    void find(searchInput.value);
+    if(embedded)requestAnimationFrame(()=>$('inline-compare').scrollIntoView({behavior:'smooth',block:'start'}));
+  });
+  if(embedded){
+    $('close-inline-search').onclick=()=>{
+      state.turn++;state.query='';state.source=null;state.offers=[];state.sourceTitle='';state.sourceImage='';state.api=false;
+      searchInput.value='';showInline(false);shortHelper(null);
+      const u=new URL(location.href);u.searchParams.delete('q');u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);
+      searchInput.focus();
+    };
+    $('shortlink-paste').onclick=async()=>{
+      try{
+        if(navigator.clipboard?.readText){
+          const value=(await navigator.clipboard.readText()).trim();
+          if(value.startsWith('https://')&&value!==state.query){searchInput.value=value;void find(value);return;}
+        }
+      }catch{}
+      searchInput.focus();status('Вставь полный адрес с помощью Ctrl+V в поиск сверху и нажми синюю кнопку.');
+    };
+  }
   const params=new URLSearchParams(location.search);
-  if(params.get('sample')==='1')void loadArchivedExample(++state.turn).catch(()=>status('Архивный пример недоступен.'));
+  if(params.get('sample')==='1') {
+    showInline(true);
+    void loadArchivedExample(++state.turn).catch(()=>status('Архивный пример недоступен.'));
+  }
   else if(params.has('q'))void find(params.get('q'));
   else {renderOffers();renderSearchLinks()}
 })();
