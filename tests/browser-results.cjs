@@ -19,7 +19,8 @@ const assert=require('node:assert/strict');
   await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('не подключён'));
   assert.equal(await page.locator('#offers .result-offer').count(),0);
   assert.equal(await page.locator('#empty').isVisible(),true);
-  assert.equal(await page.locator('#search-options').isVisible(),false);
+  assert.equal(await page.locator('#search-options').isVisible(),true);
+  assert.equal(await page.locator('#store-search-links .inline-store-row').count(),18);
 
   // 2. Exact original card loads once; the API automatically matches and ranks all confirmed stores.
   let requestBody=null;
