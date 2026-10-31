@@ -7,13 +7,13 @@ const assert=require('node:assert/strict');
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const root='http://127.0.0.1:8899/';
  try{
-  // 1. Storefront shows 12 rotating products and immediately navigates to results on submit.
+  // 1. Legacy standalone results remain directly accessible; homepage uses the inline version.
   await page.goto(root,{waitUntil:'domcontentloaded'});
   await page.waitForSelector('#grid .product-card');
   assert.equal(await page.locator('#grid .product-card').count(),12);
-  await page.locator('#q').fill('https://www.wildberries.ru/catalog/247318779/detail.aspx');
-  await page.locator('#search-form button[type=submit]').click();
-  await page.waitForURL(/results\.html\?q=/);
+  await page.goto(root+'results.html',{waitUntil:'domcontentloaded'});
+  await page.locator('#query').fill('https://www.wildberries.ru/catalog/247318779/detail.aspx');
+  await page.locator('#product-search button').click();
   await page.locator('#product-title').waitFor({state:'visible'});
   assert.match(await page.locator('#product-title').textContent(),/Wildberries/);
   await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('не подключён'));
