@@ -3,6 +3,10 @@ on:
   pull_request:
     paths:
       - 'compare-any.html'
+      - 'results.html'
+      - 'results.css'
+      - 'results.js'
+      - 'tests/browser-results.cjs'
       - 'index.html'
       - 'app.js'
       - 'styles.css'
@@ -34,3 +38,4 @@ jobs:
           python3 -m http.server 8899 --bind 127.0.0.1 > /tmp/kupiora-server.log 2>&1 &
           sleep 2
           node tests/browser-smoke.cjs
+          node tests/browser-results.cjs

@@ -141,6 +141,27 @@ class PrivateCompareTests(unittest.TestCase):
         self.assertEqual(job["markets"]["ozon"]["state"],"done")
         thread.assert_not_called()
 
+    def test_automatic_comparison_runs_after_matching_source_card(self):
+        source='https://www.ozon.ru/product/samsung-980-mz-v8v1t0bw-12345678/'
+        report={"data":[{"link":source,"sku":{"Name_found":"Samsung 980 MZ-V8V1T0BW 1 TB"},
+            "offers":[{"Name":"Samsung 980 MZ-V8V1T0BW 1 TB","Price":27000,
+                       "Offer_pics":["https://ir.ozone.ru/real-photo.jpg"]}]}]}
+        job={"markets":{"ozon":{"label":"source","state":"waiting"}},"offers":[],"errors":[],
+             "submitted":True,"sourceUrl":source,"sourceMarket":"ozon","sourceTitle":None,
+             "phase":"source","region":"Москва","autoCompare":True}
+        response=[{"result":"success"},{"data":[[
+            {"userlabel":"source"},{"status":"completed"},
+            {"report_json":"https://files.parser.market/_filestorage/x/demo.json"}]]}]
+        with patch.object(srv,"provider_post",return_value=response),patch.object(srv,"get_report",return_value=report),patch.object(srv.threading,"Thread") as thread:
+            srv.poll(job)
+        self.assertEqual(job['phase'],'cross')
+        self.assertFalse(job['submitted'])
+        self.assertEqual(job['sourceTitle'],'Samsung 980 MZ-V8V1T0BW 1 TB')
+        self.assertEqual(job['offers'][0]['match'],'source')
+        thread.assert_called_once()
+        arguments=thread.call_args.kwargs
+        self.assertEqual(arguments['args'][-1],['wbs','ym'])
+
     def test_cross_market_work_is_separate_after_preview(self):
         calls=[]
         def fake(endpoint,payload):

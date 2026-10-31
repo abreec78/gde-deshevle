@@ -208,7 +208,13 @@ def poll(job):
                         job['sourceTitle']=title
                         job['sourceImage']=next((x['image'] for x in originals if x.get('image') and str(x['image']).startswith('https://')),None)
                         job['sourcePrice']=next((x['price'] for x in originals if isinstance(x.get('price'),(int,float)) and x['price']>0),None)
-                        job['phase']='preview'
+                        auto=job.get('autoCompare',False)
+                        job['phase']='cross' if auto else 'preview'
+                        if auto:job['submitted']=False
+                    if auto:
+                        source_market=job.get('sourceMarket')
+                        markets=[m for m in ('ozons','wbs','ym') if {'ozons':'ozon','wbs':'wb','ym':'ym'}[m]!=source_market]
+                        threading.Thread(target=submit,args=(job,title,job.get('region','Москва'),None,markets),daemon=True).start()
                 else:
                     with LOCK:
                         job['phase']='error'
@@ -280,8 +286,8 @@ class Handler(SimpleHTTPRequestHandler):
             size=int(self.headers.get('Content-Length','0'))
             if not 0<size<4000:raise ValueError('size')
             d=json.loads(self.rfile.read(size))
-            q=d.get('query','');region=d.get('region','Москва');source=d.get('sourceUrl')
-            if not isinstance(q,str) or not isinstance(region,str) or len(region)>80:raise ValueError('query')
+            q=d.get('query','');region=d.get('region','Москва');source=d.get('sourceUrl');auto=d.get('autoCompare',False)
+            if not isinstance(q,str) or not isinstance(region,str) or len(region)>80 or not isinstance(auto,bool):raise ValueError('query')
             if source is not None:
                 found_source=identify_product_link(source)
                 if not found_source:raise ValueError('source')
@@ -293,7 +299,7 @@ class Handler(SimpleHTTPRequestHandler):
             # Limited local history to avoid memory exhaustion.
             if len(JOBS)>30:
                 first=next(iter(JOBS));JOBS.pop(first,None)
-            id=secrets.token_urlsafe(16);job={'markets':{},'offers':[],'errors':[],'submitted':False,'last_poll':0,'sourceUrl':source,'sourceMarket':identify_product_link(source)['market'] if source else None,'sourceTitle':None,'phase':'source' if source else 'search','region':region};JOBS[id]=job
+            id=secrets.token_urlsafe(16);job={'markets':{},'offers':[],'errors':[],'submitted':False,'last_poll':0,'sourceUrl':source,'sourceMarket':identify_product_link(source)['market'] if source else None,'sourceTitle':None,'phase':'source' if source else 'search','region':region,'autoCompare':auto};JOBS[id]=job
         threading.Thread(target=submit,args=(job,q,region,source),daemon=True).start()
         self.reply(202,{'id':id})
 if __name__=='__main__':

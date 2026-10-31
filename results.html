@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0875ff">
+<meta name="description" content="Сравнение цен конкретного товара по ссылке на маркетплейс.">
+<title>Сравнение цен товара · Где дешевле?</title>
+<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./results.css">
+<link rel="icon" href="./assets/icon-192.png">
+</head>
+<body class="result-page">
+<div class="app-shell">
+<header class="result-header">
+  <a class="result-logo" href="./" aria-label="На главную"><span class="logo-symbol">🛒</span><span><strong>Где дешевле?</strong><small>Товары и цены магазинов</small></span></a>
+  <a class="result-home" href="./">← В каталог</a>
+</header>
+<main>
+<section class="result-search">
+ <h1>Найдём, где дешевле</h1>
+ <p>Вставь ссылку на конкретный товар с Ozon, Wildberries или Яндекс Маркета. Сравним проверенные предложения той же модели, если данные доступны.</p>
+ <form id="product-search" role="search">
+  <input id="query" type="search" maxlength="1200" aria-label="Ссылка на товар или модель" placeholder="Ссылка на товар или точная модель" autocomplete="off" required>
+  <button type="submit">Найти цены</button>
+ </form>
+ <div id="status" role="status" aria-live="polite" class="result-status">Введите название модели или ссылку на товар.</div>
+</section>
+<section id="product-panel" class="result-product" hidden aria-label="Найденный товар">
+ <div class="result-product-photo" id="product-photo"><span>Фото появится, если его предоставит источник</span></div>
+ <div class="result-product-copy">
+  <span class="result-eyebrow" id="source-label">Товар</span>
+  <h2 id="product-title">Определяем товар…</h2>
+  <p id="product-description">Получаем характеристики и цены.</p>
+  <a id="original-link" target="_blank" rel="noopener noreferrer nofollow" hidden>Открыть исходный товар ↗</a>
+ </div>
+</section>
+<section class="result-offers" id="offers-section" aria-label="Цены магазинов">
+ <div class="result-row"><div><h2>Предложения магазинов</h2><p id="offers-meta">Подтверждённые совпадения, сортировка по минимальной цене</p></div><div class="result-count" id="count">0 предложений</div></div>
+ <div class="result-best" id="best" hidden></div>
+ <div id="offers" class="result-offer-grid"></div>
+ <div id="empty" class="result-empty">
+  <strong>Достоверных цен пока нет</strong>
+  <p id="empty-reason">Для поиска по произвольной ссылке нужен подключённый источник актуальных цен. Непроверенные предложения не отображаются как выгодные.</p>
+ </div>
+</section>
+<section class="result-secondary" id="search-options" hidden>
+ <h2>Найти самостоятельно на площадках</h2>
+ <p>Это ссылки на поиск, не цены и не подтверждённые совпадения.</p>
+ <div id="store-search-links" class="result-store-links"></div>
+</section>
+<section class="result-info">Цены приведены без гарантии наличия, доставки и персональных скидок. Самая низкая цена выбирается только среди найденных подтверждённых предложений. <span id="sample-note"></span></section>
+</main>
+<footer class="result-footer">Где дешевле? · Покупка происходит непосредственно в магазине.</footer>
+</div>
+<script src="./results.js" defer></script>
+</body>
+</html>
