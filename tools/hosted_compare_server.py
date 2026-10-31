@@ -101,8 +101,16 @@ def follow_ozon_shortlink(short_url):
             if body:
                 # Some storefronts expose a canonical product link without a redirect.
                 text = body.decode("utf-8", "replace")
-                links = re.findall(r'https://(?:www\.)?ozon\.ru/product/[^\s\x22\x27<>]+', text)
-                for link in links[:30]:
+                # Trust only explicit canonical markup, never recommendation links.
+                tags = re.findall(r'<(?:link|meta)\b[^>]{0,2000}>', text, flags=re.I)
+                links = []
+                for tag in tags[:100]:
+                    if not re.search(r'\b(?:rel|property|name)\s*=\s*["\x27](?:canonical|og:url)["\x27]',tag,re.I):
+                        continue
+                    match = re.search(r'\b(?:href|content)\s*=\s*["\x27](https://(?:www\.)?ozon\.ru/product/[^"\x27<>]+)["\x27]',tag,re.I)
+                    if match:
+                        links.append(match.group(1))
+                for link in links:
                     target = private.ozon_product_link(link.replace("&amp;", "&"))
                     if target:
                         return target
