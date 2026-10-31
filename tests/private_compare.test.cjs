@@ -92,7 +92,7 @@ test('the cheapest badge is reserved for confirmed matching offers',()=>{
 test('the comparison page uses the same blue-white visual identity as homepage',()=>{
  assert.ok(html.includes('href="./styles.css"'));
  assert.ok(html.includes('color:#0875ff'));
- assert.ok(html.includes('Где дешевле?'));
+ assert.ok(html.includes('Купиора'));
  assert.ok(html.includes('font-weight:600'));
 });
 
