@@ -180,8 +180,20 @@
     if(source.kind==='invalid'){status(source.reason);return}
     if(source.kind==='short'){
       const u=new URL(location.href);u.searchParams.set('q',state.query);u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);
+      status('Пытаемся раскрыть короткую ссылку Ozon и определить конкретный товар…');
+      try{
+        const response=await fetchJson('./api/resolve?url='+encodeURIComponent(source.url),{
+          cache:'no-store',signal:AbortSignal.timeout(12000)});
+        if(turn!==state.turn)return;
+        if(response.resolved&&response.url&&parseQuery(response.url).kind==='product'){
+          searchInput.value=response.url;
+          await find(response.url); // immediately continues with normal API search
+          return;
+        }
+      }catch{}
+      if(turn!==state.turn)return;
       state.done=true;renderSearchLinks();
-      status('Короткая ссылка Ozon принята, но товар по ней ещё не определён. Пока не найден точный товар, сравнение цен невозможно.');
+      status('Короткая ссылка Ozon принята. Ozon не предоставил полный адрес товара. Без него нельзя точно определить модель и сравнить реальные цены. Открой ссылку и скопируй адрес карточки.');
       return;
     }
     const u=new URL(location.href);u.searchParams.set('q',state.query);u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);

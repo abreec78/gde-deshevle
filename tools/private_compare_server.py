@@ -256,8 +256,12 @@ class Handler(SimpleHTTPRequestHandler):
         if path not in ('/api/search','/api/compare'):self.reply(404,{'error':'not found'});return
         if not KEY or not ALLOW_CHARGES:self.reply(503,{'error':'provider not enabled'});return
         origin=self.headers.get('Origin','')
-        if origin and origin not in ('http://127.0.0.1:'+str(PORT),'http://localhost:'+str(PORT)):
-            self.reply(403,{'error':'cross-origin denied'});return
+        allowed={'http://127.0.0.1:'+str(PORT),'http://localhost:'+str(PORT)}
+        public_origin=os.environ.get('KUPIORA_PUBLIC_ORIGIN','').rstrip('/')
+        if public_origin and public_origin.startswith('https://'):
+            allowed.add(public_origin)
+        if (origin and origin not in allowed) or (os.environ.get('KUPIORA_HOSTED_MODE')=='yes' and not public_origin):
+            self.reply(403,{'error':'cross-origin denied or public origin not configured'});return
         if self.headers.get('Content-Type','').split(';')[0].strip()!='application/json':
             self.reply(415,{'error':'JSON required'});return
         if path=='/api/compare':
