@@ -17,6 +17,10 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, urljoin, urlparse
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 
+os.environ["KUPIORA_HOSTED_MODE"] = "yes"
+if not os.environ.get("KUPIORA_PUBLIC_ORIGIN") and os.environ.get("RAILWAY_PUBLIC_DOMAIN"):
+    os.environ["KUPIORA_PUBLIC_ORIGIN"] = "https://" + os.environ["RAILWAY_PUBLIC_DOMAIN"].strip("/")
+
 import private_compare_server as private
 
 PORT = int(os.environ.get("PORT", os.environ.get("KUPIORA_PORT", "8872")))
