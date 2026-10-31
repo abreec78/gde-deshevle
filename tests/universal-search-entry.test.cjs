@@ -16,7 +16,7 @@ test('home page exposes universal search on desktop and mobile',()=>{
 test('home search runs inline with no navigation to second screen',()=>{
  const html=read('index.html'),app=read('app.js'),src=read('results.js');
  assert.match(html,/id="inline-compare"/);
- assert.match(html,/id="shortlink-help"/);
+ assert.doesNotMatch(html,/id="shortlink-help"/);
  assert.match(html,/src="results\.js"/);
  assert.doesNotMatch(app,/location\.assign\(url\.href\)/);
  assert.match(src,/searchForm\.addEventListener\('submit'/);

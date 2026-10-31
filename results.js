@@ -193,7 +193,7 @@
       }catch{}
       if(turn!==state.turn)return;
       state.done=true;renderSearchLinks();
-      status('Короткая ссылка Ozon принята. Ozon не предоставил полный адрес товара. Без него нельзя точно определить модель и сравнить реальные цены. Открой ссылку и скопируй адрес карточки.');
+      status('Короткая ссылка Ozon принята. Ozon не предоставил полный адрес товара. Без него нельзя точно определить модель и сравнить реальные цены. Предложения недоступны: товар по этой ссылке не определён.');
       return;
     }
     const u=new URL(location.href);u.searchParams.set('q',state.query);u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);
@@ -261,15 +261,7 @@
       const u=new URL(location.href);u.searchParams.delete('q');u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);
       searchInput.focus();
     };
-    $('shortlink-paste').onclick=async()=>{
-      try{
-        if(navigator.clipboard?.readText){
-          const value=(await navigator.clipboard.readText()).trim();
-          if(value.startsWith('https://')&&value!==state.query){searchInput.value=value;void find(value);return;}
-        }
-      }catch{}
-      searchInput.focus();status('Вставь полный адрес с помощью Ctrl+V в поиск сверху и нажми синюю кнопку.');
-    };
+
   }
   const params=new URLSearchParams(location.search);
   if(params.get('sample')==='1') {
