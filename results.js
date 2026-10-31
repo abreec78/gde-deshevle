@@ -1,6 +1,7 @@
 'use strict';
 (() => {
   const $=id=>document.getElementById(id);
+  const demoMode=new URLSearchParams(location.search).get('demo')==='1';
   const embedded=Boolean($('inline-compare'));
   const searchForm=$('product-search')||$('search-form');
   const searchInput=$('query')||$('q');
@@ -166,7 +167,34 @@
     searchInput.value=state.query;
     renderProduct();renderOffers();renderSearchLinks();status('Пример сравнения открыт. Это исторические цены, не текущие.');
   }
+  function showDemo(query){
+    state.turn++;state.demo=true;state.archival=false;state.done=true;state.api=false;
+    state.source={kind:'model',query:'Samsung 980 · 1 ТБ'};
+    state.sourceTitle='SSD Samsung 980 · 1 ТБ · MZ-V8V1T0BW';
+    state.sourceImage=new URL('./assets/ssd.webp',location.href).href;
+    state.offers=[
+      {shop:'Ozon',price:6200,delivery:390},
+      {shop:'Яндекс Маркет',price:6450,delivery:0},
+      {shop:'Ситилинк',price:6350,delivery:290},
+      {shop:'Wildberries',price:5990,delivery:null}
+    ].map(o=>({...o,url:'https://example.com/',match:'confirmed',title:state.sourceTitle}));
+    showInline(true);renderProduct();renderOffers();renderSearchLinks();
+    $('source-label').textContent='ДЕМО · пример товара';
+    $('product-description').textContent='Показан заранее подготовленный Samsung 980, а не товар, распознанный по вашей ссылке. Модель, объём и комплектация одинаковы во всех строках примера.';
+    $('sample-note').textContent='Демонстрационные цены и доставка. Не являются предложениями магазинов.';
+    $('status').textContent=query?'Ссылка принята для демонстрации. Ниже — пример будущего результата, без обращения к магазинам.':'Демо сравнения: вставьте любую ссылку сверху и нажмите поиск. Сейчас показан пример Samsung 980.';
+    const sorted=[...state.offers].sort((a,b)=>(a.delivery===null?Infinity:a.price+a.delivery)-(b.delivery===null?Infinity:b.price+b.delivery));
+    $('offers').replaceChildren();
+    $('best').replaceChildren(el('strong','','В демо выгоднее Яндекс Маркет: 6 450 ₽ с доставкой'));
+    $('best').append(el('p','','На 140 ₽ дешевле Ozon с доставкой. Wildberries не участвует в выборе: доставка неизвестна.'));
+    for(const o of sorted){
+      const row=el('article','result-offer'+(o.shop==='Яндекс Маркет'?' cheapest':''));
+      row.append(el('div','offer-seller',o.shop+' · ДЕМО'),el('div','offer-price',money(o.price)),el('div','offer-title',o.title),el('div','offer-label',o.delivery===null?'Доставка: требует уточнения':'Доставка: '+money(o.delivery)),el('strong','',o.delivery===null?'Итог требует уточнения':'Итого: '+money(o.price+o.delivery)),el('div','offer-date','Учебный пример · реальная цена не запрашивалась'));
+      const button=el('button','offer-link','В магазин · демо');button.disabled=true;row.append(button);$('offers').append(row);
+    }
+  }
   async function find(query){
+    if(demoMode){showDemo(query);return;}
     const turn=++state.turn;
     state.query=String(query||'').trim().slice(0,1200);
     state.source=parseQuery(state.query);
@@ -264,7 +292,8 @@
 
   }
   const params=new URLSearchParams(location.search);
-  if(params.get('sample')==='1') {
+  if(demoMode){showDemo(params.get('q')||'');}
+  else if(params.get('sample')==='1') {
     showInline(true);
     void loadArchivedExample(++state.turn).catch(()=>status('Архивный пример недоступен.'));
   }
