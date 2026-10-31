@@ -16,11 +16,11 @@ const assert=require('node:assert/strict');
   await page.locator('#product-search button').click();
   await page.locator('#product-title').waitFor({state:'visible'});
   assert.match(await page.locator('#product-title').textContent(),/Wildberries/);
-  await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('не подключён'));
+  await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('Нет подключения'));
   assert.equal(await page.locator('#offers .result-offer').count(),0);
   assert.equal(await page.locator('#empty').isVisible(),true);
-  assert.equal(await page.locator('#search-options').isVisible(),true);
-  assert.equal(await page.locator('#store-search-links .inline-store-row').count(),18);
+  assert.equal(await page.locator('#search-options').isVisible(),false);
+  assert.equal(await page.locator('#store-search-links .inline-store-row').count(),0);
 
   // 2. Exact original card loads once; the API automatically matches and ranks all confirmed stores.
   let requestBody=null;

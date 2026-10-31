@@ -54,3 +54,27 @@ body.inline-results-open .universal-search-banner{display:none}
 .inline-store-open:hover{color:#004e9b}
 .inline-store-unavailable{font-size:12px;color:#8493aa;grid-column:2;grid-row:1/span 2;text-align:right}
 @media(max-width:700px){.inline-store-links{grid-template-columns:1fr}.inline-store-row{grid-template-columns:minmax(0,1fr) auto}}
+
+/* One product, its verified offers, cheapest first: list, never marketplace directory. */
+.inline-offer-grid{display:flex;flex-direction:column;gap:10px}
+.inline-offer-grid .result-offer{display:grid;grid-template-columns:minmax(150px,1fr) minmax(120px,auto) minmax(125px,auto);column-gap:18px;row-gap:5px;align-items:center;padding:15px 18px}
+.inline-offer-grid .result-offer .offer-seller{grid-column:1;grid-row:1;font-size:17px}
+.inline-offer-grid .result-offer .offer-title{grid-column:1;grid-row:2;font-size:14px;min-width:0}
+.inline-offer-grid .result-offer .offer-price{grid-column:2;grid-row:1;font-size:25px;white-space:nowrap}
+.inline-offer-grid .result-offer .offer-label{grid-column:2;grid-row:2}
+.inline-offer-grid .result-offer .offer-date{grid-column:1/3;grid-row:3}
+.inline-offer-grid .result-offer .offer-link{grid-column:3;grid-row:1/4;margin:0;padding:12px 14px;min-width:123px}
+.inline-product.no-source-photo{grid-template-columns:1fr}
+.inline-product.no-source-photo .inline-product-photo{display:none}
+.inline-price-result .inline-compare-top{margin-bottom:8px}
+.inline-price-result .inline-best{margin:9px 0 12px}
+@media(max-width:700px){
+ .inline-offer-grid{display:flex;flex-direction:column}
+ .inline-offer-grid .result-offer{grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;padding:12px}
+ .inline-offer-grid .result-offer .offer-seller{grid-column:1;grid-row:1;font-size:15px}
+ .inline-offer-grid .result-offer .offer-price{grid-column:2;grid-row:1;font-size:20px}
+ .inline-offer-grid .result-offer .offer-title{grid-column:1/3;grid-row:2}
+ .inline-offer-grid .result-offer .offer-label{grid-column:1;grid-row:3}
+ .inline-offer-grid .result-offer .offer-date{grid-column:1/3;grid-row:4}
+ .inline-offer-grid .result-offer .offer-link{grid-column:2;grid-row:3;min-width:0;padding:9px 11px}
+}

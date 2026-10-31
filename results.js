@@ -91,6 +91,7 @@
     const original=$('original-link');original.hidden=source.kind!=='product';
     if(!original.hidden){original.href=source.url;original.textContent='Открыть товар на '+source.store+' ↗'}
     renderPhoto();
+    if(embedded)$('product-panel').classList.toggle('no-source-photo',!safeUrl(state.sourceImage));
   }
   function validOffer(x){
     return x&&typeof x.shop==='string'&&x.shop.trim().length>0&&safeUrl(x.url)&&Number.isFinite(x.price)&&x.price>0&&
@@ -118,10 +119,10 @@
     if(!data.length){
       $('empty-reason').textContent=state.archival?'В архиве нет допустимых предложений.':
         state.api&&!state.done?'Идёт получение подтверждённых предложений. Непохожие товары не учитываются.':
-        'Актуальные цены идентичного товара из подключённых магазинов пока не получены. Без источника цен сравнение не выполняется.';
+        'Цены точно такого же товара пока не получены. Сервер цен не подключён или совпадения не подтверждены. Нельзя определить самый дешёвый магазин.';
       return;
     }
-    const best=data[0],prefix=state.archival?'Минимальная цена из архивных предложений':'Минимальная из найденных цен';
+    const best=data[0],prefix=state.archival?'Самый дешёвый вариант из архивных предложений':'Самый дешёвый из подтверждённых вариантов';
     $('best').replaceChildren();
     $('best').append(el('span','',prefix+': '),el('strong','',money(best.price)+' · '+best.shop));
     if(state.archival)$('best').append(el('span','',' · данные за '+state.reportDate));
@@ -140,29 +141,12 @@
     }
   }
   function renderSearchLinks(){
-    const target=$('store-search-links');target.replaceChildren();
-    const source=state.source;
-    const q=state.sourceTitle||source?.query||'';
-    const canShow=Boolean(source&&source.kind!=='empty'&&source.kind!=='invalid');
-    $('search-options').hidden=!canShow;
-    if(!canShow)return;
-    const confirmed=new Set(comparableOffers().map(o=>o.shop.toLocaleLowerCase('ru')));
-    for(const shop of known){
-      const [name]=shop;
-      // Verified offers appear in the sorted price section. Do not duplicate them as unknown.
-      if(confirmed.has(name.toLocaleLowerCase('ru')))continue;
-      const row=el('div','inline-store-row');
-      row.append(el('strong','inline-store-name',name));
-      row.append(el('span','inline-store-no-price',q?'Цена не получена':'Товар ещё не определён'));
-      const url=shopSearchLink(shop,q);
-      if(url){
-        const a=el('a','inline-store-open',shop[2]?'Искать товар ↗':'Поиск по сайту ↗');
-        a.href=url;a.target='_blank';a.rel='noopener noreferrer nofollow';row.append(a);
-      }else{
-        row.append(el('span','inline-store-unavailable','Нужна точная модель'));
-      }
-      target.append(row);
-    }
+    // Not a marketplace directory: only confirmed matches are displayed.
+    // Keep the standalone page's legacy section hidden as well.
+    const section=$('search-options');
+    if(section)section.hidden=true;
+    const target=$('store-search-links');
+    if(target)target.replaceChildren();
   }
   async function fetchJson(url,options){
     const response=await fetch(url,options);
@@ -197,7 +181,7 @@
     if(source.kind==='short'){
       const u=new URL(location.href);u.searchParams.set('q',state.query);u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);
       state.done=true;renderSearchLinks();
-      status('Короткая ссылка Ozon принята. Но браузер не может прочитать её конечный адрес из-за ограничений Ozon. Открой товар и скопируй полную ссылку, всё останется на этой странице.');
+      status('Короткая ссылка Ozon принята, но товар по ней ещё не определён. Пока не найден точный товар, сравнение цен невозможно.');
       return;
     }
     const u=new URL(location.href);u.searchParams.set('q',state.query);u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);
@@ -210,7 +194,7 @@
     }catch{
       if(turn!==state.turn)return;
       state.done=true;renderOffers();renderSearchLinks();
-      status('Автоматические цены сейчас недоступны: сервер сравнения не подключён. Подтверждённые предложения не найдены.');
+      status('Нет подключения к ценам магазинов. Предложения этого товара не получены, минимальную цену определить нельзя.');
       return;
     }
     try{
