@@ -25,7 +25,7 @@ test('demonstration selection remains stable across re-render, and has manual re
   assert.match(app,/results=demoHomeOrder\.map\(id=>C\.products\.find/);
   assert.match(app,/'reshuffle-home'\)\.onclick/);
   assert.match(html,/id="reshuffle-home"/);
-  assert.match(html,/Случайные товары · демо/);
+  assert.match(html,/Товары для вас/);
 });
 
 test('homepage starts with samples and only uses real prices from fresh source',()=>{
