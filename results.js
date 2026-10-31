@@ -94,7 +94,7 @@
   function renderOffers(){
     const list=$('offers');list.replaceChildren();
     const data=comparableOffers();
-    $('count').textContent=data.length+' '+(data.length===1?'предложение':data.length>=2&&data.length<=4?'предложения':'предложений');
+    (embedded?$('inline-count'):$('count')).textContent=data.length+' '+(data.length===1?'предложение':data.length>=2&&data.length<=4?'предложения':'предложений');
     $('best').hidden=!data.length;
     $('empty').hidden=data.length>0;
     $('sample-note').textContent=state.archival?'Архив: '+state.reportDate+'. Не использовать как актуальную цену.':'';
