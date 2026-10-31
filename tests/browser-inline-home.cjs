@@ -24,6 +24,9 @@ const assert=require('node:assert/strict');
   assert.match(await page.locator('#status').textContent(),/Короткая ссылка Ozon принята/);
   assert.equal(await page.locator('#shortlink-open').getAttribute('href'),'https://ozon.ru/t/bTByYAY');
   assert.ok(await page.locator('#shortlink-open').isEnabled());
+  assert.equal(await page.locator('#store-search-links .inline-store-row').count(),18);
+  assert.equal(await page.locator('#store-search-links .inline-store-open').count(),0);
+  assert.match(await page.locator('#store-search-links').textContent(),/Нужна точная модель/);
 
   // User pastes a full Ozon URL; search runs inline, no second results page.
   await page.locator('#q').fill('https://www.ozon.ru/product/samsung-980-12345678/');
@@ -34,6 +37,9 @@ const assert=require('node:assert/strict');
   assert.equal(await page.locator('#product-panel').isVisible(),true);
   assert.equal(await page.locator('#offers .result-offer').count(),0);
   assert.equal(await page.locator('#empty').isVisible(),true);
+  assert.equal(await page.locator('#store-search-links .inline-store-row').count(),18);
+  assert.equal(await page.locator('#store-search-links .inline-store-open').count(),18);
+  assert.match(await page.locator('#store-search-links').textContent(),/Цена не получена/);
 
   // The in-page search can display real matching offers immediately when an API responds.
   let payload=null;
@@ -56,6 +62,8 @@ const assert=require('node:assert/strict');
   assert.equal(new URL(page.url()).pathname,'/');
   assert.equal(payload.autoCompare,true);
   assert.deepEqual(await page.locator('#offers .offer-seller').allTextContents(),['Ozon','Яндекс Маркет']);
+  assert.equal(await page.locator('#store-search-links .inline-store-row').count(),16);
+  assert.equal(await page.locator('#store-search-links .inline-store-open').count(),16);
   assert.equal(await page.locator('#best').isVisible(),true);
   await page.screenshot({path:'/tmp/kupiora-inline-screen.png',fullPage:true});
 
