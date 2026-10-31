@@ -3,6 +3,10 @@ on:
   pull_request:
     paths:
       - 'compare-any.html'
+      - 'results.html'
+      - 'results.css'
+      - 'results.js'
+      - 'tests/browser-results.cjs'
       - 'index.html'
       - 'app.js'
       - 'styles.css'
