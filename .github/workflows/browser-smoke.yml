@@ -6,6 +6,8 @@ on:
       - 'results.html'
       - 'results.css'
       - 'results.js'
+      - 'inline-results.css'
+      - 'tests/browser-inline-home.cjs'
       - 'tests/browser-results.cjs'
       - 'index.html'
       - 'app.js'
@@ -39,3 +41,4 @@ jobs:
           sleep 2
           node tests/browser-smoke.cjs
           node tests/browser-results.cjs
+          node tests/browser-inline-home.cjs
