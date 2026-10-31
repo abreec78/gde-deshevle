@@ -1,0 +1,64 @@
+name: Check and safely enforce HTTPS on kupiora.ru
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/enable-custom-domain-https.yml'
+
+permissions:
+  contents: read
+  pages: write
+
+jobs:
+  enable-https:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Diagnose certificate and enable HTTPS only when valid
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          DOMAIN=kupiora.ru
+          REPO="$GITHUB_REPOSITORY"
+          PAGE_API="https://api.github.com/repos/$REPO/pages"
+          echo "DNS A records:"
+          dig +short "$DOMAIN" A | sort -u || true
+          echo "DNS CAA records:"
+          dig +short "$DOMAIN" CAA || true
+          echo "WWW CNAME:"
+          dig +short "www.$DOMAIN" CNAME || true
+          echo "GitHub Pages configuration:"
+          settings="$(curl -fsS --max-time 15 -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "$PAGE_API")"
+          echo "$settings" | jq '{cname,html_url,https_enforced,https_available,status,build_type}'
+          configured="$(jq -r '.cname // empty' <<<"$settings")"
+          if [[ "$configured" != "$DOMAIN" ]]; then
+            echo "::error::Unexpected custom domain $configured; no changes made."
+            exit 1
+          fi
+          if [[ "$(jq -r '.https_enforced' <<<"$settings")" == true ]]; then
+            echo "HTTPS already enforced."
+            exit 0
+          fi
+          echo "Checking TLS certificate validity for kupiora.ru"
+          if ! curl --fail --silent --show-error --location --max-time 15 --output /dev/null "https://$DOMAIN/"; then
+            echo "::warning::Trusted certificate not yet available. HTTPS was NOT forced. Fix domain certificate provisioning in Settings > Pages."
+            exit 0
+          fi
+          echo "Valid certificate found. Enabling HTTPS using GitHub Pages API."
+          response_file="$(mktemp)"
+          code="$(curl --silent --show-error --max-time 15 --output "$response_file" --write-out '%{http_code}' --request PUT -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H 'Content-Type: application/json' --data '{"https_enforced":true}' "$PAGE_API")"
+          if [[ "$code" != 204 && "$code" != 200 ]]; then
+            echo "::warning::GitHub API rejected settings update (HTTP $code). The repository administrator needs to select Enforce HTTPS in Pages."
+            jq '{message,errors}' "$response_file" || true
+            exit 0
+          fi
+          verify="$(curl -fsS --max-time 15 -H "Authorization: Bearer $GH_TOKEN" "$PAGE_API")"
+          echo "$verify" | jq '{cname,https_enforced,https_available,status}'
+          if [[ "$(jq -r '.https_enforced' <<<"$verify")" == true ]]; then
+            echo "SUCCESS: HTTPS enforcement confirmed"
+          else
+            echo "::warning::GitHub did not confirm HTTPS enforcement"
+          fi
