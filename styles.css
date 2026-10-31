@@ -47,3 +47,9 @@
 body{font-weight:600}
 input,button,select,textarea{font-weight:600}
 @media(max-width:680px){body{font-weight:600}}
+
+.universal-banner-actions{display:flex;flex-direction:column;align-items:stretch;gap:9px;min-width:220px}
+.universal-demo-link{color:#0875ca;border:1px solid #cce1f7;background:white;border-radius:12px;padding:10px 12px;text-align:center;font-size:14px;font-weight:750}
+.universal-demo-link:hover{background:#e9f4ff;text-decoration:underline}
+.universal-demo-link:focus-visible{outline:3px solid #8fc2ff}
+@media(max-width:700px){.universal-banner-actions{min-width:0}.universal-demo-link{font-size:13px}}
