@@ -183,3 +183,39 @@ test('verified candidates and merely similar candidates are displayed separately
  assert.ok(html.includes("x.match==='source'||x.match==='confirmed'"));
  assert.ok(html.includes('min'));
 });
+
+
+test('saved two-store example uses actual historical report values and item model',()=>{
+ const sample=JSON.parse(fs.readFileSync(path.join(__dirname,'..','data','sample-ssd980.json'),'utf8'));
+ assert.equal(sample.mpn,'MZ-V8V1T0BW');
+ assert.equal(sample.sampleDate,'2026-10-30');
+ assert.deepEqual(sample.offers.map(x=>x.shop),['Ozon','Яндекс Маркет']);
+ assert.deepEqual(sample.offers.map(x=>x.price),[27428,30689]);
+ assert.ok(sample.offers.every(x=>x.source==='sample'&&x.mpn===sample.mpn&&x.checkedAt.startsWith('2026-10-30')));
+ assert.ok(sample.offers.every(x=>/^https:/.test(x.url)&&/^https:/.test(x.image)));
+});
+test('working example loads image and compare click renders sorted historical offers',async()=>{
+ const {context,elements}=setup();
+ const example=JSON.parse(fs.readFileSync(path.join(__dirname,'..','data','sample-ssd980.json'),'utf8'));
+ context.demoData=example;
+ context.fetch=async()=>({ok:true,json:async()=>example});
+ await js(context,'loadWorkingExample()');
+ assert.equal(elements['product-preview'].hidden,false);
+ assert.equal(elements['comparison-panel'].hidden,true);
+ assert.equal(elements['preview-title'].textContent,example.title);
+ assert.equal(elements['preview-photo'].children[0].src,example.image);
+ assert.equal(elements['sample-warning'].hidden,false);
+ await js(context,'startComparison()');
+ assert.equal(elements['comparison-panel'].hidden,false);
+ assert.equal(elements['cards'].children.length,2);
+ assert.match(elements['cards'].children[0].innerHTML,/27.428|27 428|27 428|27 428/);
+ assert.equal(elements['best'].hidden,false);
+ assert.ok(elements['message'].textContent.includes('не текущие цены'));
+});
+test('sample files are never treated as current market quotes',()=>{
+ const html=fs.readFileSync(path.join(__dirname,'..','compare-any.html'),'utf8');
+ assert.match(html,/историческая цена|цена из отчёта 30\.10\.2026/);
+ assert.match(html,/samplePending/);
+ assert.match(html,/sample-warning/);
+ assert.match(html,/не обновляются|не сегодняшние/i);
+});
