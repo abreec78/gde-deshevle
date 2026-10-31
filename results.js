@@ -18,7 +18,24 @@
   }
   const money=n=>new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:0}).format(n);
   const state={turn:0,query:'',source:null,sourceTitle:'',sourceImage:'',offers:[],api:false,archival:false,reportDate:'',done:false};
-  const known=[['Ozon','https://www.ozon.ru/search/?text='],['Wildberries','https://www.wildberries.ru/catalog/0/search.aspx?search='],['Яндекс Маркет','https://market.yandex.ru/search?text='],['Ситилинк','https://www.citilink.ru/search/?text='],['DNS','https://www.dns-shop.ru/search/?q=']];
+  // Price coverage is separate from links. Only a returned verified offer is a market price.
+  const known=[
+    ['Ozon','ozon.ru','https://www.ozon.ru/search/?text='],
+    ['Wildberries','wildberries.ru','https://www.wildberries.ru/catalog/0/search.aspx?search='],
+    ['Яндекс Маркет','market.yandex.ru','https://market.yandex.ru/search?text='],
+    ['Ситилинк','citilink.ru'],['DNS','dns-shop.ru'],['М.Видео','mvideo.ru'],
+    ['Эльдорадо','eldorado.ru'],['Мегамаркет','megamarket.ru'],['AliExpress','aliexpress.ru'],
+    ['ВсеИнструменты','vseinstrumenti.ru'],['Петрович','petrovich.ru'],
+    ['Золотое Яблоко','goldapple.ru'],['Lamoda','lamoda.ru'],
+    ['Спортмастер','sportmaster.ru'],['Детский мир','detmir.ru'],
+    ['RBT','rbt.ru'],['Технопарк','technopark.ru'],['Ашан','auchan.ru']
+  ];
+  function shopSearchLink(store,term){
+    if(!term)return null;
+    const text=encodeURIComponent(term);
+    if(store[2])return store[2]+text;
+    return 'https://yandex.ru/search/?text='+encodeURIComponent('site:'+store[1]+' '+term);
+  }
   function safeUrl(input){
     try{const url=new URL(input);return url.protocol==='https:'&&!url.username&&!url.password&&!['localhost','127.0.0.1','[::1]'].includes(url.hostname)?url.href:null}catch{return null}
   }
@@ -124,11 +141,27 @@
   }
   function renderSearchLinks(){
     const target=$('store-search-links');target.replaceChildren();
-    const q=state.sourceTitle||state.source?.query||'';
-    $('search-options').hidden=!q;
-    if(!q)return;
-    for(const [name,url] of known){
-      const a=el('a','','Поиск в '+name+' ↗');a.href=url+encodeURIComponent(q);a.target='_blank';a.rel='noopener noreferrer nofollow';target.append(a);
+    const source=state.source;
+    const q=state.sourceTitle||source?.query||'';
+    const canShow=Boolean(source&&source.kind!=='empty'&&source.kind!=='invalid');
+    $('search-options').hidden=!canShow;
+    if(!canShow)return;
+    const confirmed=new Set(comparableOffers().map(o=>o.shop.toLocaleLowerCase('ru')));
+    for(const shop of known){
+      const [name]=shop;
+      // Verified offers appear in the sorted price section. Do not duplicate them as unknown.
+      if(confirmed.has(name.toLocaleLowerCase('ru')))continue;
+      const row=el('div','inline-store-row');
+      row.append(el('strong','inline-store-name',name));
+      row.append(el('span','inline-store-no-price',q?'Цена не получена':'Товар ещё не определён'));
+      const url=shopSearchLink(shop,q);
+      if(url){
+        const a=el('a','inline-store-open',shop[2]?'Искать товар ↗':'Поиск по сайту ↗');
+        a.href=url;a.target='_blank';a.rel='noopener noreferrer nofollow';row.append(a);
+      }else{
+        row.append(el('span','inline-store-unavailable','Нужна точная модель'));
+      }
+      target.append(row);
     }
   }
   async function fetchJson(url,options){
@@ -163,7 +196,7 @@
     if(source.kind==='invalid'){status(source.reason);return}
     if(source.kind==='short'){
       const u=new URL(location.href);u.searchParams.set('q',state.query);u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);
-      state.done=true;
+      state.done=true;renderSearchLinks();
       status('Короткая ссылка Ozon принята. Но браузер не может прочитать её конечный адрес из-за ограничений Ozon. Открой товар и скопируй полную ссылку, всё останется на этой странице.');
       return;
     }
