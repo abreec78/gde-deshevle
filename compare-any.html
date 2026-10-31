@@ -397,6 +397,7 @@ $('search').onsubmit=async e=>{
 };
 searches();draw();showInputSource();renderPreview();
 detectAPI().then(()=>{
+ if(new URLSearchParams(location.search).get('sample')==='1'){void loadWorkingExample();return;}
  if(incoming&&current&&typeof $('search').requestSubmit==='function')$('search').requestSubmit();
 });
 </script></body></html>
