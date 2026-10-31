@@ -216,6 +216,16 @@
     if(embedded)requestAnimationFrame(()=>$('inline-compare').scrollIntoView({behavior:'smooth',block:'start'}));
   });
   if(embedded){
+    document.addEventListener('click',event=>{
+      const link=event.target.closest('a[href^="?q="]');
+      if(!link||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+      event.preventDefault();
+      const target=new URL(link.href);
+      const q=target.searchParams.get('q');
+      if(q){searchInput.value=q;void find(q);requestAnimationFrame(()=>$('inline-compare').scrollIntoView({behavior:'smooth',block:'start'}));}
+    });
+  }
+  if(embedded){
     $('close-inline-search').onclick=()=>{
       state.turn++;state.query='';state.source=null;state.offers=[];state.sourceTitle='';state.sourceImage='';state.api=false;
       searchInput.value='';showInline(false);shortHelper(null);
