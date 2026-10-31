@@ -1,0 +1,46 @@
+/* Homepage inline price comparison. Reuses existing blue/white shop visual language. */
+.inline-price-result{margin:14px 0 21px;border:1px solid #d7e6f8;border-radius:18px;padding:21px 23px;background:#fff;box-shadow:0 8px 30px #3d65a50e;scroll-margin-top:14px}
+.inline-price-result[hidden],.inline-price-result [hidden]{display:none!important}
+.inline-compare-top,.inline-offers-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.inline-compare-top{margin-bottom:10px}
+.inline-compare-top h2{font-size:23px;font-weight:800;margin:0}
+.inline-compare-top .text-button{font-size:13px;color:#64819c;border:1px solid #dce8f7;padding:7px 13px;border-radius:9px}
+.inline-status{font-size:15px;color:#276aa8;background:#eef6ff;padding:12px 15px;border-radius:11px;margin:0 0 14px;font-weight:650}
+.inline-product{display:grid;grid-template-columns:minmax(160px,25%) minmax(0,1fr);gap:20px;align-items:center;border:1px solid #e0eaf8;border-radius:14px;background:#fff;padding:15px;margin-bottom:14px}
+.inline-product-photo{min-height:165px;max-height:220px;background:#f3f7fc;border-radius:11px;padding:12px;display:flex;align-items:center;justify-content:center;text-align:center;color:#8097b1;font-size:14px;overflow:hidden}
+.inline-product-photo img{max-width:100%;max-height:200px;object-fit:contain}
+.inline-source-label{font-size:13px;color:#056fcf;background:#eef5ff;border:1px solid #cde3fb;border-radius:20px;display:inline-block;padding:4px 9px}
+.inline-product h3,.inline-stores h3,.inline-offers h3{font-size:22px;font-weight:800;margin:5px 0 6px}
+.inline-product-info p{font-size:14px;color:#6c7f97;margin:6px 0}
+.inline-product-info a{display:inline-block;margin-top:8px;color:#0875df;text-decoration:underline;font-size:14px}
+.inline-offers{margin:12px 0}
+.inline-offers-head{margin-bottom:13px}
+.inline-offers-head p,.inline-stores p{font-size:13px;color:#7487a0;margin:0}
+.inline-count{color:#587393;border:1px solid #dbe8f6;padding:6px 11px;border-radius:20px;font-size:13px}
+.inline-best{font-size:15px;color:#146c46;background:#ebf8f1;border:1px solid #cde8d9;padding:13px 14px;border-radius:11px;margin:9px 0 13px}
+.inline-best strong{font-size:21px}
+.inline-empty{border:1px dashed #c6d9ee;background:#f9fcff;padding:15px;border-radius:12px}
+.inline-empty strong{font-size:17px}
+.inline-empty p{font-size:14px;color:#74869d;margin:5px 0 0}
+.inline-offer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:12px}
+.inline-offer-grid .result-offer{display:flex;flex-direction:column;gap:6px;border:1px solid #dbe7f6;border-radius:12px;padding:14px}
+.inline-offer-grid .result-offer.cheapest{border:2px solid #15945d;background:#f6fff9}
+.inline-offer-grid .offer-seller{font-size:15px;font-weight:750}
+.inline-offer-grid .offer-price{font-size:24px;font-weight:800;color:#16823c}
+.inline-offer-grid .offer-title{font-size:13px;color:#61748e;flex:1}
+.inline-offer-grid .offer-label,.inline-offer-grid .offer-date{font-size:12px;color:#6c809b}
+.inline-offer-grid .offer-link{display:block;text-align:center;background:#0875ff;color:#fff;padding:10px 12px;font-weight:750;border-radius:9px;margin-top:6px;font-size:14px}
+.inline-offer-grid .offer-link:hover{background:#005fc9}
+.inline-stores{margin-top:15px;border-top:1px solid #e6edf6;padding-top:13px}
+.inline-store-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.inline-store-links a{font-size:13px;border:1px solid #dce9f8;border-radius:8px;padding:8px 11px;color:#086bd3;background:#fff}
+.inline-store-links a:hover{background:#eff6ff}
+.inline-disclaimer{font-size:12px;color:#74859d;margin:14px 0 0}
+.shortlink-help{padding:17px;background:#fff9ed;border:1px solid #f0d7a4;border-radius:13px;margin-bottom:14px}
+.shortlink-help strong{font-size:16px;color:#815a17}
+.shortlink-help p{margin:6px 0 14px;font-size:14px;color:#856b3f}
+.inline-helper-buttons{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.inline-helper-buttons .primary-link{display:inline-block;background:#0875ff;color:white;padding:10px 13px;font-size:14px;border-radius:10px;font-weight:750}
+.inline-helper-buttons button{padding:9px 12px;background:white;border:1px solid #e2c995;border-radius:9px;font-size:14px}
+body.inline-results-open .universal-search-banner{display:none}
+@media(max-width:700px){.inline-price-result{padding:14px}.inline-product{grid-template-columns:1fr}.inline-product-photo{min-height:170px}.inline-offer-grid{grid-template-columns:1fr}.inline-product h3{font-size:19px}}

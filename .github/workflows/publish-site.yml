@@ -31,7 +31,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p _site
-          cp index.html compare-any.html results.html results.js results.css styles.css core.js app.js catalog-loader.js sw.js manifest.webmanifest _site/
+          cp index.html compare-any.html results.html results.js results.css inline-results.css styles.css core.js app.js catalog-loader.js sw.js manifest.webmanifest _site/
           cp -R assets data _site/
           if [ -f CNAME ]; then cp CNAME _site/CNAME; fi
           touch _site/.nojekyll
@@ -39,6 +39,7 @@ jobs:
           test -s _site/compare-any.html
           test -s _site/results.html
           test -s _site/results.js
+          test -s _site/inline-results.css
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -49,9 +49,9 @@ function renderCategories(){
 }
 function renderCard(p,detailMode){
   const offers=C.sortedOffers(p.id),image='<img class="product-image" src="'+escape(imagePath(p))+'" width="300" height="180" alt="'+escape(name(p))+(C.mode==='demo'?' — иллюстрация':'')+'" loading="lazy" decoding="async">';
-  const demoSearch=C.mode==='demo'?'<a class="demo-find-link" href="results.html?q='+encodeURIComponent(name(p))+'">Найти реальные предложения ↗</a>':'';
+  const demoSearch=C.mode==='demo'?'<a class="demo-find-link" href="?q='+encodeURIComponent(name(p))+'">Найти реальные предложения ↗</a>':'';
   const info='<div class="card-info"><h3><button data-open="'+p.id+'">'+escape(name(p))+'</button></h3>'+(detailMode?'<p class="card-subtitle">'+escape(p.specs.join(', '))+'</p>'+specs(p)+merchantSummary(offers[0],0):'<div class="price">'+money(C.bestPrice(p))+'</div><p class="card-note">с известной доставкой'+(C.mode==='demo'?' · демо':' · '+escape(offers[0]?.region||''))+'</p>'+merchantSummary(offers[0],0))+demoSearch+'</div>';
-  const open=C.mode==='demo'?'<a class="compare-link demo-compare-live" href="results.html?q='+encodeURIComponent(name(p))+'">Искать настоящие цены ↗</a>':'<button class="compare-link" data-open="'+p.id+'">Сравнить цены ('+offers.length+') '+icon('arrow')+'</button>';
+  const open=C.mode==='demo'?'<a class="compare-link demo-compare-live" href="?q='+encodeURIComponent(name(p))+'">Искать настоящие цены ↗</a>':'<button class="compare-link" data-open="'+p.id+'">Сравнить цены ('+offers.length+') '+icon('arrow')+'</button>';
   return '<article class="product-card" data-product="'+p.id+'">'+favoriteButton(p)+'<button class="product-image-button" data-open="'+p.id+'" aria-label="Сравнить '+escape(name(p))+'">'+image+'</button>'+info+(detailMode?'<div class="card-offers"><div class="price">'+money(C.bestPrice(p))+'</div><p class="card-note">итого с доставкой'+(C.mode==='demo'?' · демо':' · '+escape(offers[0]?.region||''))+'</p>'+offers.map((o,i)=>'<div class="mini-offer">'+shopMark(o,i)+'<b>'+money(C.total(o))+'</b></div>').join('')+open+'</div>':open)+'</article>';
 }
 function chart(p){
@@ -153,8 +153,8 @@ document.addEventListener('click',event=>{
   if(button.id==='back-results'){document.body.classList.remove('show-detail');state.detailOpen=false;if(!state.ssdOnly&&!/ssd/i.test(state.query)){reset();}else render();return;}
   if(button.id==='empty-reset')reset();
 });
-$('q').addEventListener('input',()=>{state.query=$('q').value;state.ssdOnly=false;state.capacity=null;state.detailOpen=false;document.body.classList.remove('show-detail');render();syncRoute();});
-$('search-form').addEventListener('submit',e=>{e.preventDefault();const q=$('q').value.trim();const url=new URL('./results.html',location.href);if(q)url.searchParams.set('q',q);location.assign(url.href);});
+// Search input is owned by results.js. Typing a product URL must not filter the demo storefront.
+// Search form submits inline via results.js. Native fallback stays on the homepage.
 $('category').addEventListener('change',()=>selectCategory($('category').value));
 $('sort').addEventListener('change',()=>{state.sort=$('sort').value;render();syncRoute();});
 function toggleFavorites(){state.onlyFav=!state.onlyFav;state.detailOpen=false;document.body.classList.remove('show-detail');render();syncRoute();}
