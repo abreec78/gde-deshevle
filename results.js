@@ -194,18 +194,31 @@
     }
   }
   async function find(query){
-    if(demoMode){showDemo(query);return;}
+    if(demoMode&&!String(query||'').trim()){showDemo(query);return;}
     const turn=++state.turn;
     state.query=String(query||'').trim().slice(0,1200);
     state.source=parseQuery(state.query);
     state.sourceTitle='';state.sourceImage='';state.offers=[];state.archival=false;state.reportDate='';state.done=false;state.api=false;
     searchInput.value=state.query;
-    const source=state.source;
+    let source=state.source;
     showInline(source.kind!=='empty');
     shortHelper(source);
     renderProduct();renderOffers();renderSearchLinks();
     if(source.kind==='empty'){status('Введите ссылку на товар или точную модель.');return}
     if(source.kind==='invalid'){status(source.reason);return}
+    if(source.kind==='product'||source.kind==='short'){
+      status('Читаем публичную карточку товара по вашей ссылке…');
+      try{
+        const meta=await fetchJson('./api/identify?url='+encodeURIComponent(source.url),{cache:'no-store',signal:AbortSignal.timeout(45000)});
+        if(turn!==state.turn)return;
+        if(meta.identified&&meta.title){
+          state.sourceTitle=meta.title;state.sourceImage=meta.image||'';
+          if(source.kind==='short'){state.source=parseQuery(meta.url);if(state.source.kind==='short')state.source={kind:'model',query:meta.title};source=state.source;}
+          renderProduct();
+          $('product-description').textContent='Название и фото прочитаны из публичной карточки. Совпадения и цены других магазинов ещё не подтверждены.';
+        }
+      }catch{}
+    }
     if(source.kind==='short'){
       const u=new URL(location.href);u.searchParams.set('q',state.query);u.searchParams.delete('sample');history.replaceState(null,'',u.pathname+u.search);
       status('Пытаемся раскрыть короткую ссылку Ozon и определить конкретный товар…');

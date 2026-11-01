@@ -22,6 +22,7 @@ if not os.environ.get("KUPIORA_PUBLIC_ORIGIN") and os.environ.get("RAILWAY_PUBLI
     os.environ["KUPIORA_PUBLIC_ORIGIN"] = "https://" + os.environ["RAILWAY_PUBLIC_DOMAIN"].strip("/")
 
 import private_compare_server as private
+import product_metadata
 
 PORT = int(os.environ.get("PORT", os.environ.get("KUPIORA_PORT", "8872")))
 SHORT_PATTERN = re.compile(r"^/t/[A-Za-z0-9_-]{3,64}/?$")
@@ -150,6 +151,21 @@ def consume_budget():
 class Handler(private.Handler):
     def do_GET(self):
         path = urlparse(self.path).path
+        if path == "/api/identify":
+            value = parse_qs(urlparse(self.path).query).get("url", [""])[0]
+            if not product_metadata.allowed(value):
+                self.reply(400, {"identified": False, "reason": "Unsupported product URL"})
+                return
+            key = self.client_address[0]
+            now = time.time()
+            with lock:
+                short_resolves[key] = [t for t in short_resolves[key] if now-t < 3600]
+                if len(short_resolves[key]) >= 20:
+                    self.reply(429, {"identified": False, "reason": "Too many lookups"})
+                    return
+                short_resolves[key].append(now)
+            self.reply(200, product_metadata.identify(value))
+            return
         if path == "/api/resolve":
             params = parse_qs(urlparse(self.path).query)
             source = params.get("url", [""])[0]

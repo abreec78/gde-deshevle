@@ -4,7 +4,7 @@ WORKDIR /srv
 COPY *.html *.css *.js manifest.webmanifest /srv/
 COPY assets/ /srv/assets/
 COPY data/ /srv/data/
-COPY tools/private_compare_server.py tools/hosted_compare_server.py /srv/tools/
+COPY tools/private_compare_server.py tools/hosted_compare_server.py tools/product_metadata.py /srv/tools/
 RUN useradd -m -u 10001 kupiora && chown -R kupiora:kupiora /srv
 USER kupiora
 EXPOSE 8080
