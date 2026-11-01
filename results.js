@@ -85,11 +85,11 @@
     $('product-panel').hidden=!source||source.kind==='invalid'||source.kind==='empty'||source.kind==='short';
     if($('product-panel').hidden)return;
     $('source-label').textContent=state.archival?'Архивный пример с сохранёнными ценами':source.kind==='product'?'Источник: '+source.store:'Поиск по названию';
-    $('product-title').textContent=state.sourceTitle||source.query||(source.kind==='product'?source.store+' · товар № '+source.id:'Поиск товара');
+    $('product-title').textContent=state.sourceTitle||(source.kind==='product'?source.store+' · ссылка на товар № '+source.id:source.query||'Поиск товара');
     $('product-description').textContent=state.archival?'Данные из сохранённых отчётов за '+state.reportDate+'; это не сегодняшние цены.':
       state.sourceTitle?'Модель определена по источнику. Показываем только подтверждённые совпадения.':
-      source.kind==='product'?'Карточка распознана по ссылке. Название и фото требуют данных магазина.':'Уточните модель, чтобы найти одинаковые предложения.';
-    const original=$('original-link');original.hidden=source.kind!=='product';
+      source.kind==='product'?'Распознан формат ссылки. Сам товар пока не определён: нужны данные магазина.':'Уточните модель, чтобы найти одинаковые предложения.';
+    const original=$('original-link');original.hidden=embedded||source.kind!=='product';
     if(!original.hidden){original.href=source.url;original.textContent='Открыть товар на '+source.store+' ↗'}
     renderPhoto();
     if(embedded)$('product-panel').classList.toggle('no-source-photo',!safeUrl(state.sourceImage));
