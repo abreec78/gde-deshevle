@@ -37,6 +37,7 @@ def products(value):
 
 def parse_metadata(html,url):
     p=Metadata();p.feed(html)
+    candidates={}
     for script in p.scripts:
         try:
             for v in products(json.loads(script)):
@@ -44,8 +45,13 @@ def parse_metadata(html,url):
                 if isinstance(image,list):image=image[0] if image else None
                 if isinstance(image,dict):image=image.get('url')
                 if isinstance(name,str) and name.strip():
-                    return {'identified':True,'title':name.strip()[:300],'image':image if isinstance(image,str) and image.startswith('https://') else None,'mpn':str(v.get('mpn') or '')[:100],'gtin':str(v.get('gtin13') or v.get('gtin') or '')[:30],'url':url,'source':'public-product-metadata','offers':[]}
-        except (ValueError,TypeError):continue
+                    mpn=str(v.get('mpn') or '')[:100]
+                    gtin=str(v.get('gtin13') or v.get('gtin') or '')[:30]
+                    key=(name.strip().casefold(),mpn.casefold(),gtin)
+                    candidates[key]={'identified':True,'title':name.strip()[:300],'image':image if isinstance(image,str) and image.startswith('https://') else None,'mpn':mpn,'gtin':gtin,'url':url,'source':'public-product-metadata','offers':[]}
+        except (ValueError,TypeError,RecursionError):continue
+    if len(candidates)==1:return next(iter(candidates.values()))
+    if len(candidates)>1:return {'identified':False,'reason':'Multiple products or variants on page; exact product is ambiguous','url':url,'offers':[]}
     # Generic titles and Open Graph alone do not prove this is a product page.
     return {'identified':False,'reason':'Public product metadata was not available','url':url,'offers':[]}
 

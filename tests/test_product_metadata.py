@@ -21,3 +21,13 @@ class MetadataTests(unittest.TestCase):
   with patch('tools.product_metadata.build_opener',return_value=Blocked()):
    result=identify('https://ozon.ru/product/item-123/')
   self.assertFalse(result['identified']);self.assertEqual(result['offers'],[])
+
+ def test_conflicting_variants_are_not_arbitrarily_selected(self):
+  import json
+  products=[{'@type':'Product','name':'Drive','mpn':'SSD-1TB'},{'@type':'Product','name':'Drive','mpn':'SSD-2TB'}]
+  html='<script type="application/ld+json">'+json.dumps(products)+'</script>'
+  result=parse_metadata(html,'https://ozon.ru/product/drive-123/')
+  self.assertFalse(result['identified']);self.assertEqual(result['offers'],[])
+ def test_repeated_same_metadata_is_not_ambiguous(self):
+  html='<script type="application/ld+json">{"@type":"Product","name":"Exact","mpn":"M1"}</script>'
+  self.assertTrue(parse_metadata(html+html,'https://ozon.ru/product/x-123/')['identified'])
