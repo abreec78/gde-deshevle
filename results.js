@@ -305,7 +305,10 @@
 
   }
   const params=new URLSearchParams(location.search);
-  if(demoMode){showDemo(params.get('q')||'');}
+  if(demoMode){
+    if(params.get('q')?.trim())void find(params.get('q'));
+    else showDemo('');
+  }
   else if(params.get('sample')==='1') {
     showInline(true);
     void loadArchivedExample(++state.turn).catch(()=>status('Архивный пример недоступен.'));
