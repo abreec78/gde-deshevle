@@ -305,7 +305,28 @@
 
   }
   const params=new URLSearchParams(location.search);
-  if(demoMode){
+  let capture=null;
+  if(location.hash.startsWith('#capture=')){
+    try{
+      const raw=location.hash.slice(9);
+      if(raw.length>16000)throw Error('oversize');
+      const doc=JSON.parse(decodeURIComponent(raw));
+      const url=new URL(doc.url);
+      if(url.protocol!=='https:'||url.username||url.password||url.port||!['ozon.ru','www.ozon.ru','wildberries.ru','www.wildberries.ru','market.yandex.ru','citilink.ru','www.citilink.ru'].includes(url.hostname)||typeof doc.title!=='string'||!doc.title.trim())throw Error('invalid');
+      capture=doc;
+    }catch{}
+    history.replaceState(null,'',location.pathname+location.search);
+  }
+  if(capture){
+    state.source={kind:'model',query:capture.title.slice(0,300)};
+    state.sourceTitle=capture.title.slice(0,300);state.sourceImage=safeUrl(capture.image)||'';
+    state.done=true;state.offers=[];searchInput.value=capture.url;
+    showInline(true);renderProduct();renderOffers();renderSearchLinks();
+    $('source-label').textContent='Передано из вашего браузера · не независимая проверка';
+    $('product-description').textContent='Карточка передана расширением. '+(capture.mpn?'Модель: '+String(capture.mpn).slice(0,100)+'. ':'')+'Цены других магазинов ещё не получены.';
+    status('Товар передан из открытой карточки. Автоматическое сравнение цен пока не подключено.');
+  }
+  else if(demoMode){
     if(params.get('q')?.trim())void find(params.get('q'));
     else showDemo('');
   }
