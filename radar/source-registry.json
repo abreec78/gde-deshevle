@@ -1,0 +1,128 @@
+{
+  "feeds": [
+    {
+      "id": "cbr",
+      "name": "Банк России: курсы валют",
+      "topic": "finance",
+      "url": "https://www.cbr.ru/scripts/XML_daily.asp",
+      "adapter": "xml"
+    },
+    {
+      "id": "nasa",
+      "name": "NASA: новости",
+      "topic": "space",
+      "url": "https://www.nasa.gov/feed/",
+      "adapter": "rss"
+    },
+    {
+      "id": "arxiv",
+      "name": "arXiv: исследования ИИ",
+      "topic": "ai",
+      "url": "https://export.arxiv.org/api/query?search_query=cat:cs.AI&max_results=10&sortBy=submittedDate&sortOrder=descending",
+      "adapter": "atom"
+    },
+    {
+      "id": "pubmed",
+      "name": "PubMed: кардиология",
+      "topic": "cardiology",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=cardiology&retmode=json&retmax=10&sort=pub_date",
+      "adapter": "pubmed"
+    },
+    {
+      "id": "cisa",
+      "name": "CISA: известные уязвимости",
+      "topic": "cyber",
+      "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+      "adapter": "cisa"
+    },
+    {
+      "id": "usgs",
+      "name": "USGS: землетрясения за сутки",
+      "topic": "science",
+      "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_day.geojson",
+      "adapter": "usgs"
+    }
+  ],
+  "directories": [
+    {
+      "name": "Росстат",
+      "url": "https://rosstat.gov.ru/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "Правовые акты",
+      "url": "https://publication.pravo.gov.ru/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "Минздрав: клинические рекомендации",
+      "url": "https://cr.minzdrav.gov.ru/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "Росздравнадзор",
+      "url": "https://roszdravnadzor.gov.ru/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "Росстандарт: отзывные кампании",
+      "url": "https://www.rst.gov.ru/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "ФНС",
+      "url": "https://www.nalog.gov.ru/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "Социальный фонд",
+      "url": "https://sfr.gov.ru/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "Роструд",
+      "url": "https://rostrud.gov.ru/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "МИД России",
+      "url": "https://www.mid.ru/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "Росгидромет",
+      "url": "https://www.meteorf.gov.ru/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "Crossref API",
+      "url": "https://api.crossref.org/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "OpenAlex API",
+      "url": "https://openalex.org/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "World Bank API",
+      "url": "https://api.worldbank.org/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "WHO",
+      "url": "https://www.who.int/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    },
+    {
+      "name": "ClinicalTrials.gov",
+      "url": "https://clinicaltrials.gov/",
+      "status": "Справочная ссылка; автоматическая загрузка не подключена"
+    }
+  ]
+}
