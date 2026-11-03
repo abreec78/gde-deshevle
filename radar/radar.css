@@ -8,3 +8,4 @@
 
 /* Keep navigation backdrop continuous throughout the full page. */
 .masthead{position:relative;z-index:2}.sidebar{position:fixed;top:0;bottom:0;padding-top:118px;min-height:0;overflow-y:auto;background:linear-gradient(180deg,#24234d 40%,#554079 100%);z-index:1}.sidebar .side-art{min-height:500px}.sidebar nav{position:relative}main{position:relative}@media(max-width:650px){.sidebar{position:static;top:auto;bottom:auto;padding-top:0;overflow:visible;background:#24234d}.sidebar .side-art{display:none}}
+.subgroup-count{display:inline-block;margin-left:10px;padding:2px 8px;border-radius:20px;background:#e9e2ff;color:#5931bd;font-size:12px;font-weight:600;vertical-align:middle;white-space:nowrap}
