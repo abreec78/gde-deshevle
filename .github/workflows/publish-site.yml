@@ -26,13 +26,18 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+      - name: Refresh public radar feeds
+        run: python tools/update_radar.py
       - name: Prepare public static site
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p _site
           cp index.html compare-any.html results.html results.js results.css inline-results.css styles.css core.js app.js catalog-loader.js sw.js manifest.webmanifest _site/
-          cp -R assets data _site/
+          cp -R assets data radar _site/
           if [ -f CNAME ]; then cp CNAME _site/CNAME; fi
           touch _site/.nojekyll
           test -s _site/index.html

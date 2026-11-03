@@ -1,0 +1,301 @@
+{
+  "schema": 1,
+  "sources": [
+    {
+      "id": "cbr",
+      "name": "Банк России: курсы валют",
+      "topic": "finance",
+      "url": "https://www.cbr.ru/scripts/XML_daily.asp",
+      "adapter": "xml",
+      "attemptedAt": "2026-11-03T19:44:39.343048+00:00",
+      "status": "error",
+      "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1081)>",
+      "fetchedAt": null,
+      "items": []
+    },
+    {
+      "id": "nasa",
+      "name": "NASA: новости",
+      "topic": "space",
+      "url": "https://www.nasa.gov/feed/",
+      "adapter": "rss",
+      "attemptedAt": "2026-11-03T19:44:39.817894+00:00",
+      "status": "ok",
+      "fetchedAt": "2026-11-03T19:44:39.817894+00:00",
+      "items": [
+        {
+          "title": "Astronaut and Earth",
+          "url": "https://www.nasa.gov/image-article/astronaut-and-earth/",
+          "date": "Tue, 03 Nov 2026 16:37:42 +0000"
+        },
+        {
+          "title": "TB 26-10 Printed Circuit Board Assembly Chip Resistor Body Cracking",
+          "url": "https://www.nasa.gov/centers-and-facilities/nesc/tb-26-10-printed-circuit-board-assembly-chip-resistor-body-cracking/",
+          "date": "Tue, 03 Nov 2026 15:35:14 +0000"
+        },
+        {
+          "title": "NASA Astronaut, STEM Creator Connect with Students for STEM Day",
+          "url": "https://www.nasa.gov/learning-resources/nasa-astronaut-stem-creator-connect-with-students-for-stem-day/",
+          "date": "Tue, 03 Nov 2026 15:15:50 +0000"
+        },
+        {
+          "title": "APOD: 2026 November 3 – Comet PanSTARRs and Rainbow Meteor",
+          "url": "https://science.nasa.gov/image-article/apod-2026-november-3-comet-panstarrs-and-rainbow-meteor/",
+          "date": "Tue, 03 Nov 2026 05:05:00 +0000"
+        },
+        {
+          "title": "The Pacific’s Busy Storm Season",
+          "url": "https://science.nasa.gov/earth/earth-observatory/the-pacifics-busy-storm-season/",
+          "date": "Tue, 03 Nov 2026 05:01:00 +0000"
+        },
+        {
+          "title": "Happy 65 Years: NASA’s Johnson Space Center Then and Now",
+          "url": "https://www.nasa.gov/centers-and-facilities/johnson/happy-65-years-nasas-johnson-space-center-then-and-now/",
+          "date": "Mon, 02 Nov 2026 21:35:59 +0000"
+        },
+        {
+          "title": "TB 26-09 Measured Hammer-Tap Inputs",
+          "url": "https://www.nasa.gov/centers-and-facilities/nesc/tb-26-09-measured-hammer-tap-inputs/",
+          "date": "Mon, 02 Nov 2026 20:47:41 +0000"
+        },
+        {
+          "title": "NASA’s CHAPEA Crew “Returns” to Earth",
+          "url": "https://www.nasa.gov/image-article/nasas-chapea-crew-returns-to-earth/",
+          "date": "Mon, 02 Nov 2026 18:50:42 +0000"
+        },
+        {
+          "title": "What’s Up: November 2026 Skywatching Tips from NASA",
+          "url": "https://science.nasa.gov/solar-system/skywatching/whats-up-november-2026-skywatching-tips-from-nasa/",
+          "date": "Mon, 02 Nov 2026 18:19:58 +0000"
+        },
+        {
+          "title": "NASA Invites Media to Northrop Grumman CRS-25 Station Resupply Launch",
+          "url": "https://www.nasa.gov/news-release/nasa-invites-media-to-northrop-grumman-crs-25-station-resupply-launch/",
+          "date": "Mon, 02 Nov 2026 17:33:22 +0000"
+        }
+      ]
+    },
+    {
+      "id": "arxiv",
+      "name": "arXiv: исследования ИИ",
+      "topic": "ai",
+      "url": "https://export.arxiv.org/api/query?search_query=cat:cs.AI&max_results=10&sortBy=submittedDate&sortOrder=descending",
+      "adapter": "atom",
+      "attemptedAt": "2026-11-03T19:44:40.892962+00:00",
+      "status": "ok",
+      "fetchedAt": "2026-11-03T19:44:40.892962+00:00",
+      "items": [
+        {
+          "title": "Pixel-UMI: Learning Environment-Aware Whole-Body Manipulation from Sensorized Human Demonstrations",
+          "url": "https://arxiv.org/abs/2611.03647v1",
+          "date": "2026-11-02T18:59:32Z"
+        },
+        {
+          "title": "Pixel: A Co-Designed Full-Stack Robot System for Learning General-Purpose Mobile Manipulation",
+          "url": "https://arxiv.org/abs/2611.03648v1",
+          "date": "2026-11-02T18:59:32Z"
+        },
+        {
+          "title": "From Natural Language to Exact Cover: A Neuro-Symbolic Approach to Zebra Puzzles",
+          "url": "https://arxiv.org/abs/2611.03641v1",
+          "date": "2026-11-02T18:58:21Z"
+        },
+        {
+          "title": "WebHarbor: Docking Real Websites for Evolving GUI Agent Environments",
+          "url": "https://arxiv.org/abs/2611.03634v1",
+          "date": "2026-11-02T18:57:36Z"
+        },
+        {
+          "title": "D&A: Decoupling Description and Assessment Enables VLMs as Zero-Shot Robotic Reward Models",
+          "url": "https://arxiv.org/abs/2611.03622v1",
+          "date": "2026-11-02T18:52:11Z"
+        },
+        {
+          "title": "Strategist: Evolving Reasoning with Agents",
+          "url": "https://arxiv.org/abs/2611.03618v1",
+          "date": "2026-11-02T18:51:04Z"
+        },
+        {
+          "title": "Tracing the Scientific Discovery Capacity of LLMs to Their Training Data",
+          "url": "https://arxiv.org/abs/2611.03617v1",
+          "date": "2026-11-02T18:50:54Z"
+        },
+        {
+          "title": "DiabAgent: Toward Agentic Physiological Control",
+          "url": "https://arxiv.org/abs/2611.03601v1",
+          "date": "2026-11-02T18:41:02Z"
+        },
+        {
+          "title": "Four Bridges: Measuring Deception Propensity in a Multi-Agent Game",
+          "url": "https://arxiv.org/abs/2611.03600v1",
+          "date": "2026-11-02T18:40:47Z"
+        },
+        {
+          "title": "Spacetime Emergence in the Memory of a Learning Agent",
+          "url": "https://arxiv.org/abs/2611.03596v1",
+          "date": "2026-11-02T18:39:52Z"
+        }
+      ]
+    },
+    {
+      "id": "pubmed",
+      "name": "PubMed: кардиология",
+      "topic": "cardiology",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=cardiology&retmode=json&retmax=10&sort=pub_date",
+      "adapter": "pubmed",
+      "attemptedAt": "2026-11-03T19:44:42.065096+00:00",
+      "status": "ok",
+      "fetchedAt": "2026-11-03T19:44:42.065096+00:00",
+      "items": [
+        {
+          "title": "PubMed · исследование 42924917",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42924917/",
+          "date": null
+        },
+        {
+          "title": "PubMed · исследование 42829329",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42829329/",
+          "date": null
+        },
+        {
+          "title": "PubMed · исследование 42971896",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42971896/",
+          "date": null
+        },
+        {
+          "title": "PubMed · исследование 42971895",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42971895/",
+          "date": null
+        },
+        {
+          "title": "PubMed · исследование 42959484",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42959484/",
+          "date": null
+        },
+        {
+          "title": "PubMed · исследование 42936108",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42936108/",
+          "date": null
+        },
+        {
+          "title": "PubMed · исследование 42863172",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42863172/",
+          "date": null
+        },
+        {
+          "title": "PubMed · исследование 42815083",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42815083/",
+          "date": null
+        },
+        {
+          "title": "PubMed · исследование 42785224",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42785224/",
+          "date": null
+        },
+        {
+          "title": "PubMed · исследование 42753576",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42753576/",
+          "date": null
+        }
+      ]
+    },
+    {
+      "id": "cisa",
+      "name": "CISA: известные уязвимости",
+      "topic": "cyber",
+      "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+      "adapter": "cisa",
+      "attemptedAt": "2026-11-03T19:44:42.904440+00:00",
+      "status": "ok",
+      "fetchedAt": "2026-11-03T19:44:42.904440+00:00",
+      "items": [
+        {
+          "title": "CVE-2026-118527 · Ivanti Connect Secure Generation of Predictable Numbers or Identifiers Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-118527",
+          "date": "2026-10-30"
+        },
+        {
+          "title": "CVE-2026-111357 · Ivanti Connect Secure Missing Authentication for Critical Function Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-111357",
+          "date": "2026-10-30"
+        },
+        {
+          "title": "CVE-2026-97229 · GitLab Community Edition and Enterprise Edition Integer Overflow or Wraparound Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-97229",
+          "date": "2026-10-29"
+        },
+        {
+          "title": "CVE-2026-76418 · Cisco Secure Firewall ASA Software and Cisco Secure FTD Software Unchecked Return Value to NULL Pointer Dereference Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-76418",
+          "date": "2026-10-29"
+        },
+        {
+          "title": "CVE-2026-41709 · Broadcom VMWare ESX Insufficient Logging Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-41709",
+          "date": "2026-10-28"
+        },
+        {
+          "title": "CVE-2026-46300 · Linux Kernel Missing Initialization of a Variable Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-46300",
+          "date": "2026-10-28"
+        },
+        {
+          "title": "CVE-2026-48356 · Adobe Commerce and Magento Unrestricted Upload of File with Dangerous Type Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-48356",
+          "date": "2026-10-27"
+        },
+        {
+          "title": "CVE-2026-111497 · Google Brotli Unchecked Return Value Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-111497",
+          "date": "2026-10-27"
+        },
+        {
+          "title": "CVE-2026-109618 · PHP Memory Corruption Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-109618",
+          "date": "2026-10-26"
+        },
+        {
+          "title": "CVE-2026-109619 · PHP Stale Internal Request-State Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-109619",
+          "date": "2026-10-26"
+        },
+        {
+          "title": "CVE-2026-114625 · Arista VeloCloud Orchestrator SQL Injection Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-114625",
+          "date": "2026-10-23"
+        },
+        {
+          "title": "CVE-2026-110447 · Collabora Online – Built-in CODE Server OS Command Injection Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-110447",
+          "date": "2026-10-23"
+        },
+        {
+          "title": "CVE-2026-106931 · EG Secure Solutions SiteGuard Server Edition OS Command Injection Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-106931",
+          "date": "2026-10-20"
+        },
+        {
+          "title": "CVE-2026-96656 · Plex Media Server External Control of File Name or Path Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-96656",
+          "date": "2026-10-20"
+        },
+        {
+          "title": "CVE-2026-96655 · Plex Media Server Server-Side Request Forgery (SSRF) Vulnerability",
+          "url": "https://www.cve.org/CVERecord?id=CVE-2026-96655",
+          "date": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "usgs",
+      "name": "USGS: землетрясения за сутки",
+      "topic": "science",
+      "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_day.geojson",
+      "adapter": "usgs",
+      "attemptedAt": "2026-11-03T19:44:44.738027+00:00",
+      "status": "ok",
+      "fetchedAt": "2026-11-03T19:44:44.738027+00:00",
+      "items": []
+    }
+  ]
+}
