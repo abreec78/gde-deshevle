@@ -7,7 +7,7 @@
       "topic": "finance",
       "url": "https://www.cbr.ru/scripts/XML_daily.asp",
       "adapter": "xml",
-      "attemptedAt": "2026-11-03T19:44:39.343048+00:00",
+      "attemptedAt": "2026-11-03T20:13:58.806791+00:00",
       "status": "error",
       "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1081)>",
       "fetchedAt": null,
@@ -19,9 +19,9 @@
       "topic": "space",
       "url": "https://www.nasa.gov/feed/",
       "adapter": "rss",
-      "attemptedAt": "2026-11-03T19:44:39.817894+00:00",
+      "attemptedAt": "2026-11-03T20:13:59.289849+00:00",
       "status": "ok",
-      "fetchedAt": "2026-11-03T19:44:39.817894+00:00",
+      "fetchedAt": "2026-11-03T20:13:59.289849+00:00",
       "items": [
         {
           "title": "Astronaut and Earth",
@@ -81,9 +81,9 @@
       "topic": "ai",
       "url": "https://export.arxiv.org/api/query?search_query=cat:cs.AI&max_results=10&sortBy=submittedDate&sortOrder=descending",
       "adapter": "atom",
-      "attemptedAt": "2026-11-03T19:44:40.892962+00:00",
+      "attemptedAt": "2026-11-03T20:14:00.350708+00:00",
       "status": "ok",
-      "fetchedAt": "2026-11-03T19:44:40.892962+00:00",
+      "fetchedAt": "2026-11-03T20:14:00.350708+00:00",
       "items": [
         {
           "title": "Pixel-UMI: Learning Environment-Aware Whole-Body Manipulation from Sensorized Human Demonstrations",
@@ -143,59 +143,59 @@
       "topic": "cardiology",
       "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=cardiology&retmode=json&retmax=10&sort=pub_date",
       "adapter": "pubmed",
-      "attemptedAt": "2026-11-03T19:44:42.065096+00:00",
+      "attemptedAt": "2026-11-03T20:14:01.394916+00:00",
       "status": "ok",
-      "fetchedAt": "2026-11-03T19:44:42.065096+00:00",
+      "fetchedAt": "2026-11-03T20:14:01.394916+00:00",
       "items": [
         {
-          "title": "PubMed · исследование 42924917",
+          "title": "Pressure-guided pneumatic radial compression and radial artery occlusion after transradial coronary procedures: a retrospective historical cohort study.",
           "url": "https://pubmed.ncbi.nlm.nih.gov/42924917/",
-          "date": null
+          "date": "2027 Dec"
         },
         {
-          "title": "PubMed · исследование 42829329",
+          "title": "Reply to the letter-to-the-editor \"Percutaneous coronary intervention in nonagenarians\".",
           "url": "https://pubmed.ncbi.nlm.nih.gov/42829329/",
-          "date": null
+          "date": "2027 Dec"
         },
         {
-          "title": "PubMed · исследование 42971896",
+          "title": "Performance of artificial intelligence versus clinician left-ventricular segmentation of cardiac MRI for mortality prediction: a retrospective, multicentre, prognostic study.",
           "url": "https://pubmed.ncbi.nlm.nih.gov/42971896/",
-          "date": null
+          "date": "2027 Jun 16"
         },
         {
-          "title": "PubMed · исследование 42971895",
+          "title": "Mortality prediction using cardiac magnetic resonance: artificial intelligence versus clinicians-Quo vadis?",
           "url": "https://pubmed.ncbi.nlm.nih.gov/42971895/",
-          "date": null
+          "date": "2027 Jun 16"
         },
         {
-          "title": "PubMed · исследование 42959484",
+          "title": "Inhaled nanogels ameliorate vascular remodeling in pulmonary arterial hypertension via normalization of endothelia-smooth muscle cell crosstalk.",
           "url": "https://pubmed.ncbi.nlm.nih.gov/42959484/",
-          "date": null
+          "date": "2027 Mar"
         },
         {
-          "title": "PubMed · исследование 42936108",
+          "title": "Mitochondria-rich cytochalasomes as an intravenously deliverable vesicle platform for ischemic heart disease.",
           "url": "https://pubmed.ncbi.nlm.nih.gov/42936108/",
-          "date": null
+          "date": "2027 Mar"
         },
         {
-          "title": "PubMed · исследование 42863172",
+          "title": "Online chiral derivatization coupled with CE-MS for baseline separation of 16 proteinogenic amino acid enantiomers.",
           "url": "https://pubmed.ncbi.nlm.nih.gov/42863172/",
-          "date": null
+          "date": "2027 Mar 1"
         },
         {
-          "title": "PubMed · исследование 42815083",
+          "title": "Bioinspired ECM-mimetic peptide nanofibrous coatings promote re-endothelialization on vascular stents.",
           "url": "https://pubmed.ncbi.nlm.nih.gov/42815083/",
-          "date": null
+          "date": "2027 Mar"
         },
         {
-          "title": "PubMed · исследование 42785224",
+          "title": "Biomimetic inhalable nanovesicles for enhanced cardiac therapy of heart failure following myocardial infarction.",
           "url": "https://pubmed.ncbi.nlm.nih.gov/42785224/",
-          "date": null
+          "date": "2027 Mar"
         },
         {
-          "title": "PubMed · исследование 42753576",
+          "title": "A chrono-modulated oxygen-cycling scaffold reprograms immunometabolism to drive bone regeneration.",
           "url": "https://pubmed.ncbi.nlm.nih.gov/42753576/",
-          "date": null
+          "date": "2027 Mar"
         }
       ]
     },
@@ -205,9 +205,9 @@
       "topic": "cyber",
       "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
       "adapter": "cisa",
-      "attemptedAt": "2026-11-03T19:44:42.904440+00:00",
+      "attemptedAt": "2026-11-03T20:14:03.191352+00:00",
       "status": "ok",
-      "fetchedAt": "2026-11-03T19:44:42.904440+00:00",
+      "fetchedAt": "2026-11-03T20:14:03.191352+00:00",
       "items": [
         {
           "title": "CVE-2026-118527 · Ivanti Connect Secure Generation of Predictable Numbers or Identifiers Vulnerability",
@@ -292,9 +292,9 @@
       "topic": "science",
       "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_day.geojson",
       "adapter": "usgs",
-      "attemptedAt": "2026-11-03T19:44:44.738027+00:00",
+      "attemptedAt": "2026-11-03T20:14:05.008847+00:00",
       "status": "ok",
-      "fetchedAt": "2026-11-03T19:44:44.738027+00:00",
+      "fetchedAt": "2026-11-03T20:14:05.008847+00:00",
       "items": []
     }
   ]

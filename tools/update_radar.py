@@ -22,10 +22,14 @@ for source in registry['feeds']:
    doc=ET.fromstring(raw);ns='{http://www.w3.org/2005/Atom}'
    for n in (doc.findall('./channel/item') if kind=='rss' else doc.findall(ns+'entry'))[:15]:
     link=n.findtext('link') if kind=='rss' else next((x.get('href') for x in n.findall(ns+'link') if x.get('rel','alternate')=='alternate'),source['url'])
-    items.append({'title':n.findtext('title' if kind=='rss' else ns+'title'),'url':link,'date':n.findtext('pubDate' if kind=='rss' else ns+'published')})
+    items.append({'title':n.findtext('title' if kind=='rss' else ns+'title'),'url':link.replace('http://arxiv.org/','https://arxiv.org/'),'date':n.findtext('pubDate' if kind=='rss' else ns+'published')})
   else:
    data=json.loads(raw)
-   if kind=='pubmed':items=[{'title':'PubMed · исследование '+i,'url':'https://pubmed.ncbi.nlm.nih.gov/'+i+'/','date':None} for i in data['esearchresult']['idlist']]
+   if kind=='pubmed':
+    ids=data['esearchresult']['idlist']
+    if ids:
+     with urllib.request.urlopen('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id='+','.join(ids),timeout=18) as response: summaries=json.load(response)['result']
+     items=[{'title':summaries[i]['title'],'url':'https://pubmed.ncbi.nlm.nih.gov/'+i+'/','date':summaries[i].get('pubdate')} for i in ids]
    if kind=='cisa':items=[{'title':x['cveID']+' · '+x['vulnerabilityName'],'url':'https://www.cve.org/CVERecord?id='+x['cveID'],'date':x['dateAdded']} for x in sorted(data['vulnerabilities'],key=lambda x:x['dateAdded'],reverse=True)[:15]]
    if kind=='usgs':items=[{'title':x['properties']['title'],'url':x['properties']['url'],'date':datetime.datetime.fromtimestamp(x['properties']['time']/1000,datetime.timezone.utc).isoformat()} for x in data['features'][:15]]
   result.update(status='ok',fetchedAt=result['attemptedAt'],items=items)
