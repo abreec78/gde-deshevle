@@ -51,6 +51,8 @@ jobs:
           mkdir -p _site
           cp index.html request-app.js app.js core.js catalog-loader.js styles.css sw.js manifest.webmanifest _site/
           cp -r assets data radar _site/
+          cp _site/index.html _site/prices.html
+          printf '%s\n' '<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=radar/"><title>Радар жизни</title></head><body><a href="radar/">Открыть Радар жизни</a></body></html>' > _site/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
