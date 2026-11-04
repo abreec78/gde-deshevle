@@ -3,7 +3,7 @@
   "jurisdiction": "RU",
   "reviewedSnapshotAt": "2026-11-04",
   "collection": {
-    "attemptedAt": "2026-11-04T10:10:42.164375+00:00",
+    "attemptedAt": "2026-11-04T10:33:24.496129+00:00",
     "schedule": "Ежедневно около 09:00 МСК",
     "reviewRequired": true
   },
@@ -12,9 +12,9 @@
       "id": "cbr",
       "title": "Банк России: нормативные акты",
       "url": "https://www.cbr.ru/rss/navr",
-      "attemptedAt": "2026-11-04T10:10:42.164375+00:00",
+      "attemptedAt": "2026-11-04T10:33:24.496129+00:00",
       "status": "ok",
-      "fetchedAt": "2026-11-04T10:10:42.164375+00:00",
+      "fetchedAt": "2026-11-04T10:33:24.496129+00:00",
       "candidateCount": 19,
       "message": "Документы загружены; новые выжимки требуют проверки."
     },
@@ -22,9 +22,9 @@
       "id": "fns",
       "title": "ФНС: нормативные документы",
       "url": "https://www.nalog.gov.ru/rn77/about_fts/docs/",
-      "attemptedAt": "2026-11-04T10:10:42.164375+00:00",
+      "attemptedAt": "2026-11-04T10:33:24.496129+00:00",
       "status": "ok",
-      "fetchedAt": "2026-11-04T10:10:42.164375+00:00",
+      "fetchedAt": "2026-11-04T10:33:24.496129+00:00",
       "candidateCount": 0,
       "message": "Документы загружены; новые выжимки требуют проверки."
     },
@@ -32,7 +32,7 @@
       "id": "minzdrav",
       "title": "Минздрав: банк документов",
       "url": "https://minzdrav.gov.ru/documents",
-      "attemptedAt": "2026-11-04T10:10:42.164375+00:00",
+      "attemptedAt": "2026-11-04T10:33:24.496129+00:00",
       "status": "error",
       "message": "curl: (92) HTTP/2 stream 1 was not closed cleanly: PROTOCOL_ERROR (err 1)\n"
     },
@@ -74,7 +74,7 @@
       "summary": "Банк России изменил часть таблицы территориальных коэффициентов, используемых при расчёте ОСАГО. В документе обновлены строки по городам Новосибирской области и исключена одна из прежних строк. Это изменение расчёта страховой премии, а не единая цена полиса для всех водителей.",
       "categoryId": "auto",
       "topicIds": [
-        "auto.osago.price"
+        "auto.osago.price.territory"
       ],
       "publishedAt": "2026-06-11",
       "effectiveAt": "2026-06-22",
