@@ -4,131 +4,364 @@
   "researchedAt": "2026-11-04",
   "categories": [
     {
-      "id": "auto",
-      "title": "Автомобиль",
+      "id": "health",
+      "title": "Здоровье",
       "children": [
         {
-          "id": "auto.osago",
-          "title": "ОСАГО",
+          "id": "health.access",
+          "title": "Получение помощи",
           "children": [
             {
-              "id": "auto.osago.policy",
-              "title": "Оформление и продление"
+              "id": "health.access.oms",
+              "title": "ОМС, направления и выбор клиники"
             },
             {
-              "id": "auto.osago.price",
-              "title": "Тарифы и коэффициенты",
-              "children": [
-                {
-                  "id": "auto.osago.price.base",
-                  "title": "Базовые тарифы и расчёт"
-                },
-                {
-                  "id": "auto.osago.price.kbm",
-                  "title": "КБМ и страховая история"
-                },
-                {
-                  "id": "auto.osago.price.territory",
-                  "title": "Территориальные коэффициенты"
-                }
-              ]
+              "id": "health.access.telemedicine",
+              "title": "Телемедицина"
             },
             {
-              "id": "auto.osago.accident",
-              "title": "ДТП и европротокол",
-              "children": [
-                {
-                  "id": "auto.osago.accident.limits",
-                  "title": "Лимиты и условия европротокола"
-                },
-                {
-                  "id": "auto.osago.accident.registration",
-                  "title": "Оформление ДТП и фотофиксация"
-                }
-              ]
+              "id": "health.access.prevention",
+              "title": "Диспансеризация и профилактика"
             },
             {
-              "id": "auto.osago.payment",
-              "title": "Выплаты, ремонт и споры",
-              "children": [
-                {
-                  "id": "auto.osago.payment.money",
-                  "title": "Денежное возмещение"
-                },
-                {
-                  "id": "auto.osago.payment.repair",
-                  "title": "Ремонт и сроки"
-                },
-                {
-                  "id": "auto.osago.payment.dispute",
-                  "title": "Отказ, жалоба и финансовый уполномоченный"
-                }
-              ]
-            },
-            {
-              "id": "auto.osago.cancel",
-              "title": "Прекращение договора и возврат"
+              "id": "health.access.hightech",
+              "title": "Высокотехнологичная помощь и квоты"
             }
           ],
           "sourceIds": [
-            "cbr",
+            "minzdrav",
+            "ffoms",
             "pravo"
           ]
         },
         {
-          "id": "auto.ownership",
-          "title": "Владение автомобилем",
+          "id": "health.medicines",
+          "title": "Лекарства и медизделия",
           "children": [
             {
-              "id": "auto.ownership.register",
-              "title": "Регистрация и документы"
+              "id": "health.medicines.benefit",
+              "title": "Льготное обеспечение"
             },
             {
-              "id": "auto.ownership.inspection",
-              "title": "Техосмотр и допуск"
+              "id": "health.medicines.prescription",
+              "title": "Рецепты и отпуск"
             },
             {
-              "id": "auto.ownership.sale",
-              "title": "Покупка, продажа и утилизация"
+              "id": "health.medicines.devices",
+              "title": "Обеспечение медизделиями"
             }
           ],
           "sourceIds": [
-            "mvd",
+            "minzdrav",
+            "roszdrav",
             "pravo"
           ]
         },
         {
-          "id": "auto.driver",
-          "title": "Водитель",
-          "children": [
-            {
-              "id": "auto.driver.licence",
-              "title": "Права и медосвидетельствование"
-            },
-            {
-              "id": "auto.driver.traffic",
-              "title": "ПДД и перевозка детей"
-            },
-            {
-              "id": "auto.driver.fines",
-              "title": "Штрафы и обжалование"
-            }
-          ],
+          "id": "health.cardio",
+          "title": "Кардиология"
+        },
+        {
+          "id": "health.endocrine",
+          "title": "Эндокринология",
           "sourceIds": [
-            "mvd",
+            "minzdrav",
+            "ffoms",
+            "pravo"
+          ]
+        },
+        {
+          "id": "health.oncology",
+          "title": "Онкология"
+        },
+        {
+          "id": "health.respiratory",
+          "title": "Пульмонология"
+        },
+        {
+          "id": "health.neurology",
+          "title": "Неврология"
+        },
+        {
+          "id": "health.mental",
+          "title": "Психиатрия и психотерапия"
+        },
+        {
+          "id": "health.digestive",
+          "title": "Гастроэнтерология"
+        },
+        {
+          "id": "health.musculoskeletal",
+          "title": "Ортопедия и реабилитация"
+        },
+        {
+          "id": "health.vision",
+          "title": "Офтальмология"
+        },
+        {
+          "id": "health.hearing",
+          "title": "Оториноларингология"
+        },
+        {
+          "id": "health.dental",
+          "title": "Стоматологическая помощь"
+        },
+        {
+          "id": "health.reproductive",
+          "title": "Акушерство и гинекология"
+        },
+        {
+          "id": "health.pediatrics",
+          "title": "Педиатрия",
+          "sourceIds": [
             "minzdrav",
             "pravo"
           ]
         },
         {
-          "id": "auto.general",
-          "title": "Общие изменения для автовладельцев"
+          "id": "health.general",
+          "title": "Общие права пациентов"
         }
       ],
       "sourceIds": [
-        "cbr",
-        "pravo",
-        "mvd"
+        "minzdrav",
+        "roszdrav",
+        "ffoms",
+        "pravo"
+      ]
+    },
+    {
+      "id": "benefits",
+      "title": "Пенсии и выплаты",
+      "children": [
+        {
+          "id": "benefits.children",
+          "title": "Семьи с детьми",
+          "children": [
+            {
+              "id": "benefits.children.unified",
+              "title": "Единое пособие"
+            },
+            {
+              "id": "benefits.children.capital",
+              "title": "Материнский капитал"
+            },
+            {
+              "id": "benefits.children.birth",
+              "title": "Выплаты при рождении и уходе"
+            }
+          ]
+        },
+        {
+          "id": "benefits.pension",
+          "title": "Пенсии",
+          "children": [
+            {
+              "id": "benefits.pension.insurance",
+              "title": "Страховая пенсия и индексация"
+            },
+            {
+              "id": "benefits.pension.social",
+              "title": "Социальная пенсия и доплаты"
+            },
+            {
+              "id": "benefits.pension.working",
+              "title": "Работающие пенсионеры"
+            }
+          ]
+        },
+        {
+          "id": "benefits.disability",
+          "title": "Инвалидность",
+          "children": [
+            {
+              "id": "benefits.disability.assessment",
+              "title": "МСЭ и установление инвалидности"
+            },
+            {
+              "id": "benefits.disability.support",
+              "title": "Выплаты и средства реабилитации"
+            }
+          ]
+        },
+        {
+          "id": "benefits.general",
+          "title": "Общие условия социальной поддержки"
+        }
+      ],
+      "sourceIds": [
+        "sfr",
+        "mintrud",
+        "pravo"
+      ]
+    },
+    {
+      "id": "housing",
+      "title": "Жильё и ЖКХ",
+      "children": [
+        {
+          "id": "housing.utilities",
+          "title": "Коммунальные услуги",
+          "children": [
+            {
+              "id": "housing.utilities.bills",
+              "title": "Начисления и перерасчёт"
+            },
+            {
+              "id": "housing.utilities.meter",
+              "title": "Счётчики и нормативы"
+            },
+            {
+              "id": "housing.utilities.quality",
+              "title": "Качество услуг и права при отключении"
+            }
+          ]
+        },
+        {
+          "id": "housing.building",
+          "title": "Дом и управление",
+          "children": [
+            {
+              "id": "housing.building.repair",
+              "title": "Капремонт и общее имущество"
+            },
+            {
+              "id": "housing.building.management",
+              "title": "УК, ТСЖ и собрания"
+            }
+          ]
+        },
+        {
+          "id": "housing.rights",
+          "title": "Жилищные права",
+          "children": [
+            {
+              "id": "housing.rights.ownership",
+              "title": "Оформление и сделки"
+            },
+            {
+              "id": "housing.rights.rent",
+              "title": "Аренда и наём"
+            },
+            {
+              "id": "housing.rights.support",
+              "title": "Субсидии и жилищная поддержка"
+            }
+          ]
+        },
+        {
+          "id": "housing.general",
+          "title": "Общие жилищные изменения"
+        }
+      ],
+      "sourceIds": [
+        "minstroy",
+        "pravo"
+      ]
+    },
+    {
+      "id": "work",
+      "title": "Работа",
+      "children": [
+        {
+          "id": "work.contract",
+          "title": "Трудовой договор",
+          "children": [
+            {
+              "id": "work.contract.hiring",
+              "title": "Приём и условия труда"
+            },
+            {
+              "id": "work.contract.remote",
+              "title": "Удалённая работа"
+            },
+            {
+              "id": "work.contract.dismissal",
+              "title": "Увольнение и сокращение"
+            }
+          ]
+        },
+        {
+          "id": "work.pay",
+          "title": "Оплата и отдых",
+          "children": [
+            {
+              "id": "work.pay.salary",
+              "title": "Зарплата, МРОТ и задержки"
+            },
+            {
+              "id": "work.pay.holiday",
+              "title": "Отпуска и рабочее время"
+            },
+            {
+              "id": "work.pay.sick",
+              "title": "Больничные и страховые выплаты"
+            }
+          ]
+        },
+        {
+          "id": "work.safety",
+          "title": "Охрана труда и медосмотры"
+        },
+        {
+          "id": "work.employment",
+          "title": "Безработица и переобучение"
+        },
+        {
+          "id": "work.general",
+          "title": "Общие трудовые права"
+        }
+      ],
+      "sourceIds": [
+        "mintrud",
+        "rostrud",
+        "pravo"
+      ]
+    },
+    {
+      "id": "family",
+      "title": "Семья",
+      "children": [
+        {
+          "id": "family.children",
+          "title": "Родители и дети",
+          "children": [
+            {
+              "id": "family.children.birth",
+              "title": "Рождение и документы"
+            },
+            {
+              "id": "family.children.leave",
+              "title": "Декрет и отпуск по уходу"
+            },
+            {
+              "id": "family.children.support",
+              "title": "Алименты и содержание детей"
+            }
+          ]
+        },
+        {
+          "id": "family.guardianship",
+          "title": "Опека и усыновление"
+        },
+        {
+          "id": "family.marriage",
+          "title": "Брак и семейное имущество"
+        },
+        {
+          "id": "family.documents",
+          "title": "Паспорт, регистрация и ЗАГС"
+        },
+        {
+          "id": "family.general",
+          "title": "Общие изменения для семьи"
+        }
+      ],
+      "sourceIds": [
+        "mintrud",
+        "sfr",
+        "mvd",
+        "pravo"
       ]
     },
     {
@@ -270,430 +503,6 @@
       ]
     },
     {
-      "id": "housing",
-      "title": "Жильё и ЖКХ",
-      "children": [
-        {
-          "id": "housing.utilities",
-          "title": "Коммунальные услуги",
-          "children": [
-            {
-              "id": "housing.utilities.bills",
-              "title": "Начисления и перерасчёт"
-            },
-            {
-              "id": "housing.utilities.meter",
-              "title": "Счётчики и нормативы"
-            },
-            {
-              "id": "housing.utilities.quality",
-              "title": "Качество услуг и права при отключении"
-            }
-          ]
-        },
-        {
-          "id": "housing.building",
-          "title": "Дом и управление",
-          "children": [
-            {
-              "id": "housing.building.repair",
-              "title": "Капремонт и общее имущество"
-            },
-            {
-              "id": "housing.building.management",
-              "title": "УК, ТСЖ и собрания"
-            }
-          ]
-        },
-        {
-          "id": "housing.rights",
-          "title": "Жилищные права",
-          "children": [
-            {
-              "id": "housing.rights.ownership",
-              "title": "Оформление и сделки"
-            },
-            {
-              "id": "housing.rights.rent",
-              "title": "Аренда и наём"
-            },
-            {
-              "id": "housing.rights.support",
-              "title": "Субсидии и жилищная поддержка"
-            }
-          ]
-        },
-        {
-          "id": "housing.general",
-          "title": "Общие жилищные изменения"
-        }
-      ],
-      "sourceIds": [
-        "minstroy",
-        "pravo"
-      ]
-    },
-    {
-      "id": "health",
-      "title": "Здоровье",
-      "children": [
-        {
-          "id": "health.access",
-          "title": "Получение помощи",
-          "children": [
-            {
-              "id": "health.access.oms",
-              "title": "ОМС, направления и выбор клиники"
-            },
-            {
-              "id": "health.access.telemedicine",
-              "title": "Телемедицина"
-            },
-            {
-              "id": "health.access.prevention",
-              "title": "Диспансеризация и профилактика"
-            },
-            {
-              "id": "health.access.hightech",
-              "title": "Высокотехнологичная помощь и квоты"
-            }
-          ],
-          "sourceIds": [
-            "minzdrav",
-            "ffoms",
-            "pravo"
-          ]
-        },
-        {
-          "id": "health.medicines",
-          "title": "Лекарства и медизделия",
-          "children": [
-            {
-              "id": "health.medicines.benefit",
-              "title": "Льготное обеспечение"
-            },
-            {
-              "id": "health.medicines.prescription",
-              "title": "Рецепты и отпуск"
-            },
-            {
-              "id": "health.medicines.devices",
-              "title": "Обеспечение медизделиями"
-            }
-          ],
-          "sourceIds": [
-            "minzdrav",
-            "roszdrav",
-            "pravo"
-          ]
-        },
-        {
-          "id": "health.cardio",
-          "title": "Кардиология"
-        },
-        {
-          "id": "health.endocrine",
-          "title": "Эндокринология",
-          "sourceIds": [
-            "minzdrav",
-            "ffoms",
-            "pravo"
-          ]
-        },
-        {
-          "id": "health.oncology",
-          "title": "Онкология"
-        },
-        {
-          "id": "health.respiratory",
-          "title": "Пульмонология"
-        },
-        {
-          "id": "health.neurology",
-          "title": "Неврология"
-        },
-        {
-          "id": "health.mental",
-          "title": "Психиатрия и психотерапия"
-        },
-        {
-          "id": "health.digestive",
-          "title": "Гастроэнтерология"
-        },
-        {
-          "id": "health.musculoskeletal",
-          "title": "Ортопедия и реабилитация"
-        },
-        {
-          "id": "health.vision",
-          "title": "Офтальмология"
-        },
-        {
-          "id": "health.hearing",
-          "title": "Оториноларингология"
-        },
-        {
-          "id": "health.dental",
-          "title": "Стоматологическая помощь"
-        },
-        {
-          "id": "health.reproductive",
-          "title": "Акушерство и гинекология"
-        },
-        {
-          "id": "health.pediatrics",
-          "title": "Педиатрия",
-          "sourceIds": [
-            "minzdrav",
-            "pravo"
-          ]
-        },
-        {
-          "id": "health.general",
-          "title": "Общие права пациентов"
-        }
-      ],
-      "sourceIds": [
-        "minzdrav",
-        "roszdrav",
-        "ffoms",
-        "pravo"
-      ]
-    },
-    {
-      "id": "work",
-      "title": "Работа",
-      "children": [
-        {
-          "id": "work.contract",
-          "title": "Трудовой договор",
-          "children": [
-            {
-              "id": "work.contract.hiring",
-              "title": "Приём и условия труда"
-            },
-            {
-              "id": "work.contract.remote",
-              "title": "Удалённая работа"
-            },
-            {
-              "id": "work.contract.dismissal",
-              "title": "Увольнение и сокращение"
-            }
-          ]
-        },
-        {
-          "id": "work.pay",
-          "title": "Оплата и отдых",
-          "children": [
-            {
-              "id": "work.pay.salary",
-              "title": "Зарплата, МРОТ и задержки"
-            },
-            {
-              "id": "work.pay.holiday",
-              "title": "Отпуска и рабочее время"
-            },
-            {
-              "id": "work.pay.sick",
-              "title": "Больничные и страховые выплаты"
-            }
-          ]
-        },
-        {
-          "id": "work.safety",
-          "title": "Охрана труда и медосмотры"
-        },
-        {
-          "id": "work.employment",
-          "title": "Безработица и переобучение"
-        },
-        {
-          "id": "work.general",
-          "title": "Общие трудовые права"
-        }
-      ],
-      "sourceIds": [
-        "mintrud",
-        "rostrud",
-        "pravo"
-      ]
-    },
-    {
-      "id": "family",
-      "title": "Семья",
-      "children": [
-        {
-          "id": "family.children",
-          "title": "Родители и дети",
-          "children": [
-            {
-              "id": "family.children.birth",
-              "title": "Рождение и документы"
-            },
-            {
-              "id": "family.children.leave",
-              "title": "Декрет и отпуск по уходу"
-            },
-            {
-              "id": "family.children.support",
-              "title": "Алименты и содержание детей"
-            }
-          ]
-        },
-        {
-          "id": "family.guardianship",
-          "title": "Опека и усыновление"
-        },
-        {
-          "id": "family.marriage",
-          "title": "Брак и семейное имущество"
-        },
-        {
-          "id": "family.documents",
-          "title": "Паспорт, регистрация и ЗАГС"
-        },
-        {
-          "id": "family.general",
-          "title": "Общие изменения для семьи"
-        }
-      ],
-      "sourceIds": [
-        "mintrud",
-        "sfr",
-        "mvd",
-        "pravo"
-      ]
-    },
-    {
-      "id": "business",
-      "title": "Бизнес и самозанятость",
-      "children": [
-        {
-          "id": "business.status",
-          "title": "Форма деятельности",
-          "children": [
-            {
-              "id": "business.status.npd",
-              "title": "Самозанятость и НПД"
-            },
-            {
-              "id": "business.status.ip",
-              "title": "Регистрация и прекращение ИП"
-            }
-          ]
-        },
-        {
-          "id": "business.taxes",
-          "title": "Налоги и отчётность",
-          "children": [
-            {
-              "id": "business.taxes.usn",
-              "title": "УСН и АУСН"
-            },
-            {
-              "id": "business.taxes.patent",
-              "title": "Патент"
-            },
-            {
-              "id": "business.taxes.vat",
-              "title": "НДС"
-            },
-            {
-              "id": "business.taxes.contributions",
-              "title": "Взносы и отчётность"
-            }
-          ]
-        },
-        {
-          "id": "business.cash",
-          "title": "Касса, чеки и расчёты"
-        },
-        {
-          "id": "business.staff",
-          "title": "Работники и обязанности работодателя"
-        },
-        {
-          "id": "business.control",
-          "title": "Проверки, разрешения и маркировка"
-        },
-        {
-          "id": "business.general",
-          "title": "Общие изменения для малого бизнеса"
-        }
-      ],
-      "sourceIds": [
-        "fns",
-        "economy",
-        "pravo"
-      ]
-    },
-    {
-      "id": "benefits",
-      "title": "Пенсии и выплаты",
-      "children": [
-        {
-          "id": "benefits.children",
-          "title": "Семьи с детьми",
-          "children": [
-            {
-              "id": "benefits.children.unified",
-              "title": "Единое пособие"
-            },
-            {
-              "id": "benefits.children.capital",
-              "title": "Материнский капитал"
-            },
-            {
-              "id": "benefits.children.birth",
-              "title": "Выплаты при рождении и уходе"
-            }
-          ]
-        },
-        {
-          "id": "benefits.pension",
-          "title": "Пенсии",
-          "children": [
-            {
-              "id": "benefits.pension.insurance",
-              "title": "Страховая пенсия и индексация"
-            },
-            {
-              "id": "benefits.pension.social",
-              "title": "Социальная пенсия и доплаты"
-            },
-            {
-              "id": "benefits.pension.working",
-              "title": "Работающие пенсионеры"
-            }
-          ]
-        },
-        {
-          "id": "benefits.disability",
-          "title": "Инвалидность",
-          "children": [
-            {
-              "id": "benefits.disability.assessment",
-              "title": "МСЭ и установление инвалидности"
-            },
-            {
-              "id": "benefits.disability.support",
-              "title": "Выплаты и средства реабилитации"
-            }
-          ]
-        },
-        {
-          "id": "benefits.general",
-          "title": "Общие условия социальной поддержки"
-        }
-      ],
-      "sourceIds": [
-        "sfr",
-        "mintrud",
-        "pravo"
-      ]
-    },
-    {
       "id": "consumer",
       "title": "Покупки и права",
       "children": [
@@ -783,6 +592,197 @@
       "sourceIds": [
         "rkn",
         "digital",
+        "pravo"
+      ]
+    },
+    {
+      "id": "auto",
+      "title": "Автомобиль",
+      "children": [
+        {
+          "id": "auto.osago",
+          "title": "ОСАГО",
+          "children": [
+            {
+              "id": "auto.osago.policy",
+              "title": "Оформление и продление"
+            },
+            {
+              "id": "auto.osago.price",
+              "title": "Тарифы и коэффициенты",
+              "children": [
+                {
+                  "id": "auto.osago.price.base",
+                  "title": "Базовые тарифы и расчёт"
+                },
+                {
+                  "id": "auto.osago.price.kbm",
+                  "title": "КБМ и страховая история"
+                },
+                {
+                  "id": "auto.osago.price.territory",
+                  "title": "Территориальные коэффициенты"
+                }
+              ]
+            },
+            {
+              "id": "auto.osago.accident",
+              "title": "ДТП и европротокол",
+              "children": [
+                {
+                  "id": "auto.osago.accident.limits",
+                  "title": "Лимиты и условия европротокола"
+                },
+                {
+                  "id": "auto.osago.accident.registration",
+                  "title": "Оформление ДТП и фотофиксация"
+                }
+              ]
+            },
+            {
+              "id": "auto.osago.payment",
+              "title": "Выплаты, ремонт и споры",
+              "children": [
+                {
+                  "id": "auto.osago.payment.money",
+                  "title": "Денежное возмещение"
+                },
+                {
+                  "id": "auto.osago.payment.repair",
+                  "title": "Ремонт и сроки"
+                },
+                {
+                  "id": "auto.osago.payment.dispute",
+                  "title": "Отказ, жалоба и финансовый уполномоченный"
+                }
+              ]
+            },
+            {
+              "id": "auto.osago.cancel",
+              "title": "Прекращение договора и возврат"
+            }
+          ],
+          "sourceIds": [
+            "cbr",
+            "pravo"
+          ]
+        },
+        {
+          "id": "auto.ownership",
+          "title": "Владение автомобилем",
+          "children": [
+            {
+              "id": "auto.ownership.register",
+              "title": "Регистрация и документы"
+            },
+            {
+              "id": "auto.ownership.inspection",
+              "title": "Техосмотр и допуск"
+            },
+            {
+              "id": "auto.ownership.sale",
+              "title": "Покупка, продажа и утилизация"
+            }
+          ],
+          "sourceIds": [
+            "mvd",
+            "pravo"
+          ]
+        },
+        {
+          "id": "auto.driver",
+          "title": "Водитель",
+          "children": [
+            {
+              "id": "auto.driver.licence",
+              "title": "Права и медосвидетельствование"
+            },
+            {
+              "id": "auto.driver.traffic",
+              "title": "ПДД и перевозка детей"
+            },
+            {
+              "id": "auto.driver.fines",
+              "title": "Штрафы и обжалование"
+            }
+          ],
+          "sourceIds": [
+            "mvd",
+            "minzdrav",
+            "pravo"
+          ]
+        },
+        {
+          "id": "auto.general",
+          "title": "Общие изменения для автовладельцев"
+        }
+      ],
+      "sourceIds": [
+        "cbr",
+        "pravo",
+        "mvd"
+      ]
+    },
+    {
+      "id": "business",
+      "title": "Бизнес и самозанятость",
+      "children": [
+        {
+          "id": "business.status",
+          "title": "Форма деятельности",
+          "children": [
+            {
+              "id": "business.status.npd",
+              "title": "Самозанятость и НПД"
+            },
+            {
+              "id": "business.status.ip",
+              "title": "Регистрация и прекращение ИП"
+            }
+          ]
+        },
+        {
+          "id": "business.taxes",
+          "title": "Налоги и отчётность",
+          "children": [
+            {
+              "id": "business.taxes.usn",
+              "title": "УСН и АУСН"
+            },
+            {
+              "id": "business.taxes.patent",
+              "title": "Патент"
+            },
+            {
+              "id": "business.taxes.vat",
+              "title": "НДС"
+            },
+            {
+              "id": "business.taxes.contributions",
+              "title": "Взносы и отчётность"
+            }
+          ]
+        },
+        {
+          "id": "business.cash",
+          "title": "Касса, чеки и расчёты"
+        },
+        {
+          "id": "business.staff",
+          "title": "Работники и обязанности работодателя"
+        },
+        {
+          "id": "business.control",
+          "title": "Проверки, разрешения и маркировка"
+        },
+        {
+          "id": "business.general",
+          "title": "Общие изменения для малого бизнеса"
+        }
+      ],
+      "sourceIds": [
+        "fns",
+        "economy",
         "pravo"
       ]
     },

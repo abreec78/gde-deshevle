@@ -3,8 +3,8 @@ import org.json.*;
 import java.net.URI;
 import java.util.*;
 final class Feed {
- static final String[] IDS={"auto","education","tax","housing","health","work","family","business","benefits","consumer","digital","environment"};
- static final String[] NAMES={"Автомобиль","Школа и образование","Налоги","Жильё и ЖКХ","Здоровье","Работа","Семья","Бизнес и самозанятость","Пенсии и выплаты","Покупки и права","Связь и данные","Экология"};
+ static final String[] IDS={"health","benefits","housing","work","family","education","tax","consumer","digital","auto","business","environment"};
+ static final String[] NAMES={"Здоровье","Пенсии и выплаты","Жильё и ЖКХ","Работа","Семья","Школа и образование","Налоги","Покупки и права","Связь и данные","Автомобиль","Бизнес и самозанятость","Экология"};
  static List<JSONObject> parse(String json) throws Exception {
  JSONObject root=new JSONObject(json); if((root.optInt("schemaVersion")!=1&&root.optInt("schemaVersion")!=2)||!"RU".equals(root.optString("jurisdiction")))throw new Exception("Unsupported feed");
  List<JSONObject> out=new ArrayList<>(); Set<String> seen=new HashSet<>(); JSONArray a=root.getJSONArray("items");
