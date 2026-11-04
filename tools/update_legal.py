@@ -33,6 +33,8 @@ def collect(source):
     candidates.append({"id":"cbr-"+item.findtext("guid"),"title":name,"sourceUrl":link,"categoryId":category,"publishedAt":date.date().isoformat(),"reviewState":"needs_review"})
   else:
    html=raw.decode("utf-8")
+   expected=r"/about_fts/docs/[0-9]+" if sid=="fns" else r"/documents/[0-9]+"
+   if not re.search(expected,html):raise ValueError("Официальный список документов не распознан; импорт не подтверждён")
    for href,body in re.findall(r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)</a>',html,re.I|re.S):
     name=" ".join(unescape(re.sub("<[^>]+>"," ",body)).split());link=urljoin(url,unescape(href));category=classify(name)
     host=urlparse(link).hostname

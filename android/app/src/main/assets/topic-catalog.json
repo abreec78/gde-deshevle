@@ -17,20 +17,62 @@
             },
             {
               "id": "auto.osago.price",
-              "title": "Тарифы и коэффициенты"
+              "title": "Тарифы и коэффициенты",
+              "children": [
+                {
+                  "id": "auto.osago.price.base",
+                  "title": "Базовые тарифы и расчёт"
+                },
+                {
+                  "id": "auto.osago.price.kbm",
+                  "title": "КБМ и страховая история"
+                },
+                {
+                  "id": "auto.osago.price.territory",
+                  "title": "Территориальные коэффициенты"
+                }
+              ]
             },
             {
               "id": "auto.osago.accident",
-              "title": "ДТП и европротокол"
+              "title": "ДТП и европротокол",
+              "children": [
+                {
+                  "id": "auto.osago.accident.limits",
+                  "title": "Лимиты и условия европротокола"
+                },
+                {
+                  "id": "auto.osago.accident.registration",
+                  "title": "Оформление ДТП и фотофиксация"
+                }
+              ]
             },
             {
               "id": "auto.osago.payment",
-              "title": "Выплаты, ремонт и споры"
+              "title": "Выплаты, ремонт и споры",
+              "children": [
+                {
+                  "id": "auto.osago.payment.money",
+                  "title": "Денежное возмещение"
+                },
+                {
+                  "id": "auto.osago.payment.repair",
+                  "title": "Ремонт и сроки"
+                },
+                {
+                  "id": "auto.osago.payment.dispute",
+                  "title": "Отказ, жалоба и финансовый уполномоченный"
+                }
+              ]
             },
             {
               "id": "auto.osago.cancel",
               "title": "Прекращение договора и возврат"
             }
+          ],
+          "sourceIds": [
+            "cbr",
+            "pravo"
           ]
         },
         {
@@ -49,6 +91,10 @@
               "id": "auto.ownership.sale",
               "title": "Покупка, продажа и утилизация"
             }
+          ],
+          "sourceIds": [
+            "mvd",
+            "pravo"
           ]
         },
         {
@@ -67,6 +113,11 @@
               "id": "auto.driver.fines",
               "title": "Штрафы и обжалование"
             }
+          ],
+          "sourceIds": [
+            "mvd",
+            "minzdrav",
+            "pravo"
           ]
         },
         {
@@ -306,6 +357,11 @@
               "id": "health.access.hightech",
               "title": "Высокотехнологичная помощь и квоты"
             }
+          ],
+          "sourceIds": [
+            "minzdrav",
+            "ffoms",
+            "pravo"
           ]
         },
         {
@@ -324,77 +380,33 @@
               "id": "health.medicines.devices",
               "title": "Обеспечение медизделиями"
             }
+          ],
+          "sourceIds": [
+            "minzdrav",
+            "roszdrav",
+            "pravo"
           ]
         },
         {
           "id": "health.cardio",
-          "title": "Сердце и сосуды",
-          "children": [
-            {
-              "id": "health.cardio.followup",
-              "title": "Наблюдение и доступ к помощи"
-            },
-            {
-              "id": "health.cardio.recovery",
-              "title": "Помощь после инфаркта и инсульта"
-            }
-          ]
+          "title": "Кардиология"
         },
         {
           "id": "health.endocrine",
           "title": "Эндокринология",
-          "children": [
-            {
-              "id": "health.endocrine.diabetes",
-              "title": "Сахарный диабет",
-              "children": [
-                {
-                  "id": "health.endocrine.diabetes.adult",
-                  "title": "Помощь взрослым"
-                },
-                {
-                  "id": "health.endocrine.diabetes.child",
-                  "title": "Помощь детям"
-                },
-                {
-                  "id": "health.endocrine.diabetes.supply",
-                  "title": "Лекарства и средства контроля"
-                }
-              ]
-            },
-            {
-              "id": "health.endocrine.thyroid",
-              "title": "Щитовидная железа и другие эндокринные болезни"
-            }
+          "sourceIds": [
+            "minzdrav",
+            "ffoms",
+            "pravo"
           ]
         },
         {
           "id": "health.oncology",
-          "title": "Онкология",
-          "children": [
-            {
-              "id": "health.oncology.treatment",
-              "title": "Доступ к обследованию и лечению"
-            },
-            {
-              "id": "health.oncology.followup",
-              "title": "Наблюдение и реабилитация"
-            }
-          ]
+          "title": "Онкология"
         },
         {
           "id": "health.respiratory",
-          "title": "Дыхательная система",
-          "children": [
-            {
-              "id": "health.respiratory.asthma",
-              "title": "Астма и ХОБЛ"
-            },
-            {
-              "id": "health.respiratory.infection",
-              "title": "Инфекционные заболевания и профилактика"
-            }
-          ]
+          "title": "Пульмонология"
         },
         {
           "id": "health.neurology",
@@ -402,19 +414,23 @@
         },
         {
           "id": "health.mental",
-          "title": "Психическое здоровье"
+          "title": "Психиатрия и психотерапия"
         },
         {
           "id": "health.digestive",
-          "title": "Пищеварительная система"
+          "title": "Гастроэнтерология"
         },
         {
           "id": "health.musculoskeletal",
-          "title": "Суставы, кости и реабилитация"
+          "title": "Ортопедия и реабилитация"
         },
         {
           "id": "health.vision",
-          "title": "Зрение и слух"
+          "title": "Офтальмология"
+        },
+        {
+          "id": "health.hearing",
+          "title": "Оториноларингология"
         },
         {
           "id": "health.dental",
@@ -422,15 +438,15 @@
         },
         {
           "id": "health.reproductive",
-          "title": "Беременность и репродуктивное здоровье"
+          "title": "Акушерство и гинекология"
         },
         {
           "id": "health.pediatrics",
-          "title": "Педиатрия"
-        },
-        {
-          "id": "health.rare",
-          "title": "Орфанные заболевания и господдержка"
+          "title": "Педиатрия",
+          "sourceIds": [
+            "minzdrav",
+            "pravo"
+          ]
         },
         {
           "id": "health.general",
@@ -796,5 +812,6 @@
         "pravo"
       ]
     }
-  ]
+  ],
+  "catalogRevision": 2
 }
