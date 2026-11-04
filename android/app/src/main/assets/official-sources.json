@@ -1,0 +1,170 @@
+[
+  {
+    "id": "cbr",
+    "title": "Банк России",
+    "url": "https://www.cbr.ru/analytics/na_vr/",
+    "categories": [
+      "auto"
+    ]
+  },
+  {
+    "id": "fns",
+    "title": "ФНС России",
+    "url": "https://www.nalog.gov.ru/rn77/about_fts/docs/",
+    "categories": [
+      "tax",
+      "business"
+    ]
+  },
+  {
+    "id": "minzdrav",
+    "title": "Минздрав России",
+    "url": "https://minzdrav.gov.ru/documents",
+    "categories": [
+      "health"
+    ]
+  },
+  {
+    "id": "pravo",
+    "title": "Официальное опубликование",
+    "url": "https://publication.pravo.gov.ru/",
+    "categories": [
+      "auto",
+      "education",
+      "tax",
+      "housing",
+      "health",
+      "work",
+      "family",
+      "business",
+      "benefits",
+      "consumer",
+      "digital",
+      "environment"
+    ]
+  },
+  {
+    "id": "mvd",
+    "title": "МВД России",
+    "url": "https://мвд.рф/",
+    "categories": [
+      "auto",
+      "family"
+    ]
+  },
+  {
+    "id": "edu",
+    "title": "Минпросвещения России",
+    "url": "https://edu.gov.ru/",
+    "categories": [
+      "education"
+    ]
+  },
+  {
+    "id": "obrnadzor",
+    "title": "Рособрнадзор",
+    "url": "https://obrnadzor.gov.ru/",
+    "categories": [
+      "education"
+    ]
+  },
+  {
+    "id": "minobrnauki",
+    "title": "Минобрнауки России",
+    "url": "https://minobrnauki.gov.ru/",
+    "categories": [
+      "education"
+    ]
+  },
+  {
+    "id": "minstroy",
+    "title": "Минстрой России",
+    "url": "https://minstroyrf.gov.ru/",
+    "categories": [
+      "housing"
+    ]
+  },
+  {
+    "id": "roszdrav",
+    "title": "Росздравнадзор",
+    "url": "https://roszdravnadzor.gov.ru/",
+    "categories": [
+      "health"
+    ]
+  },
+  {
+    "id": "ffoms",
+    "title": "ФФОМС",
+    "url": "https://www.ffoms.gov.ru/",
+    "categories": [
+      "health"
+    ]
+  },
+  {
+    "id": "mintrud",
+    "title": "Минтруд России",
+    "url": "https://mintrud.gov.ru/",
+    "categories": [
+      "work",
+      "family",
+      "benefits"
+    ]
+  },
+  {
+    "id": "rostrud",
+    "title": "Роструд",
+    "url": "https://rostrud.gov.ru/",
+    "categories": [
+      "work"
+    ]
+  },
+  {
+    "id": "sfr",
+    "title": "Социальный фонд России",
+    "url": "https://sfr.gov.ru/",
+    "categories": [
+      "benefits",
+      "family"
+    ]
+  },
+  {
+    "id": "economy",
+    "title": "Минэкономразвития России",
+    "url": "https://economy.gov.ru/",
+    "categories": [
+      "business"
+    ]
+  },
+  {
+    "id": "rospotreb",
+    "title": "Роспотребнадзор",
+    "url": "https://rospotrebnadzor.ru/",
+    "categories": [
+      "consumer"
+    ]
+  },
+  {
+    "id": "rkn",
+    "title": "Роскомнадзор",
+    "url": "https://rkn.gov.ru/",
+    "categories": [
+      "digital"
+    ]
+  },
+  {
+    "id": "digital",
+    "title": "Минцифры России",
+    "url": "https://digital.gov.ru/",
+    "categories": [
+      "digital"
+    ]
+  },
+  {
+    "id": "nature",
+    "title": "Минприроды России",
+    "url": "https://mnr.gov.ru/",
+    "categories": [
+      "environment"
+    ]
+  }
+]

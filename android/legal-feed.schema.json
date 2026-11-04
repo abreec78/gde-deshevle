@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "jurisdiction",
+    "items"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "jurisdiction": {
+      "const": "RU"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "jurisdiction",
+          "kind",
+          "reviewed",
+          "title",
+          "summary",
+          "categoryId",
+          "publishedAt",
+          "sourceUrl",
+          "topicIds"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "jurisdiction": {
+            "const": "RU"
+          },
+          "kind": {
+            "const": "normative_act"
+          },
+          "reviewed": {
+            "const": true
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "categoryId": {
+            "enum": [
+              "auto",
+              "education",
+              "tax",
+              "housing",
+              "health",
+              "work",
+              "family",
+              "business",
+              "benefits",
+              "consumer",
+              "digital",
+              "environment"
+            ]
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveAt": {
+            "type": "string"
+          },
+          "sourceUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "topicIds": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

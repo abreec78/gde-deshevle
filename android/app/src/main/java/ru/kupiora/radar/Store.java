@@ -1,0 +1,13 @@
+package ru.kupiora.radar;
+import android.content.*;import org.json.*;import java.util.*;
+final class Store {
+ static android.content.SharedPreferences prefs(Context c){return c.getSharedPreferences("radar",0);}
+ static synchronized Set<String> selected(Context c){Catalog.init(c);android.content.SharedPreferences p=prefs(c);Set<String> saved=p.getStringSet("topicSelectionV1",null);if(saved!=null)return new HashSet<>(saved);Set<String> old=p.getStringSet("categories",new HashSet<>(Arrays.asList(Feed.IDS)));Set<String> result=new HashSet<>();for(String id:old)result.addAll(Catalog.leaves(id));p.edit().putStringSet("topicSelectionV1",result).apply();return result;}
+ static Set<String> enabled(Context c){Set<String> chosen=selected(c),result=new HashSet<>();for(String id:Feed.IDS)if(count(chosen,id)>0)result.add(id);return result;}
+ static int count(Set<String> chosen,String id){int n=0;for(String leaf:Catalog.leaves(id))if(chosen.contains(leaf))n++;return n;}
+ static synchronized void toggle(Context c,String id,boolean on){Set<String>s=selected(c);if(on)s.addAll(Catalog.leaves(id));else s.removeAll(Catalog.leaves(id));prefs(c).edit().putStringSet("topicSelectionV1",s).apply();}
+ static void all(Context c){Catalog.init(c);Set<String>s=new HashSet<>();for(String id:Feed.IDS)s.addAll(Catalog.leaves(id));prefs(c).edit().putStringSet("topicSelectionV1",s).apply();}
+ static boolean matches(Context c,JSONObject item){return matchesSelection(selected(c),item);}
+ static boolean matchesSelection(Set<String> chosen,JSONObject item){JSONArray tags=item.optJSONArray("topicIds");String category=item.optString("categoryId");if(tags==null||tags.length()==0){List<String> leaves=Catalog.leaves(category);return !leaves.isEmpty()&&chosen.containsAll(leaves);}for(int i=0;i<tags.length();i++){String tag=tags.optString(i);if(!tag.startsWith(category+"."))continue;for(String leaf:Catalog.leaves(tag))if(chosen.contains(leaf))return true;}return false;}
+ static String feed(Context c){String cached=prefs(c).getString("feed",null);if(cached!=null)return cached;try(java.io.InputStream in=c.getAssets().open("legal-feed.json")){java.io.ByteArrayOutputStream o=new java.io.ByteArrayOutputStream();byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1)o.write(b,0,n);return o.toString("UTF-8");}catch(Exception e){return "{\"schemaVersion\":2,\"jurisdiction\":\"RU\",\"items\":[]}";}}
+}
