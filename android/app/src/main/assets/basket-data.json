@@ -1,0 +1,214 @@
+{
+  "period": "2026-04",
+  "periodLabel": "Апрель 2026",
+  "verifiedAt": "2026-11-04",
+  "status": "archive",
+  "indicator": "Условный (минимальный) набор продуктов питания",
+  "sources": [
+    {
+      "title": "Татарстанстат · доклад за апрель 2026",
+      "url": "https://16.rosstat.gov.ru/storage/mediabank/Комплексный%20доклад_04_2026.pdf"
+    },
+    {
+      "title": "Северо-Кавказстат · Ставропольский край, апрель 2026",
+      "url": "https://26.rosstat.gov.ru/storage/mediabank/наборы%20апрель(1).pdf"
+    },
+    {
+      "title": "Северо-Кавказстат · КБР, апрель 2026",
+      "url": "https://26.rosstat.gov.ru/storage/mediabank/Стоимость%20и%20изменение%20стоимости%20минимального%20и%20фиксированного%20наборов%20потребительских%20товаров%20по%20КБР%20в%20апреле%202026г..pdf"
+    }
+  ],
+  "regions": [
+    {
+      "name": "Россия",
+      "amount": 7762.2,
+      "sourceIndices": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "Ставропольский край",
+      "amount": 7973.57,
+      "sourceIndices": [
+        1
+      ]
+    },
+    {
+      "name": "Кабардино-Балкарская Республика",
+      "amount": 7232.25,
+      "sourceIndices": [
+        2
+      ]
+    }
+  ],
+  "compositionSource": "https://12.rosstat.gov.ru/storage/mediabank/88%20МЕТОДОЛОГИЧЕСКИЕ%20ПОЯСНЕНИЯ.htm",
+  "items": [
+    {
+      "name": "Говядина",
+      "annualQuantity": 15,
+      "unit": "кг"
+    },
+    {
+      "name": "Свинина",
+      "annualQuantity": 4,
+      "unit": "кг"
+    },
+    {
+      "name": "Баранина",
+      "annualQuantity": 1.8,
+      "unit": "кг"
+    },
+    {
+      "name": "Куры",
+      "annualQuantity": 14,
+      "unit": "кг"
+    },
+    {
+      "name": "Рыба мороженая",
+      "annualQuantity": 14,
+      "unit": "кг"
+    },
+    {
+      "name": "Сельдь солёная",
+      "annualQuantity": 0.7,
+      "unit": "кг"
+    },
+    {
+      "name": "Масло сливочное",
+      "annualQuantity": 1.8,
+      "unit": "кг"
+    },
+    {
+      "name": "Масло подсолнечное",
+      "annualQuantity": 7,
+      "unit": "кг"
+    },
+    {
+      "name": "Маргарин",
+      "annualQuantity": 6,
+      "unit": "кг"
+    },
+    {
+      "name": "Молоко пастеризованное",
+      "annualQuantity": 110,
+      "unit": "л"
+    },
+    {
+      "name": "Сметана",
+      "annualQuantity": 1.8,
+      "unit": "кг"
+    },
+    {
+      "name": "Творог",
+      "annualQuantity": 10,
+      "unit": "кг"
+    },
+    {
+      "name": "Сыры",
+      "annualQuantity": 2.5,
+      "unit": "кг"
+    },
+    {
+      "name": "Яйца",
+      "annualQuantity": 180,
+      "unit": "шт."
+    },
+    {
+      "name": "Сахар",
+      "annualQuantity": 20,
+      "unit": "кг"
+    },
+    {
+      "name": "Мука пшеничная",
+      "annualQuantity": 20,
+      "unit": "кг"
+    },
+    {
+      "name": "Хлеб ржаной и ржано-пшеничный",
+      "annualQuantity": 115,
+      "unit": "кг"
+    },
+    {
+      "name": "Хлеб и булочные изделия из пшеничной муки",
+      "annualQuantity": 75,
+      "unit": "кг"
+    },
+    {
+      "name": "Рис",
+      "annualQuantity": 5,
+      "unit": "кг"
+    },
+    {
+      "name": "Пшено",
+      "annualQuantity": 6,
+      "unit": "кг"
+    },
+    {
+      "name": "Горох и фасоль",
+      "annualQuantity": 7.3,
+      "unit": "кг"
+    },
+    {
+      "name": "Вермишель",
+      "annualQuantity": 6,
+      "unit": "кг"
+    },
+    {
+      "name": "Картофель",
+      "annualQuantity": 150,
+      "unit": "кг"
+    },
+    {
+      "name": "Капуста",
+      "annualQuantity": 35,
+      "unit": "кг"
+    },
+    {
+      "name": "Морковь",
+      "annualQuantity": 35,
+      "unit": "кг"
+    },
+    {
+      "name": "Огурцы",
+      "annualQuantity": 1.8,
+      "unit": "кг"
+    },
+    {
+      "name": "Лук",
+      "annualQuantity": 20,
+      "unit": "кг"
+    },
+    {
+      "name": "Яблоки",
+      "annualQuantity": 18.6,
+      "unit": "кг"
+    },
+    {
+      "name": "Печенье",
+      "annualQuantity": 0.7,
+      "unit": "кг"
+    },
+    {
+      "name": "Карамель",
+      "annualQuantity": 0.7,
+      "unit": "кг"
+    },
+    {
+      "name": "Чай чёрный",
+      "annualQuantity": 0.5,
+      "unit": "кг"
+    },
+    {
+      "name": "Соль",
+      "annualQuantity": 3.65,
+      "unit": "кг"
+    },
+    {
+      "name": "Сухие приправы и специи",
+      "annualQuantity": 0.73,
+      "unit": "кг"
+    }
+  ]
+}

@@ -4,7 +4,10 @@
     "title": "Банк России",
     "url": "https://www.cbr.ru/analytics/na_vr/",
     "categories": [
-      "auto"
+      "auto",
+      "consumer",
+      "housing",
+      "business"
     ]
   },
   {
@@ -121,7 +124,7 @@
   {
     "id": "sfr",
     "title": "Социальный фонд России",
-    "url": "https://sfr.gov.ru/",
+    "url": "https://sfr.gov.ru/order/",
     "categories": [
       "benefits",
       "family"
