@@ -9,7 +9,7 @@ final class Catalog {
  static List<String> leaves(String id){List<String> out=new ArrayList<>();Topic t=index.get(id);if(t!=null){if(t.leaf())out.add(t.id);else for(Topic x:t.children)out.addAll(leaves(x.id));}return out;}
  static Set<String> normalizeSelection(java.util.Collection<String> saved,boolean legacyHealth){Set<String> result=new HashSet<>();for(String id:saved){if(id.equals("health.rare")){result.add("health.medicines.benefit");continue;}String current=id;while(!index.containsKey(current)&&current.contains(".")){current=current.substring(0,current.lastIndexOf('.'));if(!current.contains(".")&&!index.containsKey(id)){current="";break;}}result.addAll(leaves(current));if(legacyHealth&&id.equals("health.vision"))result.add("health.hearing");}return result;}
  static String rootId(String id){return id.split("\\.")[0];}
- static String parent(String id){int p=id.lastIndexOf('.');return p<0?"settings":"topic:"+id.substring(0,p);}
+ static String parent(String id){int p=id.lastIndexOf('.');return p<0?"topics":"topic:"+id.substring(0,p);}
  static List<String> sourcesFor(String id){String current=id;while(!current.isEmpty()){Topic t=index.get(current);if(t!=null&&!t.sourceIds.isEmpty())return t.sourceIds;int p=current.lastIndexOf('.');if(p<0)break;current=current.substring(0,p);}return java.util.Collections.emptyList();}
  static String title(String id){Topic t=index.get(id);return t==null?id:t.title;}
 }
