@@ -2,10 +2,10 @@ package ru.kupiora.radar;
 import android.app.*;import android.app.job.*;import android.content.*;import android.os.*;import org.json.*;import java.util.*;
 public class SyncJob extends JobService {
  static final String CHANNEL="official_changes";
- static void schedule(Context c){((JobScheduler)c.getSystemService(JOB_SCHEDULER_SERVICE)).schedule(new JobInfo.Builder(101,new ComponentName(c,SyncJob.class)).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setPeriodic(24*60*60*1000L).setPersisted(true).build());}
+ static void schedule(Context c){JobScheduler scheduler=(JobScheduler)c.getSystemService(JOB_SCHEDULER_SERVICE);JobInfo existing=scheduler.getPendingJob(101);if(existing!=null&&existing.getIntervalMillis()==24*60*60*1000L)return;scheduler.schedule(new JobInfo.Builder(101,new ComponentName(c,SyncJob.class)).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setPeriodic(24*60*60*1000L).setPersisted(true).build());}
  public boolean onStartJob(JobParameters p){sync(this,()->jobFinished(p,false));return true;}
  public boolean onStopJob(JobParameters p){return true;}
- static void sync(Context c,Runnable done){new Thread(()->{try{
+ static void sync(Context c,Runnable done){new Thread(()->{Store.prefs(c).edit().putLong("last_attempt",System.currentTimeMillis()).apply();try{
  // Set only after a reviewed normative feed is deployed. Do not reuse the general news feed.
  Catalog.init(c);String endpoint=Store.prefs(c).getString("feed_endpoint","https://kupiora.ru/radar/legal-feed.json");if(endpoint.isEmpty())throw new Exception("Поток официальных изменений ещё не подключён");
  java.net.URL url=new java.net.URL(endpoint);if(!url.getProtocol().equals("https"))throw new Exception("Требуется HTTPS");
