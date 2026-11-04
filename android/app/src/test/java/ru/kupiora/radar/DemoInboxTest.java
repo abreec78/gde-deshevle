@@ -1,0 +1,8 @@
+package ru.kupiora.radar;
+import org.junit.Test;import org.json.*;import java.time.*;import java.util.*;import static org.junit.Assert.*;
+public class DemoInboxTest {
+ long now=ZonedDateTime.of(2026,11,4,16,0,0,0,ZoneId.of("Europe/Moscow")).toInstant().toEpochMilli();
+ @Test public void weekCoversAllCategoriesWithMixedReadStates()throws Exception{JSONArray a=DemoInbox.build(new JSONArray(),now,ZoneId.of("Europe/Moscow"));assertEquals(24,a.length());assertEquals(12,Inbox.unread(a));Set<String> cats=new HashSet<>();for(int i=0;i<a.length();i++){JSONObject x=a.getJSONObject(i);assertTrue(x.getBoolean("test"));assertTrue(x.getBoolean("demoWeek"));assertFalse(x.has("sourceUrl"));assertTrue(x.getLong("createdAt")<now);long days=java.time.temporal.ChronoUnit.DAYS.between(Instant.ofEpochMilli(x.getLong("createdAt")).atZone(ZoneId.of("Europe/Moscow")).toLocalDate(),Instant.ofEpochMilli(now).atZone(ZoneId.of("Europe/Moscow")).toLocalDate());assertTrue(days>=1&&days<=7);cats.add(x.getString("categoryId"));}assertEquals(12,cats.size());}
+ @Test public void reloadingDoesNotDuplicateAndRemovalKeepsRealHistory()throws Exception{JSONArray original=new JSONArray().put(new JSONObject().put("id","real").put("read",false));JSONArray a=DemoInbox.build(original,now,ZoneId.of("Europe/Moscow"));JSONArray b=DemoInbox.build(a,now,ZoneId.of("Europe/Moscow"));assertEquals(25,b.length());JSONArray removed=DemoInbox.remove(b);assertEquals(1,removed.length());assertEquals("real",removed.getJSONObject(0).getString("id"));}
+ @Test public void readCanBeReversed()throws Exception{JSONArray a=new JSONArray().put(new JSONObject().put("id","1").put("read",true));assertEquals(1,Inbox.unread(Inbox.setRead(a,"1",false)));}
+}

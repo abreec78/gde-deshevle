@@ -1,0 +1,12 @@
+package ru.kupiora.radar;
+import android.content.Context;import org.json.*;import java.time.*;import java.util.*;
+final class DemoInbox {
+ static final String PREFIX="demo-week:";
+ static final String[] TOPICS={"Порядок получения медицинской помощи","Условия социальной поддержки","Правила коммунальных начислений","Оплата труда и отпуск","Семейные документы","Приём и обучение","Декларирование и вычеты","Возврат товаров и услуг","Связь и персональные данные","ОСАГО и документы водителя","Отчётность и расчёты","Правила обращения с отходами"};
+ static JSONArray remove(JSONArray old){JSONArray out=new JSONArray();for(int i=0;i<old.length();i++){JSONObject x=old.optJSONObject(i);if(x!=null&&!(x.optBoolean("demoWeek")&&x.optString("id").startsWith(PREFIX)))out.put(x);}return out;}
+ static JSONArray build(JSONArray old,long now,ZoneId zone)throws Exception {List<JSONObject> records=new ArrayList<>();JSONArray retained=remove(old);for(int i=0;i<retained.length();i++)records.add(retained.getJSONObject(i));ZonedDateTime base=Instant.ofEpochMilli(now).atZone(zone);
+ for(int i=0;i<Feed.IDS.length;i++)for(int j=0;j<2;j++){int days=(i+j*3)%7+1;long timestamp=base.minusDays(days).withHour(10+j*5).withMinute(i*3).withSecond(0).withNano(0).toInstant().toEpochMilli();JSONObject x=new JSONObject().put("id",PREFIX+Feed.IDS[i]+":"+j).put("categoryId",Feed.IDS[i]).put("categoryTitle",Feed.NAMES[i]).put("title",TOPICS[i]+" · пример "+(j+1)).put("body","Демонстрационный пример для проверки интерфейса. Это не реальное изменение закона: дата условная, официального документа у примера нет. Здесь можно проверить прочитанность и счётчик уведомлений.").put("demoWeek",true).put("test",true).put("read",j==1).put("createdAt",timestamp);records.add(x);}
+ records.sort((a,b)->Long.compare(b.optLong("createdAt"),a.optLong("createdAt")));JSONArray out=new JSONArray();for(JSONObject x:records)out.put(x);return out;}
+ static synchronized void seed(Context c){try{JSONArray data=build(Inbox.load(c),System.currentTimeMillis(),ZoneId.systemDefault());Store.prefs(c).edit().putString(Inbox.KEY,data.toString()).commit();SyncJob.notify(c,101,"ДЕМО · примеры за неделю","Добавлено 24 демонстрационных уведомления по всем направлениям. Это не реальные правовые изменения.");}catch(Exception e){android.widget.Toast.makeText(c,"Не удалось загрузить примеры",android.widget.Toast.LENGTH_LONG).show();}}
+ static synchronized void clear(Context c){Store.prefs(c).edit().putString(Inbox.KEY,remove(Inbox.load(c)).toString()).commit();SyncJob.updateSystemBadge(c);}
+}
