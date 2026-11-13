@@ -1,0 +1,25 @@
+'use strict';
+const {chromium}=require('playwright');
+const assert=require('node:assert/strict');
+(async()=>{
+ const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+ const page=await browser.newPage({viewport:{width:1365,height:900}});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const response=await page.goto('http://kupiora.ru/?diagnose=20261031',{waitUntil:'domcontentloaded',timeout:20000});
+ assert.equal(response.status(),200);
+ console.log('PUBLIC HOME',page.url(),'title',await page.title());
+ console.log('PUBLIC HOME SOURCE',await page.locator('#search-form').getAttribute('action'));
+ console.log('PUBLIC CATALOGUE COUNT',await page.locator('.product-card').count());
+ await page.locator('#q').fill('https://www.wildberries.ru/catalog/247318779/detail.aspx');
+ await page.locator('#search-form button[type=submit]').click();
+ await page.waitForURL(/results\.html\?q=/,{timeout:15000});
+ console.log('PUBLIC RESULT PAGE',page.url());
+ console.log('PUBLIC TITLE',await page.locator('#product-title').textContent());
+ await page.waitForFunction(()=>document.getElementById('status').textContent.includes('не подключён'),{timeout:10000});
+ console.log('PUBLIC STATUS',await page.locator('#status').textContent());
+ console.log('PUBLIC OFFERS',await page.locator('.result-offer').count());
+ console.log('PUBLIC API CHECK',await page.evaluate(async()=>{const r=await fetch('/api/status');return {status:r.status,contentType:r.headers.get('content-type'),body:(await r.text()).slice(0,80)}}));
+ console.log('JS ERRORS',JSON.stringify(errors));
+ assert.deepEqual(errors,[]);
+ await browser.close();
+})().catch(e=>{console.error('PUBLIC BROWSER FAILED',e);process.exitCode=1});
