@@ -1,0 +1,55 @@
+name: Compare published Kupiora with repository
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/check-published-site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Compare deployed HTML, redirects, DNS, TLS and cache headers
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,urllib.error,hashlib,subprocess
+          api=f'https://api.github.com/repos/{__import__("os").environ["GITHUB_REPOSITORY"]}/pages'
+          req=urllib.request.Request(api,headers={'Authorization':'Bearer '+__import__('os').environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          try:
+              r=json.load(urllib.request.urlopen(req,timeout=15))
+              print('PAGES',json.dumps({k:r.get(k) for k in ['url','html_url','cname','status','https_available','https_enforced','build_type']},ensure_ascii=False))
+          except Exception as e:print('PAGES ERROR',str(e))
+          for host in ['kupiora.ru','www.kupiora.ru','abreec78.github.io']:
+              for t in ['A','AAAA','CNAME']:
+                  p=subprocess.run(['dig','+short',host,t],capture_output=True,text=True)
+                  print('DNS',host,t,p.stdout.strip() or 'empty')
+          local=open('index.html','rb').read()
+          print('LOCAL',len(local),hashlib.sha256(local).hexdigest()[:18],'results.html' in local.decode('utf8'))
+          for url in ['http://kupiora.ru/','https://kupiora.ru/','https://abreec78.github.io/gde-deshevle/','http://kupiora.ru/results.html','https://abreec78.github.io/gde-deshevle/results.html','http://kupiora.ru/sw.js']:
+              proc=subprocess.run(['curl','-k','-L','-sS','--max-time','12','-w','\n__STATUS__%{http_code}|%{url_effective}|%{content_type}|%{ssl_verify_result}','-H','Cache-Control: no-cache','-H','Pragma: no-cache',url],capture_output=True)
+              data=proc.stdout.split(b'\n__STATUS__',1)
+              body=data[0];meta=data[1].decode(errors='replace') if len(data)>1 else 'no status'
+              print('FETCH',url,'CODE',proc.returncode,'META',meta,'BYTES',len(body),'HASH',hashlib.sha256(body).hexdigest()[:18],'HAS_RESULTS_ROUTE',b'results.html' in body,'HAS_LEGACY',b'compare-any.html' in body)
+              if proc.returncode:print('ERROR',proc.stderr.decode(errors='replace')[:400])
+          PY
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install Chromium
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Verify real published search in browser
+        run: node tests/browser-public.cjs
